@@ -182,6 +182,7 @@ def parse_coach_career(coach_name, coach_path, team_path):
     # For each year in their career
     prev_franchise_abrev = None
     is_head_coach = False
+    previous_year_check = None
     year = 0
     for row in dfs[2].itertuples(index=False):
         level = classify_level(row[3])
@@ -192,7 +193,8 @@ def parse_coach_career(coach_name, coach_path, team_path):
             is_head_coach = False
             feature_dict["demotion_presence"] = 1
             prev_year = rows[-1][1]
-            rows[-1].append(classify_coach_tenure(year - prev_year))
+            math_year = previous_year_check + 1 if year != previous_year_check + 1 else year
+            rows[-1].append(classify_coach_tenure(math_year - prev_year))
 
         if level == "College":
             if role == "Position":
@@ -244,7 +246,8 @@ def parse_coach_career(coach_name, coach_path, team_path):
                         # Not first time hire, previous career to calculate
                         if len(rows) != 0 and len(rows[-1]) == 28:
                             prev_year = rows[-1][1]
-                            rows[-1].append(classify_coach_tenure(year - prev_year))
+                            math_year = previous_year_check + 1 if year != previous_year_check + 1 else year
+                            rows[-1].append(classify_coach_tenure(math_year - prev_year))
 
                         # Adding the data
                         new_row = [coach_name, year] + [value if key not in feature_transform_dict else feature_transform_dict[key](value) for key, value in feature_dict.items()]
@@ -259,6 +262,7 @@ def parse_coach_career(coach_name, coach_path, team_path):
                     feature_dict["num_times_hc"] += 1
                     feature_dict["num_yr_nfl_hc"] += 1
                     # Add
+        previous_year_check = year
     
     #Handle final hire length if not demotion
     if len(rows) != 0 and len(rows[-1]) == 28:
@@ -285,6 +289,7 @@ def parse_coach_career(coach_name, coach_path, team_path):
     for i in range(0, len(rows)):
         if len(rows[i]) != 29:
             print('Error: {} {}'.format(coach_name, rows[i]))
+    #print(feature_dict)
     #print(rows)
     return rows
 
@@ -303,12 +308,12 @@ def main():
         for new_row in parse_coach_career(coach_name, coach_path, team_path):
             master_data.append(new_row)
         count += 1
-        """if count == 20:
+        """if count == 6:
             break"""
     df = pd.DataFrame(data=master_data, columns=get_point_features())
     df.to_csv("master_data.csv")
     df.to_feather("master_data.feather")
-    print(len(master_data))
+    print('Parsed {} Hiring Instances'.format(len(master_data)))
 
 if __name__ == "__main__":
     main()
