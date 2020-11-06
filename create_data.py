@@ -248,7 +248,6 @@ def parse_coach_career(coach_name, coach_path, team_path):
                             prev_year = rows[-1][1]
                             math_year = previous_year_check + 1 if year != previous_year_check + 1 else year
                             rows[-1].append(classify_coach_tenure(math_year - prev_year))
-
                         # Adding the data
                         new_row = [coach_name, year] + [value if key not in feature_transform_dict else feature_transform_dict[key](value) for key, value in feature_dict.items()]
                         new_row += get_hiring_team_stats(franchise_abrev, year, team_path)
@@ -256,10 +255,10 @@ def parse_coach_career(coach_name, coach_path, team_path):
                         
                         # add a row
                         rows.append(new_row)
+                        feature_dict["num_times_hc"] += 1
                     feature_dict["nfl_hc_norm_yard"].append(get_norm_val(dfs[1].loc[dfs[1]['Year'] == year]['Yds±'].values[0], num_teams_in_league))
                     feature_dict["nfl_hc_norm_point"].append(get_norm_val(dfs[1].loc[dfs[1]['Year'] == year]['Pts±'].values[0], num_teams_in_league))
                     feature_dict["nfl_hc_norm_turnover"].append(get_norm_val(dfs[1].loc[dfs[1]['Year'] == year]['T/G'].values[0], num_teams_in_league))
-                    feature_dict["num_times_hc"] += 1
                     feature_dict["num_yr_nfl_hc"] += 1
                     # Add
         previous_year_check = year
