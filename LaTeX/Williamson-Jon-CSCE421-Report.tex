@@ -33,10 +33,10 @@ machine learning, neural networks, prediction methods, supervised learning, unsu
 \end{IEEEkeywords}
 
 \section{Introduction}
-Although the NFL is not publicly traded, evaluation of its teams suggests that it is worth over \$91 billion dollars \cite{b1}.  Equivalently, the average NFL franchise is worth \$2.86 billion dollars \cite{b1}. Despite these large evaluations, hiring successful head coaches is anything but repeatable in the NFL. In 2016, the median head coach tenure in position was three years \cite{b2}. Although this length is marginally better than other sports leagues \cite{b2}, comparing the average top job tenure to public sector best practice shows immense area for improvement. A publicly traded company that changed CEOs at this rate would have an extremely volatile stock price and
-likely decreased stock demand \cite{b3}. Moreover, successful head coach hiring is tremendously valuable, as a differentiated NFL head coach can bring about lasting success and divisional dominance, increasing the historical importance of a franchise and its bottom line. A machine learning model that can increase the hit percentage of head coaching hires has the potential to add immense value to NFL franchises.
+Although the NFL is not publicly traded, evaluation of its teams suggests that it is worth over \$91 billion dollars \cite{b1}.  Equivalently, the average NFL franchise is worth \$2.86 billion dollars \cite{b1}. Despite these large evaluations, hiring successful head coaches is anything but repeatable in the NFL. In 2016, the median head coach tenure in position was three years \cite{b2}. Although this length is marginally better than other sports leagues \cite{b2}, comparing the average top job tenure to public sector best practice shows immense area for improvement. A publicly traded company that changed CEOs at this rate would have an extremely volatile stock price and likely decreased stock demand \cite{b3}. In this analogy, the general manager is the entire Board of Directors. Moreover, successful head coach hiring is tremendously valuable, as a differentiated NFL head coach can bring about lasting success and divisional dominance, subsequently increasing the historical importance of a franchise and improving its bottom line. A machine learning model that can increase the hit percentage of head coaching hires has the potential to add immense value to NFL franchises. This project attempts to predict two outcomes of head coach hires: the average two-year winning percent and the hire tenure, using three machine learning approaches.
 
 \section{Literature Review}
+There have been no journal publications that attempt to predict the success of NFL coaching hires through statistical learning techniques. Currently, the NFL is only beginning to implement AI in play calling prediction \cite{b4}. Additionally, there are few papers that examine the impact of individual features on NFL head coaching success. Source \cite{b5} used a linear regression with seven features to attempt to predict the number of wins of head coaches in their first three years in order to understand if prior NFL head coaching experience impacts success in position. This paper found that a previous head coaching experience had a negative impact on the success of new head coaches. Despite this finding, the model supported an adjusted $R^2$ of only $0.336$. This low value does not instill confidence in its findings or feature weights. Additionally, the lack of regularization and the small number of features further decrease confidence in the findings. Source \cite{b6} reviews research in sports economics and suggests that hiring decisions made solely on playing success are unlikely to be optimal given financial (conditional) inequality among sports franchises. 
 
 \section{Problem Formulation}
 
@@ -253,15 +253,12 @@ For papers published in translation journals, please give the English
 citation first, followed by the original foreign-language citation \cite{b6}.
 
 \begin{thebibliography}{00}
-\bibitem{b1} T. Barrabi, ``What is the NFL Worth? Revenue, Team Values and Other Financial Facts,'' Fox Business. https://www.foxbusiness.com/sports/nfl-worthrevenue-team-values (accessed Oct. 26, 2020)
-\bibitem{b2} C. Gaines, ``NFL Head Coaches Have Good Job Security When Compared To Other Major Sports Leagues,'' Business Insider. https://www.businessinsider.com/coaches-managers-tenure-nfl-mlb-nba-nhl-premier-league-2016-12 (accessed Oct. 26, 2020)
-\bibitem{b3} ``How Does a Change in CEO Impact Stock Price?,'' Investopedia. https://www.investopedia.com/ask/answers/010815/how-does-change-ceo-impact-stock-price.asp (accessed Nov. 18, 2020)
-
-
-\bibitem{b4} K. Elissa, ``Title of paper if known,'' unpublished.
-\bibitem{b5} R. Nicole, ``Title of paper with only first word capitalized,'' J. Name Stand. Abbrev., in press.
-\bibitem{b6} Y. Yorozu, M. Hirano, K. Oka, and Y. Tagawa, ``Electron spectroscopy studies on magneto-optical media and plastic substrate interface,'' IEEE Transl. J. Magn. Japan, vol. 2, pp. 740--741, August 1987 [Digests 9th Annual Conf. Magnetics Japan, p. 301, 1982].
-\bibitem{b7} M. Young, The Technical Writer's Handbook. Mill Valley, CA: University Science, 1989.
+\bibitem{b1} T. Barrabi, ``What is the NFL worth? Revenue, team values and other financial facts,'' Fox Business. https://www.foxbusiness.com/sports/nfl-worthrevenue-team-values (accessed Oct. 26, 2020)
+\bibitem{b2} C. Gaines, ``NFL head coaches have good job security when compared to other major sports leagues,'' Business Insider. https://www.businessinsider.com/coaches-managers-tenure-nfl-mlb-nba-nhl-premier-league-2016-12 (accessed Oct. 26, 2020)
+\bibitem{b3} ``How does a change in CEO impact stock price?,'' Investopedia. https://www.investopedia.com/ask/answers/010815/how-does-change-ceo-impact-stock-price.asp (accessed Nov. 18, 2020)
+\bibitem{b4} ``Using machine learning to peek inside the minds of NFL coaches,'' DataRobot. https://www.datarobot.com/blog/using-machine-learning-to-peek-inside-the-minds-of-nfl-coaches/ (accessed Oct. 26, 2020)
+\bibitem{b5} M. Roach, ``Does prior NFL head coaching experience improve team performance?,'' in Journal of Sport Management, vol. 30, no. 3, pp. 298-311.
+\bibitem{b6} D. Mielke, ``Coaching experience, playing experience, and coaching tenure: a commentary,'' in International Journal of Sports Science \& Coaching, vol. 2, no. 2, pp. 117-118.
 \end{thebibliography}
 \vspace{12pt}
 \color{red}
