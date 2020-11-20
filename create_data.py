@@ -189,7 +189,7 @@ def parse_coach_career(coach_name, coach_path, team_path):
         role = classify_role(row[5])
         year = row[1]
         
-        if is_head_coach and (level == 'College' or role != "Head Coach"):
+        if is_head_coach and (level == 'College' or level == 'None' or role != "Head Coach"):
             is_head_coach = False
             feature_dict["demotion_presence"] = 1
             prev_year = rows[-1][1]
@@ -311,7 +311,7 @@ def main():
             break"""
     df = pd.DataFrame(data=master_data, columns=get_point_features())
     df.to_csv("master_data.csv")
-    df.to_feather("master_data.feather")
+    #df.to_feather("master_data.feather")
     print('Parsed {} Hiring Instances'.format(len(master_data)))
 
 if __name__ == "__main__":
