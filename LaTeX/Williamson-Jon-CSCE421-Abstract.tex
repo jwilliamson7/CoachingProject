@@ -1,0 +1,173 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{Predicting the Average Two-Year Win Probability and Hire Tenure of NFL Head Coach Hires: Three Approaches}
+
+\author{\IEEEauthorblockN{Jon C. Williamson}
+\IEEEauthorblockA{\textit{Dept. of Computer Science \& Engineering} \\
+\textit{Texas A\&M University}\\
+College Station, TX, USA \\
+jonwilliamson@tamu.edu}
+}
+
+\maketitle
+
+\section{Introduction}
+In the NFL, successful head coach hiring is tremendously valuable, as a differentiated head coach can bring about lasting success and divisional dominance, subsequently increasing the historical importance of a franchise and improving its top line. A machine learning model that can increase the hit probability of head coaching hires has the potential to add immense value to NFL franchises.
+
+\section{Methods}
+Using statistics available at the time of hiring, this project attempts to predict two outcomes of head coach hires: the average two-year winning percent and the hire tenure, using three machine learning approaches: regularized linear models, XGBoost models, and Multi-layer perceptron models. This project uses root mean squared error and macro-averaged one-versus-rest area under the receiver operating characteristic curve to measure model performance for the regressors and classifiers, respectively. The tenure of a coach hire is defined as the number of years the hired coach remains in the same position before being fired, leaving, or retiring. Equation \eqref{eq2} shows the mapping between the coach tenure, $t$, and the four coach tenure classification labels, $C(t)$.
+\begin{equation}
+        C(t)=
+        \begin{cases}
+            0 &t \leq 2 		\\
+            1 &2 < t \leq 4 \\
+            2 &4 < t \leq 7 \\
+            3 &t > 7
+        \end{cases}
+        \label{eq2}
+\end{equation}
+
+Table \ref{tab1} shows the 25 features used. Features 1-18 are characteristics of head coaches at time of hiring, while features 19-25 are characteristics of the hiring team. Features 10-18 and 20-23 reference average normalized team ranks in different categories. This rank normalization also allows coaches across eras to be compared, as performance is purely comparative to other teams in the same era. 
+
+\begin{table}[htbp]
+\caption{Model Feature List}
+\begin{center}
+\begin{tabular}{|c||l|}
+\hline
+\textbf{No.} & \textbf{Description} \\
+\hline
+\hline
+1 & Age at hiring \\
+\hline
+2 & Number of times previously hired as head coach \\
+\hline
+3 & Number of years’ experience as college position coach \\
+\hline
+4 & Number of years’ experience as college coordinator \\
+\hline
+5 & Number of years’ experience as college head coach \\
+\hline
+6 & Number of years’ experience as NFL position coach \\
+\hline
+7 & Number of years’ experience as NFL coordinator \\
+\hline
+8 & Number of years’ experience as NFL head coach \\
+\hline
+9 & Demotion presence in hiring history \\
+\hline
+10 & During years as NFL OC, team’s avg. norm. yardage rank \\
+\hline
+11 & During years as NFL OC, team’s avg. norm. point rank \\
+\hline
+12 & During years as NFL OC, team’s avg. norm. giveaway rank \\
+\hline
+13 & During years as NFL DC, team’s avg. norm. yardage rank \\
+\hline
+14 & During years as NFL DC, team’s avg. norm. point rank \\
+\hline
+15 & During years as NFL DC, team’s avg. norm. turnover rank \\
+\hline
+16 & During years as NFL HC, team’s avg. norm. yardage differential\\
+&rank \\
+\hline
+17 & During years as NFL HC, team’s avg. norm. point differential \\
+&rank \\
+\hline
+18 & During years as NFL HC, team’s avg. norm. turnover ratio rank \\
+\hline
+19 & Hiring team’s avg. winning percent in previous two years \\
+\hline
+20 & Hiring team’s avg. norm. turnover ratio rank in previous two \\
+&years \\
+\hline
+21 & Hiring team’s avg. norm. point differential rank in previous\\
+& two years \\
+\hline
+22 & Hiring team’s avg. norm. yard differential rank in previous\\
+&two years \\
+\hline
+23 & Hiring team’s avg. norm. divisional placement in previous two\\
+&years \\
+\hline
+24 & Hiring team’s number of playoff appearances in previous\\
+&two years \\
+\hline
+25 & Hiring team’s number of playoff wins in previous two years \\
+\hline
+\end{tabular}
+\label{tab1}
+\end{center}
+\end{table}
+
+Raw data was collected by scraping pro-football-reference.com. The crawling script extracted three performance tables for all head coaches in the database and two performance tables for all franchises in the database. All data is mean-imputed prior to being fed into any model.
+
+
+\section{Results}
+Table \ref{cum1} compares the results of the three implementations for both models. All regression models showed poor RMSE performance when compared to predicting the expected value. All classification models showed better performance when compared to predicting the expected value.
+
+\begin{table}[htbp]
+\caption{Prediction Result Comparison}
+\begin{center}
+\begin{tabular}{|c||c|c|c|}
+\hline
+\textbf{Winning Probability} & \multicolumn{3}{|c|}{\textbf{RMSE}}\\
+\cline{2-4} 
+\textbf{Data Set} & \textbf{Reg. Lin.} &  \textbf{XGBR} &  \textbf{MLPR} \\
+\hline
+\hline
+Train & 0.192 & 0.171 & 0.189\\
+\hline
+Test & 0.199 & 0.200 & 0.206 \\
+\hline
+Validation & 0.222 & 0.227 & 0.224 \\
+\hline
+Validation, Expected Outcome$^{\mathrm{1}}$ & \multicolumn{3}{|c|}{0.233} \\
+\hline
+\end{tabular}
+\label{cum1}
+\end{center}
+
+\begin{center}
+\begin{tabular}{|c||c|c|c|}
+\hline
+\textbf{Tenure Classification} & \multicolumn{3}{|c|}{\textbf{OVR AUROC}}\\
+\cline{2-4} 
+\textbf{Data Set} & \textbf{Reg. Log.} &  \textbf{XGBC} &  \textbf{MLPC} \\
+\hline
+\hline
+Train & 0.706 & 0.972 & 0.787\\
+\hline
+Test & 0.620 & 0.671 & 0.638 \\
+\hline
+Validation & 0.593 & 0.669 & 0.621 \\
+\hline
+Validation, Expected Outcome$^{\mathrm{1}}$ & \multicolumn{3}{|c|}{0.500} \\
+\hline
+\multicolumn{2}{l}{$^{\mathrm{1}}$Not influenced by any model.}
+\end{tabular}
+\label{cum2}
+\end{center}
+\end{table} 
+
+\section{Conclusions}
+The three winning probability prediction models showed poor performance when compared to predicting the expected value. The best RMSE value was $0.222$, equivalent to predicting the number of won games in a 17 game season to within $\pm3.77$ wins. These findings suggest that the features in this project, largely driven by characteristics of the head coach, are not sufficient to predict a team's winning probability.
+
+The coach tenure classification models showed significantly better performance than predicting the most prevalent class. These results suggest that the features in this project have some ability to predict the tenure of head coach hires. Additionally, the regularized logistic regression and the XGBoost classifier showed that characteristics of successful hiring teams were important in determining coaches with longer tenures, suggesting that successful franchises may be better at evaluating head coach candidates. Future iterations of these models could provide significant value to NFL franchises by increasing the likelihood of successful head coach hires.
+
+\begin{thebibliography}{00}
+\bibitem{b7} Pedregosa et al., ``Scikit-learn: machine learning in Python,'' in Journal of Machine Learning Research, vol. 12, pp.2825-2830.
+\bibitem{b8} T. Chen, and C. Guestrin, ``XGBoost: a scalable tree boosting system,'' in KDD '16: Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, pp.785-794.
+\end{thebibliography}
+
+\end{document}
