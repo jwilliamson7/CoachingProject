@@ -1,3 +1,4 @@
+from multiprocessing.sharedctypes import Value
 import requests
 import urllib.request
 import time
@@ -48,12 +49,14 @@ def scrape_team_data(url):
     years = []
     for row in rows:
         years.append(row[0])
-    scrape_team_yearly_stats(base_url + url, years, start)
+    end_time = scrape_team_yearly_stats(base_url + url, years, start)
 
     #Saves the output of the team record data (which primarily includes ranks)
     df = pd.DataFrame(data=rows, columns=headers)
     df.to_csv(table_name + ".csv")
     df.to_feather(table_name + ".feather")
+
+    check_time_and_pause(end_time, time.time_ns())
     scrape_team_playoff_data(url)
     os.chdir('../')
 
@@ -64,47 +67,110 @@ def scrape_team_yearly_stats(url, years, start_time):
     team_rows = []
     opponent_rows = []
     count = 1
+    headers = [
+        'Year',
+        'PF (Points For)',
+        'Yds',
+        'Offensive Plays',
+        'Y/P',
+        'TO',
+        'FL+',
+        '1stD',
+        'Cmp Passing',
+        'Att Passing',
+        'Yds Passing',
+        'TD Passing',
+        'Int Passing',
+        'NY/A Passing',
+        '1stD Passing',
+        'Att Rushing',
+        'Yds Rushing',
+        'TD Rushing',
+        'Y/A Rushing',
+        '1stD Rushing',
+        'Pen',
+        'Yds Penalties',
+        '1stPy',
+        '#Dr',
+        'Sc%',
+        'TO%',
+        'Start Average Drive',
+        'Time Average Drive',
+        'Plays Average Drive',
+        'Yds Average Drive',
+        'Pts Average Drive',
+        '3DAtt',
+        '3DConv',
+        '3D%',
+        '4DAtt',
+        '4DConv',
+        '4D%',
+        'RZAtt',
+        'RZTD',
+        'RZPct',
+        ]
+
     for year in years:
+        print("Scraping year %s" % (year))
         #Checks the time to prevent too frequent of requests
         check_time_and_pause(start_time, time.time_ns())
         response = requests.get(base_url + '/' + year + '.htm')
         start_time = time.time_ns()
 
         soup = BeautifulSoup(response.text, 'lxml')
+
+        #Pulls the "Team stats and Rankings" table
         table = soup.find('div', {'id':'div_team_stats'}).find('table')
+        #Pulls the "Team Conversions" table
+        table2 = None
+        if int(year) > 1998:
+            table2 = soup.find('div', {'id':'div_team_conversions'}).find('table')
+
         #pulls the table headers for the first website call
+        """
         if count == 1:
-            duplicate_names = ['', 'Passing', 'Rushing', 'Penalties', 'Average Drive']
+            duplicate_names = ['', ' Passing', ' Rushing', ' Penalties', ' Average Drive']
             header_count = 0
+            #Table headers from table 1
             for th in table.find_all("th"):
                 class_list = th.get('class')
                 if class_list != None and "poptip" in class_list:
                     text = th.text.strip() + duplicate_names[header_count]
                     if text in headers:
                         header_count += 1 
-                    headers.append(text)
-            headers.pop(1)
-            print(headers)
+                        text = th.text.strip() + duplicate_names[header_count]
+                    if text != "Player":
+                        headers.append(text)
+            #table headers from table 2
+            for th in table2.find_all("th"):
+                class_list = th.get('class')
+                if class_list != None and "poptip" in class_list:
+                    text = th.text.strip()
+                    if text != "Player":
+                        headers.append(text)
+        """
         row_number = 0
         for tr in table.find('tbody').find_all('tr')[0:2]:
             row = [year]            
             for td in tr.find_all('td'):
-                row.append(td.text.strip())
+                row.append(td.text.strip())    
+            if table2 != None:
+                tr2 = table2.find('tbody').find_all('tr')[row_number]
+                for td2 in tr2.find_all('td'):
+                    row.append(td2.text.strip())
+            else:
+                row.append('' * 9)
             if row_number == 0:
                 team_rows.append(row)
             else:
                 opponent_rows.append(row)
             row_number += 1
-            print(row)
         count += 1
-        
-        #delete after
-        break
     df = pd.DataFrame(data=team_rows, columns=headers)
     df.to_csv("yearly_team_stats.csv")
     df = pd.DataFrame(data=opponent_rows, columns=headers)
     df.to_csv("yearly_opponent_stats.csv")
-
+    return time.time_ns()
 
 
 def scrape_team_playoff_data(url):
@@ -157,7 +223,6 @@ def parse_active_teams():
     os.chdir('Teams')
     url = 'https://www.pro-football-reference.com/teams/'
     response = requests.get(url)
-
     soup = BeautifulSoup(response.text, "html.parser")
 
     out = open('visited_teams.txt','w')
@@ -175,8 +240,6 @@ def parse_active_teams():
         scrape_team_data(team_brev)
         out.write(team_brev + "\n")
         count += 1
-        #delete after
-        break
     out.close()
 
 
@@ -212,4 +275,4 @@ def parse_inactive_teams():
 
 if __name__ == "__main__":
     parse_active_teams()
-    #parse_inactive_teams()
+    parse_inactive_teams()
