@@ -8,8 +8,8 @@
 6,1945,32,College,Navy,Assistant Coach
 7,1946,33,College,Navy,Assistant Coach
 8,1947,34,College,Navy,Assistant Coach
-9,1948,35,NFL,San Francisco 49ers,Defensive Coach
-10,1949,36,NFL,San Francisco 49ers,Defensive Coach
+9,1948,35,AAFC,San Francisco 49ers,Defensive Coach
+10,1949,36,AAFC,San Francisco 49ers,Defensive Coach
 11,1950,37,College,Navy,Head Coach
 12,1951,38,College,Navy,Head Coach
 13,1952,39,College,Navy,Head Coach
@@ -19,5 +19,5 @@
 17,1956,43,College,Navy,Head Coach
 18,1957,44,College,Navy,Head Coach
 19,1958,45,College,Navy,Head Coach
-20,1960,47,NFL,Oakland Raiders,Head Coach
-21,1961,48,NFL,Oakland Raiders,Head Coach
+20,1960,47,AFL,Oakland Raiders,Head Coach
+21,1961,48,AFL,Oakland Raiders,Head Coach

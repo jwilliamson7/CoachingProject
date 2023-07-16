@@ -15,10 +15,10 @@
 13,1943,35,College,Ohio State,Head Coach
 14,1944,36,U.S. Navy,Naval Station Great Lakes,Head Coach
 15,1945,37,U.S. Navy,Naval Station Great Lakes,Head Coach
-16,1946,38,NFL,Cleveland Browns,Head Coach
-17,1947,39,NFL,Cleveland Browns,Head Coach
-18,1948,40,NFL,Cleveland Browns,Head Coach
-19,1949,41,NFL,Cleveland Browns,Head Coach
+16,1946,38,AAFC,Cleveland Browns,Head Coach
+17,1947,39,AAFC,Cleveland Browns,Head Coach
+18,1948,40,AAFC,Cleveland Browns,Head Coach
+19,1949,41,AAFC,Cleveland Browns,Head Coach
 20,1950,42,NFL,Cleveland Browns,Head Coach
 21,1951,43,NFL,Cleveland Browns,Head Coach
 22,1952,44,NFL,Cleveland Browns,Head Coach
@@ -32,8 +32,8 @@
 30,1960,52,NFL,Cleveland Browns,Head Coach
 31,1961,53,NFL,Cleveland Browns,Head Coach
 32,1962,54,NFL,Cleveland Browns,Head Coach
-33,1968,60,NFL,Cincinnati Bengals,Head Coach
-34,1969,61,NFL,Cincinnati Bengals,Head Coach
+33,1968,60,AFL,Cincinnati Bengals,Head Coach
+34,1969,61,AFL,Cincinnati Bengals,Head Coach
 35,1970,62,NFL,Cincinnati Bengals,Head Coach
 36,1971,63,NFL,Cincinnati Bengals,Head Coach
 37,1972,64,NFL,Cincinnati Bengals,Head Coach

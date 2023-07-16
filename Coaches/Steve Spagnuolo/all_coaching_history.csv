@@ -1,8 +1,8 @@
 ,Year,Age,Level,Employer,Role
 0,1981,22,College,Massachusetts,Graduate Assistant
 1,1982,23,College,Massachusetts,Graduate Assistant
-2,1983,24,NFL,Washington Redskins,Player Personnel Intern
-3,1983,24,College,Massachusetts,Graduate Assistant
+2,1983,24,College,Massachusetts,Graduate Assistant
+3,1983,24,NFL,Washington Redskins,Player Personnel Intern
 4,1984,25,College,Lafayette,Defensive Line/Special Teams
 5,1985,26,College,Lafayette,Defensive Line/Special Teams
 6,1986,27,College,Lafayette,Defensive Line/Special Teams
@@ -41,3 +41,5 @@
 39,2019,60,NFL,Kansas City Chiefs,Defensive Coordinator
 40,2020,61,NFL,Kansas City Chiefs,Defensive Coordinator
 41,2021,62,NFL,Kansas City Chiefs,Defensive Coordinator
+42,2022,63,NFL,Kansas City Chiefs,Defensive Coordinator
+43,2023,64,NFL,Kansas City Chiefs,Defensive Coordinator
