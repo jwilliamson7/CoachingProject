@@ -13,6 +13,7 @@ def make_directory(name):
 
 def scrape_team_data(url):
     base_url = "https://www.pro-football-reference.com/teams/"
+    start = time.time_ns()
     response = requests.get(base_url + url)
     duplicate_names = ['Def Rank']
     table_name = "team_record"
@@ -42,11 +43,69 @@ def scrape_team_data(url):
         for td in tr.find_all('td'):
             row.append(td.text.strip())
         rows.append(row)
+    
+    # Creates a vector of the years with team stats and then calls the scrape yearly stats function on that vector
+    years = []
+    for row in rows:
+        years.append(row[0])
+    scrape_team_yearly_stats(base_url + url, years, start)
+
+    #Saves the output of the team record data (which primarily includes ranks)
     df = pd.DataFrame(data=rows, columns=headers)
     df.to_csv(table_name + ".csv")
     df.to_feather(table_name + ".feather")
     scrape_team_playoff_data(url)
     os.chdir('../')
+
+# Function that attempts to create a single table with all topline team stats (not rankings of stats)
+def scrape_team_yearly_stats(url, years, start_time):
+    base_url = url
+    headers = ['Year']
+    team_rows = []
+    opponent_rows = []
+    count = 1
+    for year in years:
+        #Checks the time to prevent too frequent of requests
+        check_time_and_pause(start_time, time.time_ns())
+        response = requests.get(base_url + '/' + year + '.htm')
+        start_time = time.time_ns()
+
+        soup = BeautifulSoup(response.text, 'lxml')
+        table = soup.find('div', {'id':'div_team_stats'}).find('table')
+        #pulls the table headers for the first website call
+        if count == 1:
+            duplicate_names = ['', 'Passing', 'Rushing', 'Penalties', 'Average Drive']
+            header_count = 0
+            for th in table.find_all("th"):
+                class_list = th.get('class')
+                if class_list != None and "poptip" in class_list:
+                    text = th.text.strip() + duplicate_names[header_count]
+                    if text in headers:
+                        header_count += 1 
+                    headers.append(text)
+            headers.pop(1)
+            print(headers)
+        row_number = 0
+        for tr in table.find('tbody').find_all('tr')[0:2]:
+            row = [year]            
+            for td in tr.find_all('td'):
+                row.append(td.text.strip())
+            if row_number == 0:
+                team_rows.append(row)
+            else:
+                opponent_rows.append(row)
+            row_number += 1
+            print(row)
+        count += 1
+        
+        #delete after
+        break
+    df = pd.DataFrame(data=team_rows, columns=headers)
+    df.to_csv("yearly_team_stats.csv")
+    df = pd.DataFrame(data=opponent_rows, columns=headers)
+    df.to_csv("yearly_opponent_stats.csv")
+
+
 
 def scrape_team_playoff_data(url):
     base_url = "https://www.pro-football-reference.com/teams/"
@@ -116,6 +175,8 @@ def parse_active_teams():
         scrape_team_data(team_brev)
         out.write(team_brev + "\n")
         count += 1
+        #delete after
+        break
     out.close()
 
 
@@ -150,5 +211,5 @@ def parse_inactive_teams():
 
 
 if __name__ == "__main__":
-    #parse_active_teams()
-    parse_inactive_teams()
+    parse_active_teams()
+    #parse_inactive_teams()
