@@ -68,9 +68,6 @@ temp_soup = None
 count = 1
 temp_count = 1
 for link in soup.find_all('a'):
-    if temp_count < 518:
-        temp_count = temp_count + 1
-        continue
     link_text = link.get('href')
     if link_text.find('/coaches/') == -1:
         continue
@@ -83,4 +80,5 @@ for link in soup.find_all('a'):
     start = time.time_ns()
     count += 1
 
+print("Scraping completed")
 out.close()
