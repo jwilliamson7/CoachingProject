@@ -1,9 +1,9 @@
 ,Year,Age,Level,Employer,Role
-0,1997,30,AFL,Nashville Kats,Offensive Coordinator
-1,1998,31,AFL,Orlando Predators,Head Coach
-2,1999,32,AFL,Orlando Predators,Head Coach
-3,2000,33,AFL,Orlando Predators,Head Coach
-4,2001,34,AFL,Orlando Predators,Head Coach
+0,1997,30,Arena,Nashville Kats,Offensive Coordinator
+1,1998,31,Arena,Orlando Predators,Head Coach
+2,1999,32,Arena,Orlando Predators,Head Coach
+3,2000,33,Arena,Orlando Predators,Head Coach
+4,2001,34,Arena,Orlando Predators,Head Coach
 5,2002,35,NFL,Tampa Bay Buccaneers,Offensive Assistant
 6,2003,36,NFL,Tampa Bay Buccaneers,Offensive Assistant
 7,2004,37,NFL,Tampa Bay Buccaneers,Offensive Assistant
@@ -23,3 +23,4 @@
 21,2018,51,NFL,Washington Redskins,Head Coach
 22,2019,52,NFL,Washington Redskins,Head Coach
 23,2020,53,NFL,Jacksonville Jaguars,Offensive Coordinator
+24,2022,55,NFL,Los Angeles Rams,Consultant

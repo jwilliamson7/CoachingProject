@@ -1,8 +1,8 @@
 ,Year,Age,Level,Employer,Role
-0,1960,40,NFL,Houston Oilers,Receivers
-1,1961,41,NFL,Houston Oilers,Receivers
-2,1962,42,NFL,Denver Broncos,Receivers
-3,1963,43,NFL,Denver Broncos,Receivers
-4,1964,44,NFL,Denver Broncos,Head Coach
-5,1965,45,NFL,Denver Broncos,Head Coach
-6,1966,46,NFL,Denver Broncos,Head Coach
+0,1960,40,AFL,Houston Oilers,Receivers
+1,1961,41,AFL,Houston Oilers,Receivers
+2,1962,42,AFL,Denver Broncos,Receivers
+3,1963,43,AFL,Denver Broncos,Receivers
+4,1964,44,AFL,Denver Broncos,Head Coach
+5,1965,45,AFL,Denver Broncos,Head Coach
+6,1966,46,AFL,Denver Broncos,Head Coach
