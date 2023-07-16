@@ -1,6 +1,6 @@
 ,Year,Age,Level,Employer,Role
-0,1962,31,NFL,Boston Patriots,Defensive Backs
-1,1963,32,NFL,Boston Patriots,Defensive Backs
+0,1962,31,AFL,Boston Patriots,Defensive Backs
+1,1963,32,AFL,Boston Patriots,Defensive Backs
 2,1964,33,NFL,Philadelphia Eagles,Defensive Backs
 3,1965,34,NFL,Philadelphia Eagles,Defensive Backs
 4,1966,35,NFL,Philadelphia Eagles,Defensive Backs
@@ -22,8 +22,8 @@
 20,1982,51,NFL,Philadelphia Eagles,Defensive Backs
 21,1983,52,NFL,Philadelphia Eagles,Assistant Head Coach/Defensive Backs
 22,1984,53,NFL,Philadelphia Eagles,Assistant Head Coach/Defensive Backs
-23,1985,54,NFL,Philadelphia Eagles,Head Coach
-24,1985,54,NFL,Philadelphia Eagles,Assistant HC/DB/Interim Head Coach
+23,1985,54,NFL,Philadelphia Eagles,Assistant HC/DB/Interim Head Coach
+24,1985,54,NFL,Philadelphia Eagles,Head Coach
 25,1986,55,NFL,Atlanta Falcons,Defensive Backs
 26,1987,56,NFL,Atlanta Falcons,Assistant Head Coach
 27,1988,57,NFL,Atlanta Falcons,Assistant Head Coach

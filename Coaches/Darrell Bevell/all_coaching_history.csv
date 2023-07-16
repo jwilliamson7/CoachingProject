@@ -1,5 +1,5 @@
 ,Year,Age,Level,Employer,Role
-0,1996,26,College,Westmar,Passing Game/Quarterbacks
+0,1996,26,College,Westmar,Quarterbacks/Passing Game Coordinator
 1,1997,27,College,Iowa State,Graduate Assistant
 2,1998,28,College,Connecticut,Wide Receivers
 3,1999,29,College,Connecticut,Wide Receivers
@@ -24,3 +24,5 @@
 22,2019,49,NFL,Detroit Lions,Offensive Coordinator
 23,2020,50,NFL,Detroit Lions,Offensive Coordinator
 24,2021,51,NFL,Jacksonville Jaguars,Offensive Coordinator
+25,2022,52,NFL,Miami Dolphins,Quarterbacks/Passing Game Coordinator
+26,2023,53,NFL,Miami Dolphins,Quarterbacks/Passing Game Coordinator
