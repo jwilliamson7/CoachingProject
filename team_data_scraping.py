@@ -125,7 +125,6 @@ def scrape_team_yearly_stats(url, years, start_time):
         table2 = None
         if int(year) > 1998:
             table2 = soup.find('div', {'id':'div_team_conversions'}).find('table')
-
         #pulls the table headers for the first website call
         """
         if count == 1:
@@ -159,7 +158,7 @@ def scrape_team_yearly_stats(url, years, start_time):
                 for td2 in tr2.find_all('td'):
                     row.append(td2.text.strip())
             else:
-                row.append('' * 9)
+                row.extend([''] * (len(headers) - len(row)))
             if row_number == 0:
                 team_rows.append(row)
             else:
