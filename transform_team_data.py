@@ -2,7 +2,8 @@ import os
 import pandas as pd
 import math
 import operator
-from numpy import mean, nan
+import numpy as np
+from scipy.stats import zscore
 import re
 
 from sympy import root
@@ -58,19 +59,39 @@ def main():
     for year, table in list_of_team_tables.items():
         df = pd.DataFrame(data=table, columns=dfs[0].columns[1:])
         df.rename({'Year': 'Team Abreviation'}, axis='columns', inplace=True)
+        if df['Start Average Drive'].dtype == object:
+            df['Start Average Drive'] = df['Start Average Drive'].apply(lambda x: float(x.split(' ')[-1]))
+            df['Time Average Drive'] = df['Time Average Drive'].apply(lambda x: float(x.split(':')[0]) + float(x.split(':')[-1])/60)
+            df['3D%'] = df['3D%'].str[:-1].astype('float') / 100.0
+            df['4D%'] = df['4D%'].str[:-1].astype('float') / 100.0
+            df['RZPct'] = df['RZPct'].str[:-1].astype('float') / 100.0
         make_directory(str(year))
         os.chdir(str(year))
         df.to_csv("league_team_data.csv")
+        numeric_cols = df.select_dtypes(include=[np.number]).columns
+        df[numeric_cols] = df[numeric_cols].apply(zscore)
+        df.to_csv("league_team_data_normalized.csv")
         os.chdir('../')
 
+    
     #Opponent tables
     for year, table in list_of_opponent_tables.items():
         df = pd.DataFrame(data=table, columns=dfs[1].columns[1:])
         df.rename({'Year': 'Team Abreviation'}, axis='columns', inplace=True)
+        if df['Start Average Drive'].dtype == object:
+            df['Start Average Drive'] = df['Start Average Drive'].apply(lambda x: float(x.split(' ')[-1]))
+            df['Time Average Drive'] = df['Time Average Drive'].apply(lambda x: float(x.split(':')[0]) + float(x.split(':')[-1])/60)
+            df['3D%'] = df['3D%'].str[:-1].astype('float') / 100.0
+            df['4D%'] = df['4D%'].str[:-1].astype('float') / 100.0
+            df['RZPct'] = df['RZPct'].str[:-1].astype('float') / 100.0
         make_directory(str(year))
         os.chdir(str(year))
         df.to_csv("league_opponent_data.csv")
+        numeric_cols = df.select_dtypes(include=[np.number]).columns
+        df[numeric_cols] = df[numeric_cols].apply(zscore)
+        df.to_csv("league_opponent_data_normalized.csv")
         os.chdir('../')
+    
     
 
 if __name__ == "__main__":
