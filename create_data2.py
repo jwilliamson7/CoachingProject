@@ -1,3 +1,4 @@
+from doctest import master
 import os
 import pandas as pd
 import math
@@ -381,8 +382,9 @@ def parse_coach_career(coach_name, coach_path, team_path, league_path):
                             num_losses = record_row['L'].values[0]
                             num_ties = record_row['T'].values[0]
                             winning_result.append((num_wins + .5 * num_ties) / (num_wins + num_ties + num_losses))
+                        #TODO Fix
                         # Not first time hire, previous career to calculate
-                        if len(rows) != 0 and len(rows[-1]) == 28:
+                        if len(rows) != 0 and len(rows[-1]) == 143:
                             prev_year = rows[-1][1]
                             math_year = previous_year_check + 1 if year != previous_year_check + 1 else year
                             rows[-1].append(classify_coach_tenure(math_year - prev_year))
@@ -403,7 +405,7 @@ def parse_coach_career(coach_name, coach_path, team_path, league_path):
         
     
     #Handle final hire length if not demotion
-    if len(rows) != 0 and len(rows[-1]) == 28:
+    if len(rows) != 0 and len(rows[-1]) == 143:
         prev_year = rows[-1][1]
         # Does not consider hires made in 2020 as they do not have 
         # at least one full season of coached games
@@ -424,11 +426,10 @@ def parse_coach_career(coach_name, coach_path, team_path, league_path):
 
 
     #Checks length
-    #TODO Fix
     for i in range(0, len(rows)):
-        if len(rows[i]) != 29:
+        if len(rows[i]) != 144:
             print('Error: {} {}'.format(coach_name, rows[i]))
-
+    
     #print(feature_dict)
     return rows
 
@@ -454,7 +455,7 @@ def main():
         count += 1
         #TODO delete
         break
- 
+    print(master_data)
     """
     df = pd.DataFrame(data=master_data, columns=get_point_features())
     df.to_csv("master_data2.csv")
