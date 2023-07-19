@@ -58,7 +58,7 @@ def main():
     #Team tables
     for year, table in list_of_team_tables.items():
         df = pd.DataFrame(data=table, columns=dfs[0].columns[1:])
-        df.rename({'Year': 'Team Abreviation'}, axis='columns', inplace=True)
+        df.rename({'Year': 'Team Abbreviation'}, axis='columns', inplace=True)
         if df['Start Average Drive'].dtype == object:
             df['Start Average Drive'] = df['Start Average Drive'].apply(lambda x: float(x.split(' ')[-1]))
             df['Time Average Drive'] = df['Time Average Drive'].apply(lambda x: float(x.split(':')[0]) + float(x.split(':')[-1])/60)
@@ -77,7 +77,7 @@ def main():
     #Opponent tables
     for year, table in list_of_opponent_tables.items():
         df = pd.DataFrame(data=table, columns=dfs[1].columns[1:])
-        df.rename({'Year': 'Team Abreviation'}, axis='columns', inplace=True)
+        df.rename({'Year': 'Team Abbreviation'}, axis='columns', inplace=True)
         if df['Start Average Drive'].dtype == object:
             df['Start Average Drive'] = df['Start Average Drive'].apply(lambda x: float(x.split(' ')[-1]))
             df['Time Average Drive'] = df['Time Average Drive'].apply(lambda x: float(x.split(':')[0]) + float(x.split(':')[-1])/60)
