@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import math
 import operator
-from numpy import mean, nan
+from numpy import mean, nan, nanmean
 import re
 
 from sympy import comp
@@ -196,7 +196,7 @@ def quick_mean(lis):
     if len(lis) == 0:
         return nan
     else:
-        return mean(lis)
+        return nanmean(lis)
 
 
 def get_hiring_team_stat_dict():
@@ -459,7 +459,7 @@ def main():
     #print(master_data)
     
     df = pd.DataFrame(data=master_data, columns=get_point_features())
-    df.to_csv("master_data2.csv")
+    df.to_csv("master_data4.csv")
     
     
     print('Parsed {} Hiring Instances'.format(len(master_data)))
