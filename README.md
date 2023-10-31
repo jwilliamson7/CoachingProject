@@ -1,1 +1,1 @@
-# CSCE421
+# MIT SSAC
