@@ -51,7 +51,8 @@ def get_team_dict():
             "was":["was", "sen"],
             "dtx":["kan", "dtx"],
             "nyg":["nyg", "ng1"],
-            "cli":["cli", "cib"]
+            "cli":["cli", "cib"],
+            "nyb":["nyb", "nyy"]
             }
 
 
@@ -448,7 +449,7 @@ def main():
     list_subfolders_with_paths = [f.path for f in os.scandir(coach_path) if f.is_dir()]
     for sub in list_subfolders_with_paths:
         #TODO Unhide
-        #coach_name = "Don Shula"
+        #coach_name = "DeMeco Ryans"
         coach_name = sub.split('\\')[-1]
         print("Parsing coach {}, {}".format(count, coach_name))
         for new_row in parse_coach_career(coach_name, coach_path, team_path, league_path):
@@ -457,9 +458,8 @@ def main():
         #TODO delete
         #break
     #print(master_data)
-    
     df = pd.DataFrame(data=master_data, columns=get_point_features())
-    df.to_csv("master_data4.csv")
+    df.to_csv("master_data5.csv")
     
     
     print('Parsed {} Hiring Instances'.format(len(master_data)))
