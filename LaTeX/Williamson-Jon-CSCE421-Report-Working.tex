@@ -275,11 +275,11 @@ This implementation used an outer ten-fold cross-validation over an inner five-f
 \hline
 Objective & reg:squarederror \\
 \hline
-Number of Estimators & 100 \\
+Number of Estimators & 20 \\
 \hline
-Learning Rate & 0.05 \\
+Learning Rate & 0.1 \\
 \hline
-Max Estimator Depth & 10 \\
+Max Estimator Depth & 4 \\
 \hline
 Gamma & 0.1 \\
 \hline
@@ -349,11 +349,11 @@ Solver & lbfgs \\
 \hline
 Alpha & 0 \\
 \hline
-Hidden Layer Sizes & (50, 25) \\
+Hidden Layer Sizes & (50, 25, 15, 9) \\
 \hline
 Max Iterations & 200 \\
 \hline
-Tolerance & $1e^{-5}$ \\
+Tolerance & $1e^{-4}$ \\
 \hline
 \end{tabular}
 \label{tab6}
@@ -413,13 +413,13 @@ Table \ref{cum1} compares the results of these three implementations. This table
 \textbf{Set} & \textbf{Reg. Lin.} &  \textbf{XGBR} &  \textbf{MLPR} \\
 \hline
 \hline
-Train & 0.197 & 0.154 & 0.194\\
+Train & 0.190 & 0.154 & 0.166\\
 \hline
-Test & 0.202 & 0.204 & 0.212 \\
+Test & 0.195 & 0.194 & 0.214 \\
 \hline
-Validation & 0.202 & 0.215 & 0.199 \\
+Validation & 0.200 & 0.192 & 0.195 \\
 \hline
-Validation, Expected Outcome$^{\mathrm{1}}$ & \multicolumn{3}{|c|}{0.208} \\
+Validation, Expected Outcome$^{\mathrm{1}}$ & \multicolumn{3}{|c|}{0.214} \\
 \hline
 \multicolumn{2}{l}{$^{\mathrm{1}}$Not influenced by any model.}
 \end{tabular}
@@ -440,7 +440,7 @@ This implementation used an outer ten-fold cross-validation over an inner five-f
 \textbf{Hyperparameter} & \textbf{Value} \\
 \hline
 \hline
-C & 0.01 \\
+C & 0.1 \\
 \hline
 \end{tabular}
 \label{tab8}
@@ -504,11 +504,11 @@ Objective & multi:softprob \\
 \hline
 Number of Estimators & 25 \\
 \hline
-Learning Rate & 0.2 \\
+Learning Rate & 0.05 \\
 \hline
-Max Estimator Depth & 2 \\
+Max Estimator Depth & 3 \\
 \hline
-Gamma & 0 \\
+Gamma & 0.1 \\
 \hline
 Lambda & 0 \\
 \hline
@@ -576,7 +576,7 @@ Max Iterations & 200 \\
 \hline
 Tolerance & $1e^{-4}$ \\
 \hline
-Alpha & 0.001 \\
+Alpha & $1e^{-4}$ \\
 \hline
 \end{tabular}
 \label{tab13}
@@ -676,11 +676,11 @@ Table \ref{cum2} compares the results of these three implementations. This table
 \textbf{Set} & \textbf{Reg. Log.} &  \textbf{XGBC} &  \textbf{MLPC} \\
 \hline
 \hline
-Train & 0.629 & 0.905 & 0.752\\
+Train & 0.686 & 0.938 & 0.887\\
 \hline
-Test & 0.577 & 0.634 & 0.579 \\
+Test & 0.649 & 0.664 & 0.597 \\
 \hline
-Validation & 0.605 & 0.706 & 0.704 \\
+Validation & 0.644 & 0.674 & 0.629 \\
 \hline
 Validation, Expected Outcome$^{\mathrm{1}}$ & \multicolumn{3}{|c|}{0.500} \\
 \hline
