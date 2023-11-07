@@ -410,10 +410,11 @@ def parse_coach_career(coach_name, coach_path, team_path, league_path):
     #Handle final hire length if not demotion
     if len(rows) != 0 and len(rows[-1]) == 153:
         prev_year = rows[-1][1]
+
         # Does not consider hires made in 2020 as they do not have 
         # at least one full season of coached games
         cutoff_year = 2020
-        current_year = 2023
+        current_year = 2024
         if prev_year == current_year:
             new_hire_data.append(rows.pop())
             print('\tExcluded last hire for both classification: {}, hire year: {}'.format(coach_name, prev_year))
@@ -425,7 +426,7 @@ def parse_coach_career(coach_name, coach_path, team_path, league_path):
             # for fair classification
             if year > current_year and prev_year >= cutoff_year:
                 print('\tExcluded last hire tenure classification: {}'.format(coach_name))
-            rows[-1].append(classify_coach_tenure(year - prev_year) if prev_year < cutoff_year else -1)
+            rows[-1].append(classify_coach_tenure(year - prev_year) if year < current_year or prev_year < cutoff_year else -1)
 
 
     #Checks length
@@ -449,7 +450,7 @@ def main():
     list_subfolders_with_paths = [f.path for f in os.scandir(coach_path) if f.is_dir()]
     for sub in list_subfolders_with_paths:
         #TODO Unhide
-        #coach_name = "DeMeco Ryans"
+        #coach_name = "Jon Gruden"
         coach_name = sub.split('\\')[-1]
         print("Parsing coach {}, {}".format(count, coach_name))
         for new_row in parse_coach_career(coach_name, coach_path, team_path, league_path):
@@ -459,7 +460,7 @@ def main():
         #break
     #print(master_data)
     df = pd.DataFrame(data=master_data, columns=get_point_features())
-    df.to_csv("master_data5.csv")
+    df.to_csv("master_data6.csv")
     
     
     print('Parsed {} Hiring Instances'.format(len(master_data)))
