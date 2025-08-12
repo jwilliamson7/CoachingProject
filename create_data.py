@@ -12,6 +12,7 @@ from data_constants import (
     TENURE_CLASSIFICATIONS,
     DATA_FILES,
     ANALYSIS_CONFIG,
+    FIRED_COACHES,
     get_all_feature_names,
     get_feature_dict,
     get_hiring_team_stat_dict,
@@ -270,6 +271,7 @@ class CoachingDataProcessor:
         is_head_coach = False
         prev_franchise = None
         prev_year_check = None
+        last_hc_year = None  # Track last year as head coach for gap detection
         
         # Process each year of coaching history
         for _, row in history_df.iterrows():
@@ -301,12 +303,32 @@ class CoachingDataProcessor:
                 if role == "Position":
                     feature_dict["num_yr_nfl_pos"] += 1
                 elif role != "None":
-                    # Get team abbreviation
+                    # Get team abbreviation from ranks data or derive for current year hires
+                    franchise = None
+                    franchise_list = None
+                    
                     if not ranks_df.empty:
                         team_rows = ranks_df[ranks_df['Year'] == year]
                         if not team_rows.empty:
                             franchise = team_rows.iloc[0]['Tm'].lower()
                             franchise_list = self._resolve_team_franchise(franchise)
+                    
+                    # For current year head coach hires without ranking data, derive team from role
+                    # This applies to NEW hires and team changes in current year
+                    if (franchise is None and role == "Head Coach" and 
+                        year >= ANALYSIS_CONFIG['current_year']):
+                        # Parse team from history data for current year hires/moves
+                        employer = row.get('Employer', '')
+                        if employer:
+                            current_franchise = self._get_team_abbreviation(employer)
+                            current_franchise_list = self._resolve_team_franchise(current_franchise)
+                            
+                            # Only set franchise if this is genuinely a new hire or team change
+                            if not is_head_coach or current_franchise_list != prev_franchise:
+                                franchise = current_franchise
+                                franchise_list = current_franchise_list
+                    
+                    if franchise_list:
                             
                             if role in ["Offensive Coordinator", "Defensive Coordinator", "Special Teams Coordinator"]:
                                 feature_dict["num_yr_nfl_coor"] += 1
@@ -319,7 +341,21 @@ class CoachingDataProcessor:
                                     
                             elif role == "Head Coach":
                                 # Check if this is a new head coaching hire
-                                if not is_head_coach or franchise_list != prev_franchise:
+                                # Conditions: first time HC, team change, OR gap > 1 year since last HC role
+                                is_new_hire = (not is_head_coach or 
+                                             franchise_list != prev_franchise or
+                                             (last_hc_year is not None and year - last_hc_year > 1))
+                                
+                                if is_new_hire:
+                                    # If this is a gap (not first time), need to reset HC features for clean slate
+                                    if last_hc_year is not None and year - last_hc_year > 1:
+                                        # Gap detected - reset HC-specific accumulated stats for new hiring instance
+                                        # Keep experience counters but clear performance stats
+                                        for feature_name in get_all_feature_names():
+                                            if "__hc" in feature_name or "__opp__hc" in feature_name:
+                                                if feature_name in feature_dict and isinstance(feature_dict[feature_name], list):
+                                                    feature_dict[feature_name] = []
+                                    
                                     is_head_coach = True
                                     feature_dict["age"] = age
                                     prev_franchise = franchise_list
@@ -343,22 +379,61 @@ class CoachingDataProcessor:
                                     if career_instances and len(career_instances[-1]) == ANALYSIS_CONFIG['expected_feature_count'] - 1:
                                         prev_instance = career_instances[-1]
                                         prev_hire_year = prev_instance[1]
-                                        tenure_years = year - prev_hire_year
+                                        
+                                        # Calculate actual tenure based on when the previous stint ended
+                                        # If there's a gap, the previous stint ended at last_hc_year + 1
+                                        # If it's a team change with no gap, use the year before current hire
+                                        if last_hc_year is not None and year - last_hc_year > 1:
+                                            # Gap detected - previous stint ended after last_hc_year
+                                            tenure_years = (last_hc_year + 1) - prev_hire_year
+                                        else:
+                                            # No gap - previous stint ended just before current hire
+                                            tenure_years = year - prev_hire_year
+                                        
                                         prev_instance.append(self._classify_coach_tenure(tenure_years))
                                     
-                                    # Create new instance
-                                    team_index = self._load_league_data(year, franchise_list, "HC", feature_dict)
-                                    if team_index >= 0:
-                                        new_instance = [coach_name, year]
-                                        new_instance.extend([self._safe_mean(val) for val in feature_dict.values()])
-                                        new_instance.extend(self._get_hiring_team_context(franchise_list[team_index], year))
-                                        new_instance.append(self._safe_mean(win_results))
-                                        career_instances.append(new_instance)
-                                        feature_dict["num_times_hc"] += 1
+                                    # Create new instance with PREVIOUS experience only
+                                    new_instance = [coach_name, year]
+                                    
+                                    # Ensure feature order matches get_all_feature_names() order
+                                    feature_names = get_all_feature_names()
+                                    feature_values = []
+                                    for feature_name in feature_names:
+                                        if feature_name in feature_dict:
+                                            feature_values.append(self._safe_mean(feature_dict[feature_name]))
+                                        else:
+                                            feature_values.append(0)  # Default for missing features
+                                    
+                                    new_instance.extend(feature_values)
+                                    
+                                    # Get team index for hiring context
+                                    team_index = 0
+                                    for i, team_abbrev in enumerate(franchise_list):
+                                        year_dir = self.league_dir / str(year)
+                                        if year_dir.exists():
+                                            try:
+                                                team_file = year_dir / f"{DATA_FILES['league_tables'][0]}.csv"
+                                                team_df = pd.read_csv(team_file)
+                                                team_row = team_df[team_df['Team Abbreviation'] == team_abbrev]
+                                                if not team_row.empty:
+                                                    team_index = i
+                                                    break
+                                            except FileNotFoundError:
+                                                continue
+                                    
+                                    new_instance.extend(self._get_hiring_team_context(franchise_list[team_index], year))
+                                    new_instance.append(self._safe_mean(win_results))
+                                    career_instances.append(new_instance)
+                                    feature_dict["num_times_hc"] += 1
+                                    
+                                    # NOW add current year's HC performance for future instances
+                                    self._load_league_data(year, franchise_list, "HC", feature_dict)
                                 else:
                                     # Continue current head coaching stint
                                     self._load_league_data(year, franchise_list, "HC", feature_dict)
-                                    
+                                
+                                # Update last HC year for gap detection
+                                last_hc_year = year
                                 feature_dict["num_yr_nfl_hc"] += 1
             
             prev_year_check = year
@@ -369,14 +444,23 @@ class CoachingDataProcessor:
             hire_year = final_instance[1]
             
             # Determine tenure classification
-            if hire_year >= ANALYSIS_CONFIG['current_year']:
-                # New hire - exclude from tenure classification
+            if hire_year > ANALYSIS_CONFIG['current_year']:
+                # Future hire - exclude completely
                 career_instances.pop()
-                print(f'\tExcluded new hire: {coach_name}, hire year: {hire_year}')
+                print(f'\tExcluded future hire: {coach_name}, hire year: {hire_year}')
             elif hire_year >= ANALYSIS_CONFIG['cutoff_year']:
-                # Recent hire - insufficient data for classification
-                final_instance.append(-1)
-                print(f'\tExcluded tenure classification: {coach_name}')
+                # Recent hire - check if still active or was fired
+                # Special handling for known fired coaches vs still active
+                # For coaches hired 2022+, check if we have evidence they were fired
+                if coach_name in FIRED_COACHES or prev_year_check < ANALYSIS_CONFIG['current_year'] - 1:
+                    # Was fired/resigned - we know the actual tenure
+                    tenure_years = (prev_year_check + 1) - hire_year
+                    final_instance.append(self._classify_coach_tenure(tenure_years))
+                    print(f'\tCalculated tenure for fired coach: {coach_name}, tenure: {tenure_years} years')
+                else:
+                    # Still active - insufficient data for final classification
+                    final_instance.append(-1)
+                    print(f'\tExcluded tenure classification: {coach_name}')
             else:
                 # Calculate final tenure
                 tenure_years = (prev_year_check + 1) - hire_year
@@ -403,10 +487,14 @@ class CoachingDataProcessor:
             
             coach_instances = self._process_coach_career(coach_name)
             all_instances.extend(coach_instances)
+            
+            
+            
         
         # Create DataFrame
         columns = get_output_column_names()
         df = pd.DataFrame(data=all_instances, columns=columns)
+        
         
         print(f'Processed {len(all_instances)} coaching instances')
         return df
@@ -424,7 +512,7 @@ def main():
     
     # Save results
     output_file = "master_data.csv"
-    master_df.to_csv(output_file, index=False)
+    master_df.to_csv(output_file, index=True)
     
     print(f"\nProcessing completed!")
     print(f"Dataset saved to: {output_file}")
