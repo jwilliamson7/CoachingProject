@@ -17,6 +17,7 @@ TEAM_FRANCHISE_MAPPINGS = {
     "oak": ["oak", "rai"], 
     "stl": ["stl", "ram", "sla", "gun"],
     "lar": ["lar", "ram"],
+    "ram": ["lar", "ram"],
     "bal": ["bal", "rav", "clt"],
     "lac": ["lac", "sdg"],
     "chr": ["chr", "cra"],
@@ -55,7 +56,12 @@ CURRENT_TEAM_ABBREVIATIONS = {
     "New York Jets": "nyj",
     "Dallas Cowboys": "dal",
     "New England Patriots": "nwe",
-    "Las Vegas Raiders": "rai"
+    "Las Vegas Raiders": "rai",
+    "San Francisco 49ers": "sfo",
+    "New York Giants": "nyg",
+    "Los Angeles Chargers": "lac", 
+    "Green Bay Packers": "gnb",
+    "Los Angeles Rams": "ram"
 }
 
 # Core coaching experience features
@@ -177,15 +183,53 @@ ANALYSIS_CONFIG = {
     "hiring_context_years": [1, 2]  # Look back 1-2 years for team context
 }
 
+# Coaches who were fired/resigned and should get actual tenure classification
+# (not marked as -1 for insufficient data)
+FIRED_COACHES = [
+    "Doug Pederson",
+    "Frank Reich",
+    "Antonio Pierce",
+    "Jerod Mayo"
+]
+
 
 def get_all_feature_names() -> List[str]:
-    """Generate complete list of feature names in correct order"""
-    feature_names = CORE_COACHING_FEATURES.copy()
+    """Generate complete list of feature names in correct order matching Excel file"""
     
-    # Add role-specific team statistics
+    # Core coaching experience features (Features 1-8)
+    core_features = [
+        "age",
+        "num_times_hc", 
+        "num_yr_col_pos",
+        "num_yr_col_coor",
+        "num_yr_col_hc",
+        "num_yr_nfl_pos",
+        "num_yr_nfl_coor", 
+        "num_yr_nfl_hc"
+    ]
+    
+    # NFL OC team statistics (Features 9-41)
+    oc_features = []
     for stat in BASE_TEAM_STATISTICS:
-        for suffix in ROLE_SUFFIXES.values():
-            feature_names.append(f"{stat}{suffix}")
+        oc_features.append(f"{stat}__oc")
+    
+    # NFL DC opponent statistics (Features 42-74) 
+    dc_features = []
+    for stat in BASE_TEAM_STATISTICS:
+        dc_features.append(f"{stat}__dc")
+    
+    # NFL HC team statistics (Features 75-107)
+    hc_features = []
+    for stat in BASE_TEAM_STATISTICS:
+        hc_features.append(f"{stat}__hc")
+    
+    # NFL HC opponent statistics (Features 108-140)
+    hc_opp_features = []
+    for stat in BASE_TEAM_STATISTICS:
+        hc_opp_features.append(f"{stat}__opp__hc")
+    
+    # Combine all in exact Excel order
+    feature_names = core_features + oc_features + dc_features + hc_features + hc_opp_features
     
     return feature_names
 
