@@ -1,14 +1,14 @@
-,Year,Age,Level,Employer,Role
-0,1960,30,NFL,New York Giants,Defensive Coordinator
-1,1961,31,NFL,New York Giants,Defensive Coordinator
-2,1962,32,NFL,Los Angeles Rams,Head Coach
-3,1963,33,NFL,Los Angeles Rams,Head Coach
-4,1964,34,NFL,Los Angeles Rams,Head Coach
-5,1965,35,NFL,Los Angeles Rams,Head Coach
-6,1967,37,NFL,New York Giants,Defensive Coordinator
-7,1968,38,NFL,New York Giants,Defensive Coordinator
-8,1969,39,NFL,Washington Redskins,Defensive Coordinator
-9,1970,40,NFL,Washington Redskins,Defensive Coordinator
-10,1971,41,NFL,San Diego Chargers,Head Coach
-11,1972,42,NFL,San Diego Chargers,Head Coach
-12,1973,43,NFL,San Diego Chargers,Head Coach
+Year,Age,Level,Employer,Role
+1960,30,NFL,New York Giants,Defensive Coordinator
+1961,31,NFL,New York Giants,Defensive Coordinator
+1962,32,NFL,Los Angeles Rams,Head Coach
+1963,33,NFL,Los Angeles Rams,Head Coach
+1964,34,NFL,Los Angeles Rams,Head Coach
+1965,35,NFL,Los Angeles Rams,Head Coach
+1967,37,NFL,New York Giants,Defensive Coordinator
+1968,38,NFL,New York Giants,Defensive Coordinator
+1969,39,NFL,Washington Redskins,Defensive Coordinator
+1970,40,NFL,Washington Redskins,Defensive Coordinator
+1971,41,NFL,San Diego Chargers,Head Coach
+1972,42,NFL,San Diego Chargers,Head Coach
+1973,43,NFL,San Diego Chargers,Head Coach
