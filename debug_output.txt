@@ -1,0 +1,58 @@
+Starting Coaching Data Processing...
+Processing 537 coaches...
+Parsing coach 1: Aaron Glenn
+    DEBUG: Aaron Glenn 2021 - Loading DC data
+      DEBUG: Added 33 DC features for year 2021
+    DEBUG: Aaron Glenn 2022 - Loading DC data
+      DEBUG: Added 33 DC features for year 2022
+    DEBUG: Aaron Glenn 2023 - Loading DC data
+      DEBUG: Added 33 DC features for year 2023
+    DEBUG: Aaron Glenn 2024 - Loading DC data
+      DEBUG: Added 33 DC features for year 2024
+Parsing coach 2: Aaron Kromer
+    DEBUG: Aaron Kromer 2013 - Loading OC data
+      DEBUG: Added 33 OC features for year 2013
+    DEBUG: Aaron Kromer 2014 - Loading OC data
+      DEBUG: Added 33 OC features for year 2014
+Parsing coach 3: Abe Gibron
+    DEBUG: Abe Gibron HC hire 1972 - OC features: 0, DC features: 0
+    DEBUG: Abe Gibron 1976 - Loading DC data
+      DEBUG: Added 33 DC features for year 1976
+    DEBUG: Abe Gibron 1977 - Loading DC data
+      DEBUG: Added 33 DC features for year 1977
+Parsing coach 4: Adam Gase
+    DEBUG: Adam Gase 2013 - Loading OC data
+      DEBUG: Added 33 OC features for year 2013
+    DEBUG: Adam Gase 2014 - Loading OC data
+      DEBUG: Added 33 OC features for year 2014
+    DEBUG: Adam Gase 2015 - Loading OC data
+      DEBUG: Added 33 OC features for year 2015
+    DEBUG: Adam Gase HC hire 2016 - OC features: 33, DC features: 0
+    DEBUG: Adam Gase HC hire 2019 - OC features: 33, DC features: 0
+Parsing coach 5: Adam Walsh
+    DEBUG: Adam Walsh HC hire 1945 - OC features: 0, DC features: 0
+Parsing coach 6: Al Cornsweet
+    DEBUG: Al Cornsweet HC hire 1931 - OC features: 0, DC features: 0
+Parsing coach 7: Al Davis
+Parsing coach 8: Al Groh
+    DEBUG: Al Groh 1991 - Loading DC data
+      DEBUG: Added 33 DC features for year 1991
+    DEBUG: Al Groh 1993 - Loading DC data
+      DEBUG: Added 33 DC features for year 1993
+    DEBUG: Al Groh 1994 - Loading DC data
+      DEBUG: Added 33 DC features for year 1994
+    DEBUG: Al Groh 1995 - Loading DC data
+      DEBUG: Added 33 DC features for year 1995
+    DEBUG: Al Groh 1996 - Loading DC data
+      DEBUG: Added 33 DC features for year 1996
+    DEBUG: Al Groh HC hire 2000 - OC features: 0, DC features: 33
+Parsing coach 9: Al Jolley
+    DEBUG: Al Jolley HC hire 1929 - OC features: 0, DC features: 0
+    DEBUG: Al Jolley HC hire 1933 - OC features: 0, DC features: 0
+Parsing coach 10: Al Nesser
+    DEBUG: Al Nesser HC hire 1926 - OC features: 0, DC features: 0
+Processed 9 coaching instances
+
+Processing completed!
+Dataset saved to: master_data_debug.csv
+Total coaching instances: 9
