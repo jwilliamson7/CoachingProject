@@ -274,4 +274,4 @@ def parse_inactive_teams():
 
 if __name__ == "__main__":
     parse_active_teams()
-    parse_inactive_teams()
+    #parse_inactive_teams()

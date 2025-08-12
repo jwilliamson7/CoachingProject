@@ -26,8 +26,9 @@ def scrape_coach_data(url):
         if t == None:
             comment = table_soup.find(text=lambda text: isinstance(text, Comment))
             if comment == None:
-                break
-            if comment.find("<table ") > 0:
+                count += 1
+                continue
+            if comment.find("<table ") >= 0:
                 comment_soup = BeautifulSoup(str(comment), 'html.parser')
                 t = comment_soup.find("table")
         headers = []
@@ -67,6 +68,24 @@ stop = 0
 temp_soup = None
 count = 1
 temp_count = 1
+
+manual_urls = ['/coaches/JohnBe0.htm',
+               '/coaches/CoenLi0.htm',
+               '/coaches/MoorKe0.htm',
+               '/coaches/GlenAa0.htm',
+               '/coaches/SchoBr0.htm'
+               ]
+
+for link in manual_urls:
+    print("Scraping coach %d, %s" % (count, link))
+    stop = time.time_ns()
+    if stop - start < 1e9:
+        time.sleep(randint(1,5))
+    scrape_coach_data(link)
+    out.write(link + "\n")
+    start = time.time_ns()
+    count += 1
+    
 for link in soup.find_all('a'):
     link_text = link.get('href')
     if link_text.find('/coaches/') == -1:
@@ -79,6 +98,6 @@ for link in soup.find_all('a'):
     out.write(link_text + "\n")
     start = time.time_ns()
     count += 1
-
+    
 print("Scraping completed")
 out.close()

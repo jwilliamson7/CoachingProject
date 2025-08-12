@@ -15,7 +15,7 @@
 13,1982,35,NFL,New Orleans Saints,Defensive Coordinator
 14,1983,36,NFL,New Orleans Saints,Defensive Coordinator
 15,1984,37,NFL,New Orleans Saints,Defensive Coordinator
-16,1985,38,NFL,New Orleans Saints,Defensive Coordinator
+16,1985,38,NFL,New Orleans Saints,Defensive Coordinator/Interim HC
 17,1986,39,NFL,Philadelphia Eagles,Defensive Coordinator
 18,1987,40,NFL,Philadelphia Eagles,Defensive Coordinator
 19,1988,41,NFL,Philadelphia Eagles,Defensive Coordinator
@@ -32,7 +32,7 @@
 30,1999,52,NFL,Buffalo Bills,Head Coach
 31,2000,53,NFL,Buffalo Bills,Head Coach
 32,2002,55,NFL,Atlanta Falcons,Defensive Coordinator
-33,2003,56,NFL,Atlanta Falcons,Defensive Coordinator/Interim Head Coach
+33,2003,56,NFL,Atlanta Falcons,Defensive Coordinator/Interim HC
 34,2004,57,NFL,San Diego Chargers,Defensive Coordinator
 35,2005,58,NFL,San Diego Chargers,Defensive Coordinator
 36,2006,59,NFL,San Diego Chargers,Defensive Coordinator
@@ -49,3 +49,5 @@
 47,2018,71,NFL,Los Angeles Rams,Defensive Coordinator
 48,2019,72,NFL,Los Angeles Rams,Defensive Coordinator
 49,2023,76,XFL,Houston Roughnecks,Head Coach
+50,2024,77,UFL,San Antonio Brahmas,Head Coach
+51,2025,78,UFL,San Antonio Brahmas,Head Coach
