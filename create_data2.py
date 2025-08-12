@@ -16,6 +16,17 @@ def get_point_features():
     features.append('Coach Tenure Class')
     return features
 
+def get_team_abbrev(last_team):
+    team_conversion_dict = {
+        "Chicago Bears":"chi",
+        "Jacksonville Jaguars":"jax",
+        "New Orleans Saints":"nor",
+        "New York Jets":"nyj",
+        "Dallas Cowboys":"dal",
+        "New England Patriots":"nwe",
+        "Las Vegas Raiders":"rai"
+    }
+    return team_conversion_dict[last_team]
 
 def get_team_dict():
     return {"ind":["ind", "clt"], 
@@ -194,10 +205,11 @@ def classify_level(level):
 def quick_mean(lis):
     if not isinstance(lis, list):
         return lis
-    if len(lis) == 0:
+    clean = [x for x in lis if not (isinstance(x, float) and math.isnan(x))]
+    if len(clean) == 0:
         return nan
     else:
-        return nanmean(lis)
+        return nanmean(clean)
 
 
 def get_hiring_team_stat_dict():
@@ -222,7 +234,10 @@ def get_features_from_year(year, team_list, role, feature_dict, league_path):
     file_path = league_path + "\\" + str(year) + "\\"
     dfs = []
     for table_name in league_table_names:
-        dfs.append(pd.read_csv(file_path + table_name + ".csv"))
+        try:
+            dfs.append(pd.read_csv(file_path + table_name + ".csv"))
+        except:
+            return 0
     rows = []
     list_iterator = 0
     for df in dfs:
@@ -324,8 +339,11 @@ def parse_coach_career(coach_name, coach_path, team_path, league_path):
 
     dfs = []
     for table_name in coach_table_names:
-        dfs.append(pd.read_csv(file_path + table_name + ".csv"))
-    
+        try:
+            dfs.append(pd.read_csv(file_path + table_name + ".csv"))
+        except:
+            dfs.append(pd.DataFrame())
+        
     prev_franchise_abrev = None
     is_head_coach = False
     previous_year_check = None
@@ -407,27 +425,35 @@ def parse_coach_career(coach_name, coach_path, team_path, league_path):
                     feature_dict["num_yr_nfl_hc"] += 1
                     # Add
         previous_year_check = year
+    
+    
     #Handle final hire length if not demotion
+    # Does not consider hires made in 2020 as they do not have 
+    # at least one full season of coached games
+    cutoff_year = 2022
+    current_year = 2025
     if len(rows) != 0 and len(rows[-1]) == 153:
         prev_year = rows[-1][1]
-
-        # Does not consider hires made in 2020 as they do not have 
-        # at least one full season of coached games
-        cutoff_year = 2020
-        current_year = 2024
         if prev_year == current_year:
             new_hire_data.append(rows.pop())
             print('\tExcluded last hire for both classification: {}, hire year: {}'.format(coach_name, prev_year))
         else:
-            # Necessary as the year count is not iterated like all previous checks
-            year += 1
             # Does not handle current coach tenure classification for those
             # hired since 2017 and still employed since not enough time has passed 
             # for fair classification
-            if year > current_year and prev_year >= cutoff_year:
+            if year >= current_year and prev_year >= cutoff_year:
                 print('\tExcluded last hire tenure classification: {}'.format(coach_name))
-            rows[-1].append(classify_coach_tenure(year - prev_year) if year < current_year or prev_year < cutoff_year else -1)
-
+            rows[-1].append(classify_coach_tenure(year + 1 - prev_year) if prev_year < cutoff_year or year < current_year else -1)
+    if year >= current_year and dfs[2]["Role"].iloc[-1] == "Head Coach" and dfs[2]["Level"].iloc[-1] == "NFL" and (dfs[2]["Role"].iloc[-2] != "Head Coach" or dfs[2]["Employer"].iloc[-2] != dfs[2]["Employer"].iloc[-1]):
+        last_team = dfs[2]["Employer"].iloc[-1]
+        last_team_abbrev = get_team_abbrev(last_team)
+        feature_dict["age"] = dfs[2]["Age"].iloc[-1]
+        new_row = [coach_name, year] + [quick_mean(value) for value in feature_dict.values()]
+        get_features_from_year(year, [last_team_abbrev], "HC", feature_dict, league_path)
+        new_row.extend(get_hiring_team_stats(last_team_abbrev, year, team_path, league_path))
+        new_row.append(-1)
+        new_row.append(-1)
+        rows.append(new_row)
 
     #Checks length
     for i in range(0, len(rows)):
@@ -450,7 +476,7 @@ def main():
     list_subfolders_with_paths = [f.path for f in os.scandir(coach_path) if f.is_dir()]
     for sub in list_subfolders_with_paths:
         #TODO Unhide
-        #coach_name = "Jon Gruden"
+        #coach_name = "Antonio Pierce"
         coach_name = sub.split('\\')[-1]
         print("Parsing coach {}, {}".format(count, coach_name))
         for new_row in parse_coach_career(coach_name, coach_path, team_path, league_path):
@@ -460,7 +486,7 @@ def main():
         #break
     #print(master_data)
     df = pd.DataFrame(data=master_data, columns=get_point_features())
-    df.to_csv("master_data6.csv")
+    df.to_csv("master_data7.csv")
     
     
     print('Parsed {} Hiring Instances'.format(len(master_data)))
