@@ -3,7 +3,10 @@
     "allow": [
       "Bash(python:*)",
       "Bash(mv:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(start coaching_timeline_animation.html)",
+      "Bash(pip install:*)",
+      "Bash(start enhanced_interactive_3d_clustering.html)"
     ],
     "deny": [],
     "ask": []
