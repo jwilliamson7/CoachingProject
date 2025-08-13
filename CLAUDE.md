@@ -11,13 +11,13 @@ This is a data science research project analyzing NFL coaching tenure and perfor
 ### Data Collection Scripts
 - `coach_scraping.py`: Scrapes individual coach data from pro-football-reference.com, extracting coaching results, rankings, and history
 - `team_data_scraping.py`: Scrapes team performance data by year, including playoff information and team statistics  
-- `create_data2.py`: Main feature engineering script that combines coach and team data (this is the current/active version)
+- `create_data.py`: Main feature engineering script that combines coach and team data (this is the current/active version)
 
 ### Data Structure
 - `Coaches/`: Individual coach directories containing CSV and Feather files with coaching history, results, and rankings
 - `League Data/`: Year-by-year league statistics (1920-2024) with team and opponent data, both raw and normalized
 - `Teams/`: Team-specific data storage with team records and playoff data
-- `master_data*.csv`: Consolidated datasets combining all features for model training (master_data7.csv is latest)
+- `master_data.csv`: Consolidated dataset combining all features for model training
 
 ## Development Workflow
 
@@ -30,13 +30,11 @@ python coach_scraping.py
 python team_data_scraping.py
 
 # Transform and combine data (current version)
-python create_data2.py
+python create_data.py
 ```
 
 ### Analysis Environment
 - Primary dependencies: pandas, numpy, sympy, scipy for data processing
-- Machine learning: scikit-learn for clustering, classification, and preprocessing
-- Visualization: matplotlib, seaborn for statistical plots and cluster analysis
 - Data stored in both CSV and Feather formats for performance
 - No package.json or requirements.txt - dependencies managed manually
 
@@ -44,11 +42,10 @@ python create_data2.py
 - LaTeX files for academic paper formatting (IEEE conference style)
 - Model parameter files (XGBC_best_params variants)
 - Generated visualizations and statistical analysis
-- Clustering analysis visualizations for coach profiling
 
 ## Data Features and Architecture
 
-The project uses `create_data2.py` to engineer 154 features per coaching hire including:
+The project uses `create_data.py` to engineer 154 features per coaching hire including:
 
 ### Core Coach Features (8 features)
 - Age at time of hire
@@ -88,44 +85,30 @@ The project uses `create_data2.py` to engineer 154 features per coaching hire in
 - Model evaluation focuses on coaching tenure prediction and winning percentage forecasting
 - Data spans from 1920 to 2025, covering the complete modern NFL era
 - Recent hires (2025) included as new hire predictions without tenure classification
-- Coach clustering analysis to identify natural groupings and hiring patterns
 
-## Clustering Analysis Scripts
+## Data Quality and Historical Context
 
-### Coach Clustering Visualization
-- `coach_clustering_viz.py`: Original clustering script with comprehensive visualization suite
-- `improved_clustering.py`: Enhanced preprocessing with feature selection and PCA dimensionality reduction
-- `balanced_clustering.py`: **RECOMMENDED** - Optimized for balanced cluster distribution with interpretable results
+### NFL Statistics Evolution
+The feature engineering process preserves historical accuracy regarding NFL statistics tracking:
 
-### Running Clustering Analysis
-```bash
-# Original comprehensive analysis (may produce unbalanced clusters)
-python coach_clustering_viz.py
+- **Basic statistics** (1920+): Points, yards, wins/losses, basic offensive/defensive stats
+- **Advanced passing metrics** (1960s+): Completion percentage, yards per attempt, passer rating components  
+- **Drive statistics** (1990s+): Average drive length, time of possession, scoring percentage
+- **Situational metrics** (2000s+): Third down conversion, red zone efficiency, fourth down attempts
 
-# Improved preprocessing with better feature handling
-python improved_clustering.py
+### Missing Data Patterns
+Some features will naturally be NaN for earlier coaching tenures:
+- **Features 62-74**: Late defensive coordinator metrics (drive stats, situational stats)
+- **Features 95-140**: Advanced head coach performance metrics
+- This is **historically accurate** - the NFL didn't track these statistics in the 1980s and earlier
 
-# Balanced clustering with interpretable core features (recommended)
-python balanced_clustering.py
-```
+### Data Processing Logic
+- **Performance data accumulation**: Each coach's performance statistics accumulate chronologically across all roles
+- **Hiring instance creation**: Separate data points generated for each head coaching hire, preserving prior experience
+- **Multi-tenure coaches**: Coaches hired multiple times (e.g., Bill Belichick 1991, 2000) retain accumulated experience from all previous roles
+- **Team franchise mapping**: Handles relocations and name changes (Raiders, Rams, Colts, etc.) correctly
 
-### Clustering Methodology
-- **Data preprocessing**: Feature completeness filtering (>70%), variance thresholding, robust scaling
-- **Core features**: 8 interpretable coach characteristics (age, experience, background)
-- **Algorithms**: K-means with balance optimization, hierarchical clustering, Gaussian mixture models
-- **Visualization**: PCA and t-SNE dimensionality reduction for cluster interpretation
-- **Balance optimization**: Multiple random initializations to prevent dominant mega-clusters
-
-### Known Issues and Solutions
-- **Unbalanced clustering**: Original 150-feature approach creates one dominant cluster (84% of data)
-- **Solution**: Use `balanced_clustering.py` which focuses on 8 core features and optimizes for cluster balance
-- **Feature sparsity**: Many of the 150 engineered features have missing values or low variance
-- **Solution**: Implemented feature completeness filtering and variance thresholding
-
-### Cluster Interpretation
-The balanced clustering identifies 5 distinct coach archetypes:
-- **Young coordinators** (62%): First-time HCs promoted from coordinator roles
-- **Experienced assistants** (11%): Mid-career hires with extensive NFL experience
-- **Veteran retreads** (8%): Former HCs returning to head coaching
-- **Position coach veterans** (11%): Long-time position coaches with minimal coordinator experience
-- **College-to-NFL** (8%): College head coaches transitioning to NFL
+### Known Data Quality Issues (Fixed)
+- ✅ **Multi-hire performance retention**: Fixed bug where coaches lost prior performance data on subsequent hires
+- ✅ **Feature completeness**: Advanced statistics correctly show as NaN for historical periods when not tracked
+- ✅ **Team mapping**: Franchise relocations and abbreviation changes handled properly via comprehensive mapping dictionary

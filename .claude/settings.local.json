@@ -6,7 +6,8 @@
       "Bash(rm:*)",
       "Bash(start coaching_timeline_animation.html)",
       "Bash(pip install:*)",
-      "Bash(start enhanced_interactive_3d_clustering.html)"
+      "Bash(start enhanced_interactive_3d_clustering.html)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []
