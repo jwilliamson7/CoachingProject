@@ -329,112 +329,102 @@ class CoachingDataProcessor:
                                 franchise_list = current_franchise_list
                     
                     if franchise_list:
+                        
+                        # FIRST: Load performance data for ALL roles (before creating hiring instances)
+                        if role in ["Offensive Coordinator", "Defensive Coordinator", "Special Teams Coordinator"]:
+                            feature_dict["num_yr_nfl_coor"] += 1
                             
-                            if role in ["Offensive Coordinator", "Defensive Coordinator", "Special Teams Coordinator"]:
-                                feature_dict["num_yr_nfl_coor"] += 1
+                            # Load performance data
+                            if role == "Offensive Coordinator":
+                                self._load_league_data(year, franchise_list, "OC", feature_dict)
+                            elif role == "Defensive Coordinator":
+                                self._load_league_data(year, franchise_list, "DC", feature_dict)
                                 
-                                # Load performance data
-                                if role == "Offensive Coordinator":
-                                    self._load_league_data(year, franchise_list, "OC", feature_dict)
-                                elif role == "Defensive Coordinator":
-                                    self._load_league_data(year, franchise_list, "DC", feature_dict)
+                        elif role == "Head Coach":
+                            # FIRST: Check if this is a new head coaching hire
+                            # Conditions: first time HC, team change, OR gap > 1 year since last HC role
+                            is_new_hire = (not is_head_coach or 
+                                         franchise_list != prev_franchise or
+                                         (last_hc_year is not None and year - last_hc_year > 1))
+                            
+                            if is_new_hire:
+                                # Create new hiring instance with ONLY prior experience data
+                                is_head_coach = True
+                                feature_dict["age"] = age
+                                prev_franchise = franchise_list
+                                
+                                # Calculate 2-year winning percentage
+                                win_results = []
+                                for result_year in [year, year + 1]:
+                                    if not results_df.empty:
+                                        result_rows = results_df[results_df['Year'] == result_year]
+                                        if not result_rows.empty:
+                                            result = result_rows.iloc[0]
+                                            wins = result.get('W', 0)
+                                            losses = result.get('L', 0)
+                                            ties = result.get('T', 0)
+                                            total = wins + losses + ties
+                                            if total > 0:
+                                                win_pct = (wins + 0.5 * ties) / total
+                                                win_results.append(win_pct)
+                                
+                                # Finalize previous instance if exists
+                                if career_instances and len(career_instances[-1]) == ANALYSIS_CONFIG['expected_feature_count'] - 1:
+                                    prev_instance = career_instances[-1]
+                                    prev_hire_year = prev_instance[1]
                                     
-                            elif role == "Head Coach":
-                                # Check if this is a new head coaching hire
-                                # Conditions: first time HC, team change, OR gap > 1 year since last HC role
-                                is_new_hire = (not is_head_coach or 
-                                             franchise_list != prev_franchise or
-                                             (last_hc_year is not None and year - last_hc_year > 1))
-                                
-                                if is_new_hire:
-                                    # If this is a gap (not first time), need to reset HC features for clean slate
+                                    # Calculate actual tenure based on when the previous stint ended
+                                    # If there's a gap, the previous stint ended at last_hc_year + 1
+                                    # If it's a team change with no gap, use the year before current hire
                                     if last_hc_year is not None and year - last_hc_year > 1:
-                                        # Gap detected - reset HC-specific accumulated stats for new hiring instance
-                                        # Keep experience counters but clear performance stats
-                                        for feature_name in get_all_feature_names():
-                                            if "__hc" in feature_name or "__opp__hc" in feature_name:
-                                                if feature_name in feature_dict and isinstance(feature_dict[feature_name], list):
-                                                    feature_dict[feature_name] = []
+                                        # Gap detected - previous stint ended after last_hc_year
+                                        tenure_years = (last_hc_year + 1) - prev_hire_year
+                                    else:
+                                        # No gap - previous stint ended just before current hire
+                                        tenure_years = year - prev_hire_year
                                     
-                                    is_head_coach = True
-                                    feature_dict["age"] = age
-                                    prev_franchise = franchise_list
-                                    
-                                    # Calculate 2-year winning percentage
-                                    win_results = []
-                                    for result_year in [year, year + 1]:
-                                        if not results_df.empty:
-                                            result_rows = results_df[results_df['Year'] == result_year]
-                                            if not result_rows.empty:
-                                                result = result_rows.iloc[0]
-                                                wins = result.get('W', 0)
-                                                losses = result.get('L', 0)
-                                                ties = result.get('T', 0)
-                                                total = wins + losses + ties
-                                                if total > 0:
-                                                    win_pct = (wins + 0.5 * ties) / total
-                                                    win_results.append(win_pct)
-                                    
-                                    # Finalize previous instance if exists
-                                    if career_instances and len(career_instances[-1]) == ANALYSIS_CONFIG['expected_feature_count'] - 1:
-                                        prev_instance = career_instances[-1]
-                                        prev_hire_year = prev_instance[1]
-                                        
-                                        # Calculate actual tenure based on when the previous stint ended
-                                        # If there's a gap, the previous stint ended at last_hc_year + 1
-                                        # If it's a team change with no gap, use the year before current hire
-                                        if last_hc_year is not None and year - last_hc_year > 1:
-                                            # Gap detected - previous stint ended after last_hc_year
-                                            tenure_years = (last_hc_year + 1) - prev_hire_year
-                                        else:
-                                            # No gap - previous stint ended just before current hire
-                                            tenure_years = year - prev_hire_year
-                                        
-                                        prev_instance.append(self._classify_coach_tenure(tenure_years))
-                                    
-                                    # Create new instance with PREVIOUS experience only
-                                    new_instance = [coach_name, year]
-                                    
-                                    # Ensure feature order matches get_all_feature_names() order
-                                    feature_names = get_all_feature_names()
-                                    feature_values = []
-                                    for feature_name in feature_names:
-                                        if feature_name in feature_dict:
-                                            feature_values.append(self._safe_mean(feature_dict[feature_name]))
-                                        else:
-                                            feature_values.append(0)  # Default for missing features
-                                    
-                                    new_instance.extend(feature_values)
-                                    
-                                    # Get team index for hiring context
-                                    team_index = 0
-                                    for i, team_abbrev in enumerate(franchise_list):
-                                        year_dir = self.league_dir / str(year)
-                                        if year_dir.exists():
-                                            try:
-                                                team_file = year_dir / f"{DATA_FILES['league_tables'][0]}.csv"
-                                                team_df = pd.read_csv(team_file)
-                                                team_row = team_df[team_df['Team Abbreviation'] == team_abbrev]
-                                                if not team_row.empty:
-                                                    team_index = i
-                                                    break
-                                            except FileNotFoundError:
-                                                continue
-                                    
-                                    new_instance.extend(self._get_hiring_team_context(franchise_list[team_index], year))
-                                    new_instance.append(self._safe_mean(win_results))
-                                    career_instances.append(new_instance)
-                                    feature_dict["num_times_hc"] += 1
-                                    
-                                    # NOW add current year's HC performance for future instances
-                                    self._load_league_data(year, franchise_list, "HC", feature_dict)
-                                else:
-                                    # Continue current head coaching stint
-                                    self._load_league_data(year, franchise_list, "HC", feature_dict)
+                                    prev_instance.append(self._classify_coach_tenure(tenure_years))
                                 
-                                # Update last HC year for gap detection
-                                last_hc_year = year
-                                feature_dict["num_yr_nfl_hc"] += 1
+                                # Create new instance with PREVIOUS experience only
+                                new_instance = [coach_name, year]
+                                
+                                # Ensure feature order matches get_all_feature_names() order
+                                feature_names = get_all_feature_names()
+                                feature_values = []
+                                for feature_name in feature_names:
+                                    if feature_name in feature_dict:
+                                        feature_values.append(self._safe_mean(feature_dict[feature_name]))
+                                    else:
+                                        feature_values.append(0)  # Default for missing features
+                                
+                                new_instance.extend(feature_values)
+                                
+                                # Get team index for hiring context
+                                team_index = 0
+                                for i, team_abbrev in enumerate(franchise_list):
+                                    year_dir = self.league_dir / str(year)
+                                    if year_dir.exists():
+                                        try:
+                                            team_file = year_dir / f"{DATA_FILES['league_tables'][0]}.csv"
+                                            team_df = pd.read_csv(team_file)
+                                            team_row = team_df[team_df['Team Abbreviation'] == team_abbrev]
+                                            if not team_row.empty:
+                                                team_index = i
+                                                break
+                                        except FileNotFoundError:
+                                            continue
+                                    
+                                new_instance.extend(self._get_hiring_team_context(franchise_list[team_index], year))
+                                new_instance.append(self._safe_mean(win_results))
+                                career_instances.append(new_instance)
+                                feature_dict["num_times_hc"] += 1
+                            
+                            # NOW add current year's HC performance for future hiring instances
+                            self._load_league_data(year, franchise_list, "HC", feature_dict)
+                            feature_dict["num_yr_nfl_hc"] += 1
+                            
+                            # Update last HC year for gap detection (for all HC years, not just new hires)
+                            last_hc_year = year
             
             prev_year_check = year
         
