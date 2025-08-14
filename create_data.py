@@ -13,6 +13,7 @@ from data_constants import (
     DATA_FILES,
     ANALYSIS_CONFIG,
     FIRED_COACHES,
+    EXCLUDED_HIRING_INSTANCES,
     get_all_feature_names,
     get_feature_dict,
     get_hiring_team_stat_dict,
@@ -416,8 +417,15 @@ class CoachingDataProcessor:
                                     
                                 new_instance.extend(self._get_hiring_team_context(franchise_list[team_index], year))
                                 new_instance.append(self._safe_mean(win_results))
-                                career_instances.append(new_instance)
-                                feature_dict["num_times_hc"] += 1
+                                
+                                # Check if this instance should be excluded from the dataset
+                                if (coach_name, year) not in EXCLUDED_HIRING_INSTANCES:
+                                    career_instances.append(new_instance)
+                                    feature_dict["num_times_hc"] += 1
+                                else:
+                                    print(f"\tExcluded hiring instance: {coach_name} ({year})")
+                                    # Still count as head coach experience for future instances
+                                    feature_dict["num_times_hc"] += 1
                             
                             # NOW add current year's HC performance for future hiring instances
                             self._load_league_data(year, franchise_list, "HC", feature_dict)

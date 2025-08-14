@@ -192,6 +192,12 @@ FIRED_COACHES = [
     "Jerod Mayo"
 ]
 
+# Coach-year hiring instances to exclude from final dataset
+# Format: (coach_name, hire_year) tuples
+EXCLUDED_HIRING_INSTANCES = [
+    ("Sean Payton", 2013)  # Interim/temporary hire that should not be included in analysis
+]
+
 
 def get_all_feature_names() -> List[str]:
     """Generate complete list of feature names in correct order matching Excel file"""
