@@ -424,8 +424,7 @@ class CoachingDataProcessor:
                                     feature_dict["num_times_hc"] += 1
                                 else:
                                     print(f"\tExcluded hiring instance: {coach_name} ({year})")
-                                    # Still count as head coach experience for future instances
-                                    feature_dict["num_times_hc"] += 1
+                                    # Do NOT count excluded instances in prior HC count for future hires
                             
                             # NOW add current year's HC performance for future hiring instances
                             self._load_league_data(year, franchise_list, "HC", feature_dict)
