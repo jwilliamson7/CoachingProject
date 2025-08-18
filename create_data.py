@@ -356,6 +356,7 @@ class CoachingDataProcessor:
                                 
                                 # Calculate 2-year winning percentage
                                 win_results = []
+                                # For coaches hired in 2024 or later, we may not have 2 years of data
                                 for result_year in [year, year + 1]:
                                     if not results_df.empty:
                                         result_rows = results_df[results_df['Year'] == result_year]
@@ -416,7 +417,13 @@ class CoachingDataProcessor:
                                             continue
                                     
                                 new_instance.extend(self._get_hiring_team_context(franchise_list[team_index], year))
-                                new_instance.append(self._safe_mean(win_results))
+                                
+                                # For recent hires (2024+), set win pct to -1 if we don't have sufficient data
+                                if year >= 2024 and len(win_results) < 2:
+                                    # Not enough data for 2-year average
+                                    new_instance.append(-1.0 if len(win_results) == 0 else win_results[0])
+                                else:
+                                    new_instance.append(self._safe_mean(win_results))
                                 
                                 # Check if this instance should be excluded from the dataset
                                 if (coach_name, year) not in EXCLUDED_HIRING_INSTANCES:
