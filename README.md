@@ -53,6 +53,16 @@ This platform combines extensive historical NFL data (1920-2025) with advanced f
 
 ## Getting Started
 
+### Prerequisites
+```bash
+# Required Python packages
+pip install pandas numpy scipy sympy
+pip install beautifulsoup4 requests
+pip install scikit-learn xgboost
+pip install matplotlib seaborn
+pip install pyarrow  # For Feather file support
+```
+
 ### Data Collection
 ```bash
 # Collect coaching data (rate-limited for API compliance)
@@ -61,12 +71,22 @@ python coach_scraping.py
 # Gather team performance data
 python team_data_scraping.py
 
+# Transform and normalize team data
+python transform_team_data.py
+
 # Generate feature-engineered dataset
-python create_data2.py
+python create_data.py
+
+# Optional: Run data validation
+python detailed_data_comparison.py
 ```
 
-### Output
-The pipeline generates `master_data7.csv` containing the complete feature-engineered dataset ready for machine learning applications.
+### Output Files
+- `master_data.csv`: Complete feature-engineered dataset ready for machine learning
+- `Coaches/`: Individual coach data files in CSV and Feather formats
+- `League Data/`: Yearly league statistics (raw and normalized)
+- `Teams/`: Team-specific performance data
+- `XGBC_best_params_*.pkl`: Optimized model parameters for different configurations
 
 ## Applications
 
@@ -77,11 +97,48 @@ The pipeline generates `master_data7.csv` containing the complete feature-engine
 
 ## Technical Stack
 
-- **Data Processing**: Python (pandas, numpy, scipy)
-- **Web Scraping**: BeautifulSoup, requests with rate limiting
+- **Data Processing**: Python (pandas, numpy, scipy, sympy)
+- **Web Scraping**: BeautifulSoup4, requests with rate limiting
+- **Machine Learning**: scikit-learn, XGBoost
+- **Visualization**: matplotlib, seaborn
 - **Storage**: CSV and Feather formats for performance optimization
 - **Research Output**: LaTeX for academic publication formatting
+- **Development**: Jupyter notebooks for iterative model development
+
+## Project Structure
+
+```
+CoachingProject/
+├── coach_scraping.py           # Coach data collection
+├── team_data_scraping.py       # Team performance scraping
+├── create_data.py              # Feature engineering pipeline
+├── transform_team_data.py      # Data transformation utilities
+├── matrix_factorization_imputation.py  # Missing data handling
+├── data_constants.py           # Configuration and constants
+├── detailed_data_comparison.py # Data validation tools
+├── Coaches/                    # Individual coach data
+├── League Data/                # Historical league statistics
+├── Teams/                      # Team-specific data
+├── Williamson-Jon-*.ipynb      # Model development notebooks
+└── master_data.csv             # Final feature-engineered dataset
+```
+
+## Model Development
+
+The project includes multiple Jupyter notebooks documenting the iterative model development process:
+
+- **CoachTenureModels (v2-v6)**: Progressive improvements in coaching tenure classification
+- **CoachWinPctModels (v1)**: Winning percentage prediction models
+
+Each notebook version represents refinements in feature selection, hyperparameter tuning, and model evaluation strategies.
+
+## Data Quality Notes
+
+- **Historical Coverage**: Statistics availability varies by era (basic stats from 1920, advanced metrics from 1990s+)
+- **Missing Data**: Handled appropriately with matrix factorization for imputation where suitable
+- **Franchise Changes**: Comprehensive mapping handles team relocations and name changes
+- **Validation**: Extensive data quality checks ensure 154 features per coaching instance
 
 ## Research Impact
 
-This platform supports academic research in sports analytics and has been developed for presentation at sports analytics conferences, contributing to the growing field of data-driven decision making in professional sports management.
+This platform supports academic research in sports analytics and has been developed for presentation at sports analytics conferences (SSAC), contributing to the growing field of data-driven decision making in professional sports management. The project originated as coursework for CSCE421 and has evolved into a comprehensive research platform for NFL coaching analytics.

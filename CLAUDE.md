@@ -12,12 +12,17 @@ This is a data science research project analyzing NFL coaching tenure and perfor
 - `coach_scraping.py`: Scrapes individual coach data from pro-football-reference.com, extracting coaching results, rankings, and history
 - `team_data_scraping.py`: Scrapes team performance data by year, including playoff information and team statistics  
 - `create_data.py`: Main feature engineering script that combines coach and team data (this is the current/active version)
+- `transform_team_data.py`: Processes and transforms raw team data into analysis-ready format
+- `matrix_factorization_imputation.py`: Handles missing data imputation using matrix factorization techniques
+- `data_constants.py`: Centralized storage for data constants and configuration parameters
+- `detailed_data_comparison.py`: Data validation and comparison utilities for quality assurance
 
 ### Data Structure
 - `Coaches/`: Individual coach directories containing CSV and Feather files with coaching history, results, and rankings
-- `League Data/`: Year-by-year league statistics (1920-2024) with team and opponent data, both raw and normalized
+- `League Data/`: Year-by-year league statistics (1920-2025) with team and opponent data, both raw and normalized
 - `Teams/`: Team-specific data storage with team records and playoff data
 - `master_data.csv`: Consolidated dataset combining all features for model training
+- `*.ipynb`: Jupyter notebooks for model development and analysis (multiple versions for different model iterations)
 
 ## Development Workflow
 
@@ -35,13 +40,17 @@ python create_data.py
 
 ### Analysis Environment
 - Primary dependencies: pandas, numpy, sympy, scipy for data processing
+- Machine learning libraries: scikit-learn, XGBoost for predictive modeling
+- Visualization: matplotlib, seaborn for data analysis and model evaluation
 - Data stored in both CSV and Feather formats for performance
 - No package.json or requirements.txt - dependencies managed manually
 
 ### Research Output
 - LaTeX files for academic paper formatting (IEEE conference style)
-- Model parameter files (XGBC_best_params variants)
+- Model parameter files (XGBC_best_params variants for different model configurations)
 - Generated visualizations and statistical analysis
+- Excel files with results tables and model comparisons
+- Jupyter notebooks documenting model development iterations (v1-v6)
 
 ## Data Features and Architecture
 
@@ -85,6 +94,19 @@ The project uses `create_data.py` to engineer 154 features per coaching hire inc
 - Model evaluation focuses on coaching tenure prediction and winning percentage forecasting
 - Data spans from 1920 to 2025, covering the complete modern NFL era
 - Recent hires (2025) included as new hire predictions without tenure classification
+
+## Model Development and Evaluation
+
+### Modeling Approach
+- **Gradient Boosting Models**: Primary approach using XGBoost for both classification and regression tasks
+- **Feature Selection**: Recursive feature elimination and importance-based selection
+- **Cross-validation**: Time-aware splitting to prevent data leakage
+- **Hyperparameter Tuning**: Grid search with cross-validation for optimal parameters
+
+### Model Versions
+- Multiple notebook versions (v1-v6) document iterative model improvements
+- Separate models for tenure classification vs winning percentage prediction
+- Best parameters saved for reproducibility
 
 ## Data Quality and Historical Context
 
