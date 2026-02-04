@@ -9,7 +9,8 @@
       "Bash(start enhanced_interactive_3d_clustering.html)",
       "Bash(grep:*)",
       "Bash(cat:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(pdflatex:*)"
     ],
     "deny": [],
     "ask": []
