@@ -1,9 +1,14 @@
 import os
+import sys
 import pandas as pd
 import math
 from pathlib import Path
 from numpy import mean, nan, nanmean
 from typing import List, Dict, Tuple, Union, Optional
+
+# Add project root to path for imports
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root))
 
 from data_constants import (
     TEAM_FRANCHISE_MAPPINGS,
@@ -23,13 +28,13 @@ from data_constants import (
 
 class CoachingDataProcessor:
     """Processes NFL coaching career data into feature-engineered datasets"""
-    
-    def __init__(self, coaches_dir: str = "Coaches", teams_dir: str = "Teams", 
-                 league_dir: str = "League Data"):
-        """Initialize with data directory paths"""
-        self.coaches_dir = Path(coaches_dir)
-        self.teams_dir = Path(teams_dir)
-        self.league_dir = Path(league_dir)
+
+    def __init__(self, coaches_dir: str = None, teams_dir: str = None,
+                 league_dir: str = None):
+        """Initialize with data directory paths (relative to project root)"""
+        self.coaches_dir = Path(coaches_dir) if coaches_dir else project_root / "Coaches"
+        self.teams_dir = Path(teams_dir) if teams_dir else project_root / "Teams"
+        self.league_dir = Path(league_dir) if league_dir else project_root / "League Data"
         
     def _classify_coach_tenure(self, years: int) -> int:
         """Classify coaching tenure into categories"""
@@ -507,17 +512,18 @@ class CoachingDataProcessor:
 def main():
     """Main execution function"""
     print("Starting Coaching Data Processing...")
-    
+
     # Initialize processor
     processor = CoachingDataProcessor()
-    
+
     # Process all coaching data
     master_df = processor.process_all_coaches()
-    
-    # Save results
-    output_file = "master_data.csv"
+
+    # Save results to data directory
+    output_file = project_root / "data" / "master_data.csv"
+    output_file.parent.mkdir(parents=True, exist_ok=True)
     master_df.to_csv(output_file, index=True)
-    
+
     print(f"\nProcessing completed!")
     print(f"Dataset saved to: {output_file}")
     print(f"Total coaching instances: {len(master_df)}")
