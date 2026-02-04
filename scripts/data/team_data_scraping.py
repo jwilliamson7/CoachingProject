@@ -1,12 +1,17 @@
 import requests
 import time
 import os
+import sys
 import pandas as pd
 from random import randint
 from pathlib import Path
 from bs4 import BeautifulSoup, Comment
 import math
 from typing import List, Optional, Tuple
+
+# Add project root to path
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root))
 
 
 class TeamDataScraper:
@@ -25,9 +30,9 @@ class TeamDataScraper:
         '4DConv', '4D%', 'RZAtt', 'RZTD', 'RZPct'
     ]
     
-    def __init__(self, output_dir: str = "Teams"):
+    def __init__(self, output_dir: str = None):
         """Initialize the scraper with output directory"""
-        self.output_dir = Path(output_dir)
+        self.output_dir = Path(output_dir) if output_dir else project_root / "Teams"
         self.output_dir.mkdir(exist_ok=True)
         
     def _create_team_directory(self, team_abbrev: str) -> Path:

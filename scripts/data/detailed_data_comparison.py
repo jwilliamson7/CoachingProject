@@ -1,18 +1,28 @@
+import sys
 import pandas as pd
 import numpy as np
+from pathlib import Path
 from collections import defaultdict
+
+# Add project root to path
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root))
+
 
 def detailed_data_comparison():
     """Comprehensive comparison between old and new master_data files"""
-    
+
     print("="*80)
     print("DETAILED MASTER DATA COMPARISON")
     print("="*80)
-    
+
+    # Define paths relative to project root
+    data_dir = project_root / "data"
+
     # Load both datasets
     try:
-        old_df = pd.read_csv('old_master_data.csv')
-        new_df = pd.read_csv('master_data.csv')
+        old_df = pd.read_csv(data_dir / 'old_master_data.csv')
+        new_df = pd.read_csv(data_dir / 'master_data.csv')
         print(f"* Loaded old_master_data.csv: {len(old_df)} rows, {len(old_df.columns)} columns")
         print(f"* Loaded master_data.csv: {len(new_df)} rows, {len(new_df.columns)} columns")
     except FileNotFoundError as e:

@@ -264,11 +264,38 @@ def get_hiring_team_stat_dict() -> Dict[str, List]:
 def get_output_column_names() -> List[str]:
     """Generate output CSV column names"""
     columns = ['Coach Name', 'Year']
-    
+
     # Add numbered feature columns
     total_features = len(get_all_feature_names()) + len(HIRING_TEAM_FEATURES)
     for i in range(1, total_features + 1):
         columns.append(f'Feature {i}')
-    
+
     columns.extend(['Avg 2Y Win Pct', 'Coach Tenure Class'])
     return columns
+
+
+# Model file paths (relative to project root)
+MODEL_PATHS = {
+    'data_dir': 'data',
+    'data_file': 'data/svd_imputed_master_data.csv',
+    'raw_data_file': 'data/master_data.csv',
+    'models_dir': 'data/models',
+    'default_model_output': 'data/models/coach_tenure_model.pkl',
+    'ordinal_model_output': 'data/models/coach_tenure_ordinal_model.pkl',
+    'multiclass_model_output': 'data/models/coach_tenure_multiclass_model.pkl'
+}
+
+# Ordinal classification configuration
+ORDINAL_CONFIG = {
+    'n_classes': 3,
+    'class_names': [
+        'Class 0 (1-2 yrs)',
+        'Class 1 (3-4 yrs)',
+        'Class 2 (5+ yrs)'
+    ],
+    'class_thresholds': {
+        0: (1, 2),   # 1-2 years tenure
+        1: (3, 4),   # 3-4 years tenure
+        2: (5, None) # 5+ years tenure
+    }
+}
