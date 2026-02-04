@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.1.26)  4 FEB 2026 08:54
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.1.26)  4 FEB 2026 09:38
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -911,87 +911,81 @@ File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 [1{C:/Users/jonwi/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/jo
 nwi/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}
 
-{C:/Users/jonwi/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc}
-{C:/Users/jonwi/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc} <C:
-/Users/jonwi/AppData/Local/Programs/MiKTeX/tex/latex/notes/warn.pdf>] [2{C:/Use
-rs/jonwi/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathex.enc}{C:/Use
-rs/jonwi/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}]
-<figures/correlation_matrix.png, id=128, 820.9872pt x 711.1368pt>
-File: figures/correlation_matrix.png Graphic file (type png)
-<use figures/correlation_matrix.png>
-Package pdftex.def Info: figures/correlation_matrix.png  used on input line 133
-.
-(pdftex.def)             Requested size: 396.9131pt x 343.80498pt.
-LaTeX Font Info:    Calculating math sizes for size <8.0> on input line 134.
+{C:/Users/jonwi/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}
+ <C:/Users/jonwi/AppData/Local/Programs/MiKTeX/tex/latex/notes/warn.pdf>] [2{C:
+/Users/jonwi/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc}{C:
+/Users/jonwi/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}{C:/Use
+rs/jonwi/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathex.enc}]
+LaTeX Font Info:    Calculating math sizes for size <8.0> on input line 126.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8.0> on input line 134.
+(Font)              <8.0> on input line 126.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5.6209> on input line 134.
+(Font)              <5.6209> on input line 126.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <4.01495> on input line 134.
+(Font)              <4.01495> on input line 126.
 
 
 LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <4.01495> not available
-(Font)              size <5> substituted on input line 154.
+(Font)              size <5> substituted on input line 129.
 
 
 LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <4.01495> not available
-(Font)              size <5> substituted on input line 154.
+(Font)              size <5> substituted on input line 129.
 
 
 LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <4.01495> not available
-(Font)              size <5> substituted on input line 154.
+(Font)              size <5> substituted on input line 129.
 
-[3] [4 <./figures/correlation_matrix.png>]
-<figures/tenure_predictions.png, id=148, 849.6543pt x 328.3467pt>
+[3]
+<figures/correlation_matrix.png, id=134, 820.9872pt x 711.1368pt>
+File: figures/correlation_matrix.png Graphic file (type png)
+<use figures/correlation_matrix.png>
+Package pdftex.def Info: figures/correlation_matrix.png  used on input line 155
+.
+(pdftex.def)             Requested size: 396.9131pt x 343.80498pt.
+ [4] [5 <./figures/correlation_matrix.png>]
+<figures/tenure_predictions.png, id=154, 849.6543pt x 328.3467pt>
 File: figures/tenure_predictions.png Graphic file (type png)
 <use figures/tenure_predictions.png>
-Package pdftex.def Info: figures/tenure_predictions.png  used on input line 205
+Package pdftex.def Info: figures/tenure_predictions.png  used on input line 227
 .
 (pdftex.def)             Requested size: 432.19531pt x 167.02371pt.
-<figures/tenure_feature_importance.png, id=150, 715.2321pt x 569.7285pt>
-File: figures/tenure_feature_importance.png Graphic file (type png)
-<use figures/tenure_feature_importance.png>
-Package pdftex.def Info: figures/tenure_feature_importance.png  used on input l
-ine 214.
-(pdftex.def)             Requested size: 396.9131pt x 316.16829pt.
-<figures/category_importance_total.png, id=152, 715.473pt x 425.1885pt>
+<figures/category_importance_total.png, id=156, 715.473pt x 425.1885pt>
 File: figures/category_importance_total.png Graphic file (type png)
 <use figures/category_importance_total.png>
 Package pdftex.def Info: figures/category_importance_total.png  used on input l
-ine 223.
+ine 236.
 (pdftex.def)             Requested size: 211.68654pt x 125.79932pt.
-<figures/category_importance_avg.png, id=153, 715.473pt x 425.1885pt>
+<figures/category_importance_avg.png, id=157, 715.473pt x 425.1885pt>
 File: figures/category_importance_avg.png Graphic file (type png)
 <use figures/category_importance_avg.png>
 Package pdftex.def Info: figures/category_importance_avg.png  used on input lin
-e 224.
+e 237.
 (pdftex.def)             Requested size: 211.68654pt x 125.79932pt.
- [5 <./figures/tenure_predictions.png>] [6 <./figures/tenure_feature_importance
-.png> <./figures/category_importance_total.png> <./figures/category_importance_
-avg.png>] [7]
+ [6 <./figures/tenure_predictions.png>] [7 <./figures/category_importance_total
+.png> <./figures/category_importance_avg.png>]
 LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <8.0> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 308.
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 301.
 
-Underfull \hbox (badness 7451) in paragraph at lines 311--312
+Underfull \hbox (badness 7451) in paragraph at lines 304--305
 []\T1/lmss/m/n/8.0 (+20) DataRobot (2020). Us-ing ma-chine learn-ing to peek in
 -side the minds of NFL coaches. Avail-able at: 
  []
 
 [8]
-LaTeX Font Info:    Calculating math sizes for size <7.0> on input line 384.
+LaTeX Font Info:    Calculating math sizes for size <7.0> on input line 377.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <4.91829> on input line 384.
+(Font)              <4.91829> on input line 377.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <3.51308> on input line 384.
+(Font)              <3.51308> on input line 377.
  [9
 
 ] [10] [11] [12]
-<figures/tenure_distribution.png, id=205, 570.933pt x 352.9185pt>
+<figures/tenure_distribution.png, id=201, 570.933pt x 352.9185pt>
 File: figures/tenure_distribution.png Graphic file (type png)
 <use figures/tenure_distribution.png>
 Package pdftex.def Info: figures/tenure_distribution.png  used on input line 53
-9.
+2.
 (pdftex.def)             Requested size: 352.81538pt x 218.09637pt.
  [13
 
@@ -1015,13 +1009,13 @@ ct.out' has not changed.
 (rerunfilecheck)             Checksum: 87D9F7DA93C2F7E18432289D56371652;3927.
  ) 
 Here is how much of TeX's memory you used:
- 18469 strings out of 467871
- 303665 string characters out of 5418376
- 769236 words of memory out of 5000000
- 46718 multiletter control sequences out of 15000+600000
- 716616 words of font info for 197 fonts, out of 8000000 for 9000
+ 18468 strings out of 467871
+ 303401 string characters out of 5418376
+ 769088 words of memory out of 5000000
+ 46710 multiletter control sequences out of 15000+600000
+ 716981 words of font info for 201 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 90i,11n,131p,1296b,559s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 90i,11n,131p,1298b,534s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/jonwi/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
 cmr6.pfb><C:/Users/jonwi/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfo
 nts/cm/cmsy8.pfb><C:/Users/jonwi/AppData/Local/Programs/MiKTeX/fonts/type1/publ
@@ -1036,9 +1030,9 @@ lmssbx10.pfb><C:/Users/jonwi/AppData/Local/Programs/MiKTeX/fonts/type1/public/l
 m/lmsso8.pfb><C:/Users/jonwi/AppData/Local/Programs/MiKTeX/fonts/type1/public/l
 m/lmsy10.pfb>
 Output written on 2026-Williamson-Jon-Portfolio-Coaching-Project.pdf (14 pages,
- 1348262 bytes).
+ 1158724 bytes).
 PDF statistics:
- 277 PDF objects out of 1000 (max. 8388607)
- 58 named destinations out of 1000 (max. 500000)
- 46792 words of extra memory for PDF output out of 51595 (max. 10000000)
+ 273 PDF objects out of 1000 (max. 8388607)
+ 57 named destinations out of 1000 (max. 500000)
+ 46787 words of extra memory for PDF output out of 51595 (max. 10000000)
 

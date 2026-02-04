@@ -12,7 +12,8 @@
       "WebSearch",
       "Bash(pdflatex:*)",
       "Bash(pushd:*)",
-      "Bash(popd:*)"
+      "Bash(popd:*)",
+      "Bash(powershell -Command \"Get-Content ''C:\\\\Users\\\\jonwi\\\\Documents\\\\Projects\\\\CoachingProject\\\\data\\\\svd_imputed_master_data.csv'' -Head 5\")"
     ],
     "deny": [],
     "ask": []
