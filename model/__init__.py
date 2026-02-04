@@ -25,6 +25,12 @@ from .config import (
     ORDINAL_CONFIG,
     MODEL_CONFIG
 )
+from .tuning import (
+    tune_ordinal_model_qwk,
+    TunableOrdinalClassifier,
+    QWK_SCORER,
+    compare_tuning_metrics
+)
 
 __all__ = [
     'OrdinalClassifier',
@@ -40,5 +46,9 @@ __all__ = [
     'XGBOOST_PARAM_DISTRIBUTIONS',
     'DEFAULT_XGBOOST_PARAMS',
     'ORDINAL_CONFIG',
-    'MODEL_CONFIG'
+    'MODEL_CONFIG',
+    'tune_ordinal_model_qwk',
+    'TunableOrdinalClassifier',
+    'QWK_SCORER',
+    'compare_tuning_metrics'
 ]

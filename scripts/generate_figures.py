@@ -205,6 +205,72 @@ def generate_predictions_plot(df, X, y, model, output_dir):
     print(f"  Saved: {output_path}")
 
 
+def get_feature_description(feat_num):
+    """Get abbreviated description for a feature number (1-indexed)."""
+    # Core features (1-8)
+    core_features = {
+        1: "Age at hiring",
+        2: "Prior HC hires",
+        3: "Yrs college pos. coach",
+        4: "Yrs college coordinator",
+        5: "Yrs college HC",
+        6: "Yrs NFL pos. coach",
+        7: "Yrs NFL coordinator",
+        8: "Yrs NFL HC",
+    }
+    if feat_num in core_features:
+        return core_features[feat_num]
+
+    # Stat names for OC/DC/HC features (33 stats each)
+    stat_names = [
+        "points", "yards", "yds/play", "turnovers", "1st downs",
+        "pass comp.", "pass att.", "pass yds", "pass TDs", "INTs",
+        "NY/A", "pass 1st downs", "rush att.", "rush yds", "rush TDs",
+        "rush yds/play", "rush 1st downs", "penalties", "penalty yds", "penalty 1st",
+        "drives", "scoring %", "TO %", "drive duration", "plays/drive",
+        "yds/drive", "pts/drive", "3rd down att.", "3rd down %", "4th down att.",
+        "4th down %", "red zone att.", "red zone %"
+    ]
+
+    # OC stats (9-41)
+    if 9 <= feat_num <= 41:
+        stat_idx = feat_num - 9
+        return f"OC: {stat_names[stat_idx]}"
+
+    # DC stats (42-74)
+    if 42 <= feat_num <= 74:
+        stat_idx = feat_num - 42
+        return f"DC opp: {stat_names[stat_idx]}"
+
+    # HC team stats (75-107)
+    if 75 <= feat_num <= 107:
+        stat_idx = feat_num - 75
+        return f"HC: {stat_names[stat_idx]}"
+
+    # HC opponent stats (108-140)
+    if 108 <= feat_num <= 140:
+        stat_idx = feat_num - 108
+        return f"HC opp: {stat_names[stat_idx]}"
+
+    # Hiring team features (141-150)
+    hiring_features = {
+        141: "Hiring tm: win %",
+        142: "Hiring tm: pts scored",
+        143: "Hiring tm: pts allowed",
+        144: "Hiring tm: yds offense",
+        145: "Hiring tm: yds allowed",
+        146: "Hiring tm: yds/play",
+        147: "Hiring tm: yds/play allowed",
+        148: "Hiring tm: TOs forced",
+        149: "Hiring tm: TOs",
+        150: "Hiring tm: playoff apps",
+    }
+    if feat_num in hiring_features:
+        return hiring_features[feat_num]
+
+    return f"Feature {feat_num}"
+
+
 def generate_feature_importance_plot(model, output_dir):
     """Generate feature importance bar chart."""
     print("Generating feature importance plot...")
@@ -217,32 +283,8 @@ def generate_feature_importance_plot(model, output_dir):
     indices = np.argsort(importances)[::-1][:top_n]
     top_importances = importances[indices]
 
-    # Feature descriptions (abbreviated)
-    feature_descriptions = {
-        103: "HC: 3rd down conv. %",
-        6: "Years NFL position coach",
-        12: "OC: team turnovers",
-        145: "Hiring team: yds allowed",
-        122: "HC opp: rushing TDs",
-        35: "OC: points per drive",
-        94: "HC: penalty 1st downs",
-        83: "HC: passing TDs",
-        70: "DC opp: 3rd down conv. %",
-        136: "HC opp: 3rd down conv. %",
-        135: "HC opp: 3rd down attempts",
-        11: "OC: yards per play",
-        73: "DC opp: red zone attempts",
-        22: "OC: rushing yards",
-        120: "HC opp: rushing attempts",
-        48: "DC opp: passing attempts",
-        138: "HC opp: 4th down conv. %",
-        129: "HC opp: scoring %",
-        101: "HC: points per drive",
-        55: "DC opp: rushing yards",
-    }
-
-    # Create labels
-    labels = [feature_descriptions.get(idx+1, f"Feature {idx+1}") for idx in indices]
+    # Create labels using comprehensive feature descriptions
+    labels = [get_feature_description(idx + 1) for idx in indices]
 
     # Create figure
     fig, ax = plt.subplots(figsize=(10, 8))
@@ -289,6 +331,93 @@ def generate_feature_importance_plot(model, output_dir):
     plt.close()
 
     print(f"  Saved: {output_path}")
+
+
+def generate_category_importance_plots(model, output_dir):
+    """Generate feature importance by category plots (total and average)."""
+    print("Generating category importance plots...")
+
+    # Get feature importances
+    importances = model.get_feature_importances()
+
+    # Define categories with their feature ranges (1-indexed)
+    # HC Stats and HC Opponent Stats are combined (same as individual feature importance plot)
+    categories = {
+        'Core\nExperience': (1, 8),
+        'OC\nStats': (9, 41),
+        'DC\nStats': (42, 74),
+        'HC\nStats': (75, 140),  # Combined HC team (75-107) and HC opponent (108-140)
+        'Hiring\nTeam': (141, 150)
+    }
+
+    # Calculate total and average importance per category
+    category_names = list(categories.keys())
+    total_importance = []
+    avg_importance = []
+    feature_counts = []
+
+    for cat_name, (start, end) in categories.items():
+        # Convert to 0-indexed
+        cat_importances = importances[start-1:end]
+        total_importance.append(cat_importances.sum())
+        avg_importance.append(cat_importances.mean())
+        feature_counts.append(end - start + 1)
+
+    # Colors for categories (matching individual feature importance plot)
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#8c564b']
+
+    # --- Figure 1: Total Feature Importance by Category ---
+    fig1, ax1 = plt.subplots(figsize=(10, 6))
+
+    x_pos = np.arange(len(category_names))
+    bars1 = ax1.bar(x_pos, total_importance, color=colors, alpha=0.8, edgecolor='black')
+
+    # Add value labels on bars
+    for bar, val, count in zip(bars1, total_importance, feature_counts):
+        height = bar.get_height()
+        ax1.annotate(f'{val:.3f}\n({count} feat.)',
+                    xy=(bar.get_x() + bar.get_width() / 2, height),
+                    xytext=(0, 3),
+                    textcoords="offset points",
+                    ha='center', va='bottom', fontsize=9)
+
+    ax1.set_xticks(x_pos)
+    ax1.set_xticklabels(category_names, fontsize=10)
+    ax1.set_ylabel('Total Feature Importance (Sum)', fontsize=11)
+    ax1.set_title('Total Feature Importance by Category', fontsize=12)
+    ax1.set_ylim(0, max(total_importance) * 1.25)
+
+    plt.tight_layout()
+    output_path1 = os.path.join(output_dir, 'category_importance_total.png')
+    plt.savefig(output_path1, dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"  Saved: {output_path1}")
+
+    # --- Figure 2: Average Feature Importance by Category ---
+    fig2, ax2 = plt.subplots(figsize=(10, 6))
+
+    bars2 = ax2.bar(x_pos, avg_importance, color=colors, alpha=0.8, edgecolor='black')
+
+    # Add value labels on bars
+    for bar, val, count in zip(bars2, avg_importance, feature_counts):
+        height = bar.get_height()
+        ax2.annotate(f'{val:.4f}\n({count} feat.)',
+                    xy=(bar.get_x() + bar.get_width() / 2, height),
+                    xytext=(0, 3),
+                    textcoords="offset points",
+                    ha='center', va='bottom', fontsize=9)
+
+    ax2.set_xticks(x_pos)
+    ax2.set_xticklabels(category_names, fontsize=10)
+    ax2.set_ylabel('Average Feature Importance (Mean)', fontsize=11)
+    ax2.set_title('Average Feature Importance by Category', fontsize=12)
+    ax2.set_ylim(0, max(avg_importance) * 1.25)
+
+    plt.tight_layout()
+    output_path2 = os.path.join(output_dir, 'category_importance_avg.png')
+    plt.savefig(output_path2, dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"  Saved: {output_path2}")
 
 
 def generate_distribution_plot(y, output_dir):
@@ -360,6 +489,7 @@ def main():
     generate_correlation_matrix(X, output_dir)
     generate_predictions_plot(df, X, y, model, output_dir)
     generate_feature_importance_plot(model, output_dir)
+    generate_category_importance_plots(model, output_dir)
     generate_distribution_plot(y, output_dir)
 
     print("\n" + "="*60)
@@ -372,6 +502,8 @@ def main():
     print("\\includegraphics[width=0.9\\textwidth]{figures/correlation_matrix.png}")
     print("\\includegraphics[width=0.9\\textwidth]{figures/tenure_predictions.png}")
     print("\\includegraphics[width=0.9\\textwidth]{figures/tenure_feature_importance.png}")
+    print("\\includegraphics[width=0.8\\textwidth]{figures/category_importance_total.png}")
+    print("\\includegraphics[width=0.8\\textwidth]{figures/category_importance_avg.png}")
     print("\\includegraphics[width=0.8\\textwidth]{figures/tenure_distribution.png}")
 
 
