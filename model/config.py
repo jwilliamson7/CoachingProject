@@ -41,18 +41,18 @@ DEFAULT_XGBOOST_BINARY_PARAMS: Dict[str, Any] = {
     'random_state': 42
 }
 
-# Optimal parameters discovered from v5 notebook cross-validation
-# These are the mode (most frequent) values across 5 CV folds
+# Optimal parameters discovered from 1000-iteration RandomizedSearchCV
+# with 5-fold coach-level cross-validation (validated Feb 2026)
 OPTIMIZED_XGBOOST_PARAMS: Dict[str, Any] = {
-    'n_estimators': 100,
-    'learning_rate': 0.25,
+    'n_estimators': 200,
+    'learning_rate': 0.2,
     'max_depth': 2,
-    'gamma': 0,
-    'reg_lambda': 0.1,
-    'reg_alpha': 0.1,
-    'subsample': 0.85,
+    'gamma': 0.01,
+    'reg_lambda': 0.5,
+    'reg_alpha': 0,
+    'subsample': 0.9,
     'colsample_bytree': 0.9,
-    'min_child_weight': 1
+    'min_child_weight': 3
 }
 
 # Ordinal classification configuration
