@@ -48,7 +48,7 @@
 %\affil[1]{\protect\raggedright
 %Des Moines, Iowa, e-mail: jon@williamsonconsultinggroup.com}
 
-\abstract{What if NFL teams could predict which head coach candidates would be successful? This project predicts the tenure classification of NFL head coach hires using statistics available at the time the hire was made. Using 150 engineered features spanning coach experience, historical team performance during prior coordinator and head coaching roles, and hiring team context, we implement ordinal classification via the Frank-Hall binary decomposition method with XGBoost base classifiers. This approach respects the natural ordering of tenure classes (short, medium, long) and penalizes distant misclassifications more heavily than adjacent errors. The ordinal model, optimized using Quadratic Weighted Kappa (QWK), achieves a QWK of 0.754, mean absolute error of 0.307, and 98.4\% adjacent accuracy on held-out test data, which outperforms a standard multiclass approach on all ordinal metrics and achieves a 5.3$\times$ improvement over human baseline decisions. Analysis of feature importance reveals that the model draws broadly on all feature categories, with no single category showing significantly higher predictive value per feature. These findings provide actionable insights for NFL teams evaluating head coaching candidates.}
+\abstract{What if NFL teams could predict which head coach candidates would be successful? This project predicts the tenure classification of NFL head coach hires using statistics available at the time the hire was made. Using 150 engineered features spanning coach experience, historical team performance during prior coordinator and head coaching roles, and hiring team context, we implement ordinal classification via the Frank-Hall binary decomposition method with XGBoost base classifiers. This approach respects the natural ordering of tenure classes (short, medium, long) and penalizes distant misclassifications more heavily than adjacent errors. The ordinal model, optimized using Quadratic Weighted Kappa (QWK), achieves a QWK of 0.754, mean absolute error of 0.307, and 98.4\% adjacent accuracy on held-out test data, which outperforms a standard multiclass approach on all ordinal metrics and achieves a 5.3$\times$ improvement over human baseline decisions. SHAP-based feature importance analysis reveals that defensive metrics are approximately 1.7 times more predictive than offensive metrics, with this pattern consistent across eras and coach backgrounds. These findings provide actionable insights for NFL teams evaluating head coaching candidates.}
 
 \keywords{head coach, tenure prediction, sports analytics, NFL}
 
@@ -287,11 +287,156 @@ Todd Bowles* & 2022 & 0 & 86.8\% & 12.3\% & 0.8\% \\
 
 After applying the data leakage fix, the ordinal model predicts only 1 of the 21 recent hires to achieve Class 2 (5+ years): Mike Vrabel (58.7\% confidence). Notably, Pete Carroll, who would have been predicted Class 2 without the leakage fix due to the model having learned from his successful 14-year Seattle tenure, is instead predicted Class 1 (64.3\%) when his prior outcomes are excluded from training. This demonstrates the importance of preventing data leakage for fair predictions. The model shows highest confidence (95.7\%) that Raheem Morris will have a short tenure, while DeMeco Ryans and Dan Quinn receive strong Class 1 predictions (93.6\% and 91.4\%, respectively), suggesting moderate expected tenure with high confidence.
 
+\section{Feature Importance Analysis}
+\label{sec:feature_importance}
+
+While the ordinal classification model demonstrates strong predictive performance, understanding \textit{which} features drive predictions provides actionable insights for team decision-makers. We employ SHAP (SHapley Additive exPlanations) values \citep{lundberg2017unified} to quantify each feature's contribution to model predictions. For the Frank-Hall ordinal classifier, we compute SHAP values for each binary classifier and aggregate them using mean absolute values across classifiers.
+
+\subsection{Offensive vs.\ Defensive Metrics}
+
+We categorize the 150 features into six groups based on their source and type: Core Experience (8 features), OC Statistics (33 offensive features from coordinator tenure), DC Statistics (33 defensive features from coordinator tenure), HC Team Statistics (33 features reflecting team offensive performance during head coaching tenure), HC Opponent Statistics (33 features reflecting opponent performance, i.e., defensive effectiveness, during head coaching tenure), and Hiring Team Context (10 features). Table~\ref{tab:shap_categories} presents the mean absolute SHAP values by category.
+
+\begin{table}[htbp]
+\centering
+\caption{Feature Importance by Category}
+\label{tab:shap_categories}
+\begin{tabular}{lrrr}
+\toprule
+Category & \# Features & Total $|\text{SHAP}|$ & Avg $|\text{SHAP}|$ \\
+\midrule
+HC Opponent Stats (Defense) & 33 & 0.131 & 0.0040 \\
+DC Stats (Defense) & 33 & 0.088 & 0.0027 \\
+HC Team Stats (Offense) & 33 & 0.080 & 0.0024 \\
+Hiring Team Context & 10 & 0.022 & 0.0022 \\
+OC Stats (Offense) & 33 & 0.049 & 0.0015 \\
+Core Experience & 8 & 0.012 & 0.0015 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Aggregating offensive metrics (OC Stats + HC Team Stats) and defensive metrics (DC Stats + HC Opponent Stats), we find that defensive features exhibit substantially higher predictive importance. Defensive metrics average 0.0033 SHAP per feature compared to 0.0020 for offensive metrics---a ratio of 1.69.
+
+To assess statistical significance, we compute a per-coach defensive-to-offensive SHAP ratio and test whether this ratio systematically exceeds 1.0 (Table~\ref{tab:shap_stats}). Of the 635 coaching hires, 503 (79.2\%) have defensive metrics contributing more to their tenure prediction than offensive metrics. The median per-coach ratio is 1.70, with a tight bootstrap 95\% confidence interval of [1.64, 1.83]. A Wilcoxon signed-rank test strongly rejects the null hypothesis that the median ratio equals 1.0 ($p < 0.0001$), and a sign test confirms that the proportion of coaches with defensive-dominant predictions significantly exceeds 50\% ($p < 10^{-50}$). These results provide strong evidence that defensive metrics are more predictive of coaching tenure than offensive metrics.
+
+\begin{table}[htbp]
+\centering
+\caption{Statistical Tests: Offensive vs.\ Defensive Feature Importance}
+\label{tab:shap_stats}
+\begin{tabular}{lrl}
+\toprule
+Test & Result & Interpretation \\
+\midrule
+Coaches with Def $>$ Off & 503/635 (79.2\%) & Strong majority \\
+Median Def/Off Ratio & 1.70 & --- \\
+Bootstrap 95\% CI (Median) & [1.64, 1.83] & Excludes 1.0 \\
+Wilcoxon Signed-Rank & $p < 0.0001$ & Highly significant \\
+Sign Test & $p < 10^{-50}$ & Highly significant \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Consistency Across Eras}
+
+One concern is whether the defensive emphasis reflects historical biases in coaching evaluation that may have diminished in the modern passing-oriented NFL. We segment the data into three eras: Pre-1970 ($n = 262$), 1970--1999 ($n = 210$), and 2000+ ($n = 163$). Table~\ref{tab:shap_era} presents the defensive-to-offensive importance ratio by era.
+
+\begin{table}[htbp]
+\centering
+\caption{Defensive Bias by Era}
+\label{tab:shap_era}
+\begin{tabular}{lrrr}
+\toprule
+Era & $n$ & Def/Off Ratio & Per-Sample Median \\
+\midrule
+Pre-1970 & 262 & 1.69$\times$ & 1.68 \\
+1970--1999 & 210 & 1.76$\times$ & 1.78 \\
+2000+ & 163 & 1.61$\times$ & 1.68 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A Kruskal-Wallis test comparing per-sample defensive/offensive ratios across eras yields $H = 1.83$, $p = 0.401$, indicating no significant difference. The defensive bias in tenure prediction is consistent across all eras, suggesting it reflects persistent organizational evaluation patterns rather than era-specific coaching philosophies.
+
+\subsection{Coach Background Analysis}
+
+We further investigate whether coaches are evaluated based on their area of expertise by classifying coaches according to their pre-head-coaching career: offensive background (primarily offensive coordinator or position coach experience, $n = 201$), defensive background ($n = 159$), or other/mixed ($n = 275$). The ``other'' category consists predominantly of pre-1970 coaches (219 of 243) for whom detailed career histories are unavailable; for hires since 2000, background classification is complete. If organizations evaluate coaches on their expertise, we would expect offensive metrics to matter more for offensive-background coaches and defensive metrics to matter more for defensive-background coaches.
+
+Table~\ref{tab:shap_background} presents the results. Both offensive-background and defensive-background coaches show significantly higher importance for defensive metrics (Wilcoxon signed-rank $p < 0.0001$ for both groups). Crucially, the magnitude of defensive bias does not differ between groups (Mann-Whitney $p = 0.660$; bootstrap 95\% CI for difference: $[-0.22, 0.31]$).
+
+\begin{table}[htbp]
+\centering
+\caption{Defensive Bias by Coach Background}
+\label{tab:shap_background}
+\begin{tabular}{lrrr}
+\toprule
+Coach Background & $n$ & Median Def/Off Ratio & Wilcoxon $p$ \\
+\midrule
+Offensive Background & 201 & 1.81$\times$ & $< 0.0001$ \\
+Defensive Background & 159 & 1.77$\times$ & $< 0.0001$ \\
+\midrule
+\multicolumn{3}{l}{Mann-Whitney (between groups)} & $p = 0.660$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Top Predictive Features}
+
+Table~\ref{tab:top_features} presents the ten most predictive individual features. Notably, situational defensive metrics dominate: red zone attempts faced (as DC), fourth-down conversion rate allowed, and third-down metrics. These suggest that organizations, implicitly or explicitly, weight high-leverage defensive situations when evaluating head coaches.
+
+\begin{table}[htbp]
+\centering
+\caption{Top 10 Most Predictive Features}
+\label{tab:top_features}
+\begin{tabular}{rlr}
+\toprule
+Rank & Feature & Mean $|\text{SHAP}|$ \\
+\midrule
+1 & Red Zone Attempts (DC) & 0.0342 \\
+2 & 4th Down \% (HC Opponent) & 0.0222 \\
+3 & 3rd Down Attempts (HC Opponent) & 0.0176 \\
+4 & Scoring \% (HC Opponent) & 0.0174 \\
+5 & 3rd Down \% (HC Team) & 0.0165 \\
+6 & Rushing Attempts (HC Opponent) & 0.0119 \\
+7 & Passing Attempts (DC) & 0.0095 \\
+8 & 3rd Down \% (HC Opponent) & 0.0071 \\
+9 & Yards/Drive (HC Team) & 0.0058 \\
+10 & Total Yards (HC Team) & 0.0051 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Discussion}
+
+The feature importance analysis reveals several insights relevant to coaching evaluation.
+
+Across all analyses, defensive performance metrics are approximately 1.7 times more predictive than offensive metrics, with 79.2\% of coaches showing higher defensive than offensive SHAP contributions ($p < 10^{-50}$). This aligns with the conventional wisdom that ``defense wins championships,'' but extends it to job security: defense also wins job tenure.
+
+Core experience features (age, years as coordinator, number of prior head coaching stints) rank lowest in predictive importance. This suggests that quality of prior performance matters more than quantity of experience, a finding with implications for hiring practices that weight experience heavily.
+
+Statistical tests confirm that defensive emphasis is consistent across eras (Kruskal-Wallis $p = 0.401$) and coach backgrounds (Mann-Whitney $p = 0.660$). This persistence suggests the pattern reflects deep organizational preferences rather than artifacts of historical data or coaching pipelines.
+
+The top predictive features emphasize high-leverage situations (red zone, third/fourth down), suggesting that organizations value coaches who perform in critical game situations.
+
+Figure~\ref{fig:shap_categories} visualizes the category-level importance, and Figure~\ref{fig:shap_era} shows the consistency of defensive bias across eras.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\columnwidth]{figures/shap_offense_defense_split.png}
+\caption{SHAP feature importance by category, split into offensive and defensive metrics. Defensive categories (blue) show higher average importance than offensive categories (orange).}
+\label{fig:shap_categories}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\columnwidth]{figures/shap_by_era.png}
+\caption{Defensive-to-offensive importance ratio by era. The defensive bias is consistent across all eras (Kruskal-Wallis $p = 0.401$).}
+\label{fig:shap_era}
+\end{figure}
+
 \section{Conclusion}
 
 The ordinal classification approach using the Frank-Hall binary decomposition method, optimized with Quadratic Weighted Kappa (QWK), demonstrates strong predictive performance for NFL head coach tenure. The model achieves a QWK of 0.754, AUROC of 0.881, and 98.4\% adjacent accuracy on held-out test data, indicating that predictions are both accurate and, when incorrect, typically only off by one class. Compared to a standard multiclass approach, the ordinal model shows improvements across all metrics, with a notable 62.3\% improvement in the challenging middle-class (3--4 year tenure) F1 score (0.581 vs.\ 0.358).
 
-Feature importance analysis at the category level reveals that HC Stats (capturing prior head coaching performance) contributes the highest total importance due to its large feature count, while average importance per feature shows no statistically significant differences across categories ($p = 0.66$). This suggests the model draws broadly on information from all feature types, rather than relying heavily on any single category of predictors.
+SHAP-based feature importance analysis reveals that defensive metrics are approximately 1.7 times more predictive than offensive metrics, with 79.2\% of coaches showing higher defensive than offensive feature contributions ($p < 10^{-50}$). This defensive emphasis is consistent across all eras (Kruskal-Wallis $p = 0.401$) and coach backgrounds (Mann-Whitney $p = 0.660$), suggesting it reflects persistent organizational evaluation patterns. Notably, situational defensive metrics---red zone defense, third-down efficiency, fourth-down conversion rates---rank among the most predictive features, indicating that organizations implicitly weight high-leverage defensive situations when evaluating head coaches.
 
 The practical implications of this research extend beyond academic interest. With approximately half of NFL head coaching hires lasting two years or fewer, teams clearly struggle to identify successful candidates through traditional evaluation methods. The model's 5.3$\times$ improvement over the human baseline (Macro F1 of 0.695 vs.\ 0.130) demonstrates that data-driven approaches can substantially outperform intuition-based hiring decisions. While no model can guarantee successful hires, integrating predictive analytics into the evaluation process could help teams avoid high-risk candidates and identify undervalued coaching talent. For a league where a single additional win can mean the difference between playoff contention and a losing season, even modest improvements in hiring decisions translate to meaningful competitive advantages. The model's predictions for recent hires, such as high confidence that Mike Vrabel will achieve long tenure and that Raheem Morris faces a short tenure, illustrate how these insights can inform real-world evaluations and set appropriate expectations for coaching transitions.
 
@@ -305,6 +450,9 @@ DataRobot (2020). Using machine learning to peek inside the minds of NFL coaches
 
 \bibitem[Frank and Hall(2001)]{frank2001}
 Frank, E. and Hall, M. (2001). A simple approach to ordinal classification. In: \emph{Machine Learning: ECML 2001}, Lecture Notes in Computer Science, vol. 2167. Springer, Berlin, Heidelberg, pp. 145--156.
+
+\bibitem[Lundberg and Lee(2017)]{lundberg2017unified}
+Lundberg, S. M. and Lee, S. (2017). A unified approach to interpreting model predictions. In: \emph{Advances in Neural Information Processing Systems}, vol. 30, pp. 4765--4774.
 
 \bibitem[Mielke(2007)]{mielke2007}
 Mielke, D. (2007). Coaching experience, playing experience, and coaching tenure: a commentary. \emph{International Journal of Sports Science \& Coaching}, \textbf{2}(2), pp. 117--118.
