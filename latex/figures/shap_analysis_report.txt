@@ -1,0 +1,80 @@
+================================================================================
+SHAP ANALYSIS REPORT: NFL Coach Tenure Prediction
+================================================================================
+
+1. TOP 20 MOST IMPORTANT FEATURES (by mean |SHAP|)
+------------------------------------------------------------
+Rank   Feature                                        Mean |SHAP|
+------------------------------------------------------------
+1      RZAtt (DC)                                          0.0342
+2      4D% (HC Opp)                                        0.0222
+3      3DAtt (HC Opp)                                      0.0176
+4      Sc% (HC Opp)                                        0.0174
+5      3D% (HC)                                            0.0165
+6      Att Rushing (HC Opp)                                0.0119
+7      Att Passing (DC)                                    0.0095
+8      3D% (HC Opp)                                        0.0071
+9      Yds Average Drive (HC)                              0.0058
+10     Yds (HC)                                            0.0051
+11     Yds Average Drive (HC Opp)                          0.0045
+12     TO (HC)                                             0.0041
+13     TO% (HC)                                            0.0040
+14     Y/P (OC)                                            0.0038
+15     Int Passing (HC)                                    0.0037
+16     RZAtt (OC)                                          0.0036
+17     PF (Points For) (HC)                                0.0036
+18     PF (Points For) (HC Opp)                            0.0036
+19     Hiring: turnovers committed                         0.0035
+20     Hiring: yards offense                               0.0033
+
+
+2. IMPORTANCE BY FEATURE CATEGORY
+------------------------------------------------------------
+Category               Total SHAP     Avg SHAP   # Features
+------------------------------------------------------------
+HC Stats                   0.2107       0.0032           66
+DC Stats                   0.0881       0.0027           33
+OC Stats                   0.0491       0.0015           33
+Hiring Team                0.0218       0.0022           10
+Core Experience            0.0122       0.0015            8
+
+
+3. TOP FEATURES BY CLASSIFICATION DECISION
+------------------------------------------------------------
+
+P(Y > 0):
+  (What distinguishes short-tenure [Class 0] from longer-tenure coaches)
+   1. RZAtt (DC)                               0.0589
+   2. Sc% (HC Opp)                             0.0305
+   3. 3DAtt (HC Opp)                           0.0249
+   4. 3D% (HC)                                 0.0201
+   5. 4D% (HC Opp)                             0.0186
+   6. Att Rushing (HC Opp)                     0.0111
+   7. 3D% (HC Opp)                             0.0093
+   8. Yds Average Drive (HC)                   0.0078
+   9. PF (Points For) (HC Opp)                 0.0063
+  10. RZAtt (OC)                               0.0057
+
+P(Y > 1):
+  (What distinguishes medium/long-tenure coaches [Classes 1+2])
+   1. 4D% (HC Opp)                             0.0258
+   2. Att Passing (DC)                         0.0144
+   3. 3D% (HC)                                 0.0128
+   4. Att Rushing (HC Opp)                     0.0126
+   5. 3DAtt (HC Opp)                           0.0103
+   6. RZAtt (DC)                               0.0094
+   7. Yds (HC)                                 0.0078
+   8. Yds Average Drive (HC Opp)               0.0059
+   9. PF (Points For) (HC)                     0.0048
+  10. 3D% (HC Opp)                             0.0048
+
+
+4. KEY FINDINGS
+------------------------------------------------------------
+- The model uses features from multiple categories, suggesting tenure
+  prediction requires diverse information about coaching background.
+- Top features typically include age, experience metrics, and recent
+  team performance statistics.
+- See partial dependence plots for direction of feature effects.
+
+================================================================================

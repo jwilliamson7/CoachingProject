@@ -13,7 +13,12 @@
       "Bash(pdflatex:*)",
       "Bash(pushd:*)",
       "Bash(popd:*)",
-      "Bash(powershell -Command \"Get-Content ''C:\\\\Users\\\\jonwi\\\\Documents\\\\Projects\\\\CoachingProject\\\\data\\\\svd_imputed_master_data.csv'' -Head 5\")"
+      "Bash(powershell -Command \"Get-Content ''C:\\\\Users\\\\jonwi\\\\Documents\\\\Projects\\\\CoachingProject\\\\data\\\\svd_imputed_master_data.csv'' -Head 5\")",
+      "Bash(where python:*)",
+      "Bash(C:UsersjonwiAppDataLocalPythonbinpython.exe \"C:\\\\Users\\\\jonwi\\\\Documents\\\\Projects\\\\CoachingProject\\\\scripts\\\\shap_analysis.py\" --save-shap)",
+      "Bash(cmd.exe /c \"python scripts\\\\shap_analysis.py --save-shap\")",
+      "Bash(/mnt/c/Users/jonwi/AppData/Local/Microsoft/WindowsApps/python.exe scripts/shap_analysis.py:*)",
+      "Bash(py -3 scripts/shap_analysis.py:*)"
     ],
     "deny": [],
     "ask": []
