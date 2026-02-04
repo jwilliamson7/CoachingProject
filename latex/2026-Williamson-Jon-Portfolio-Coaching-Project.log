@@ -1,12 +1,9 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.1.26)  4 FEB 2026 11:21
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.1.26)  4 FEB 2026 11:46
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**C:/Users/jonwi/Documents/Projects/CoachingProject/latex/2026-Williamson-Jon-P
-ortfolio-Coaching-Project.tex
-
-(C:/Users/jonwi/Documents/Projects/CoachingProject/latex/2026-Williamson-Jon-Po
-rtfolio-Coaching-Project.tex
+**./2026-Williamson-Jon-Portfolio-Coaching-Project.tex
+(2026-Williamson-Jon-Portfolio-Coaching-Project.tex
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
 (C:\Users\jonwi\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
@@ -42,8 +39,7 @@ File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count283
 ))
 Package: xparse 2025-10-09 L3 Experimental document command parser
-)
-(C:/Users\jonwi\Documents\Projects\CoachingProject\latex\dgruyter.sty
+) (dgruyter.sty
 Package: dgruyter 2017/09/19 v2.00 De Gruyter layout
 LaTeX Info: Redefining \numberline on input line 148.
 Applying: [2015/01/01] Nowadays obsolete fixes on input line 160.
@@ -756,8 +752,7 @@ LaTeX Font Info:    Trying to load font information for T1+lmr on input line 26
 (C:\Users\jonwi\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmr.fd
 File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-(C:/Users\jonwi\Documents\Projects\CoachingProject\latex\2026-Williamson-Jon-Po
-rtfolio-Coaching-Project.aux)
+(2026-Williamson-Jon-Portfolio-Coaching-Project.aux)
 \openout1 = `2026-Williamson-Jon-Portfolio-Coaching-Project.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 26.
@@ -829,11 +824,8 @@ Package caption Info: rotating package is loaded.
 Package caption Info: sidecap package is loaded.
 Package caption Info: End \AtBeginDocument code.
 Package hyperref Info: Link coloring OFF on input line 26.
-
-(C:/Users\jonwi\Documents\Projects\CoachingProject\latex\2026-Williamson-Jon-Po
-rtfolio-Coaching-Project.out)
-(C:/Users\jonwi\Documents\Projects\CoachingProject\latex\2026-Williamson-Jon-Po
-rtfolio-Coaching-Project.out)
+ (2026-Williamson-Jon-Portfolio-Coaching-Project.out)
+(2026-Williamson-Jon-Portfolio-Coaching-Project.out)
 \@outlinefile=\write4
 \openout4 = `2026-Williamson-Jon-Portfolio-Coaching-Project.out'.
 
@@ -951,45 +943,39 @@ File: figures/correlation_matrix.png Graphic file (type png)
 Package pdftex.def Info: figures/correlation_matrix.png  used on input line 155
 .
 (pdftex.def)             Requested size: 396.9131pt x 343.80498pt.
- [4] [5 <C:/Users/jonwi/Documents/Projects/CoachingProject/latex/figures/correl
-ation_matrix.png>]
-<figures/tenure_predictions.png, id=178, 849.6543pt x 328.3467pt>
+ [4] [5 <./figures/correlation_matrix.png>]
+<figures/tenure_predictions.png, id=176, 849.6543pt x 328.3467pt>
 File: figures/tenure_predictions.png Graphic file (type png)
 <use figures/tenure_predictions.png>
 Package pdftex.def Info: figures/tenure_predictions.png  used on input line 227
 .
 (pdftex.def)             Requested size: 432.19531pt x 167.02371pt.
-<figures/category_importance_total.png, id=180, 715.473pt x 425.1885pt>
+<figures/category_importance_total.png, id=178, 715.473pt x 425.1885pt>
 File: figures/category_importance_total.png Graphic file (type png)
 <use figures/category_importance_total.png>
 Package pdftex.def Info: figures/category_importance_total.png  used on input l
 ine 236.
 (pdftex.def)             Requested size: 211.68654pt x 125.79932pt.
-<figures/category_importance_avg.png, id=181, 715.473pt x 425.1885pt>
+<figures/category_importance_avg.png, id=179, 715.473pt x 425.1885pt>
 File: figures/category_importance_avg.png Graphic file (type png)
 <use figures/category_importance_avg.png>
 Package pdftex.def Info: figures/category_importance_avg.png  used on input lin
 e 237.
 (pdftex.def)             Requested size: 211.68654pt x 125.79932pt.
- [6 <C:/Users/jonwi/Documents/Projects/CoachingProject/latex/figures/tenure_pre
-dictions.png>] [7 <C:/Users/jonwi/Documents/Projects/CoachingProject/latex/figu
-res/category_importance_total.png> <C:/Users/jonwi/Documents/Projects/CoachingP
-roject/latex/figures/category_importance_avg.png>]
-[8] [9]
-<figures/shap_offense_defense_split.png, id=227, 1004.7939pt x 425.4294pt>
+ [6 <./figures/tenure_predictions.png>] [7 <./figures/category_importance_total
+.png> <./figures/category_importance_avg.png>] [8] [9] [10]
+<figures/shap_offense_defense_split.png, id=231, 1004.553pt x 425.4294pt>
 File: figures/shap_offense_defense_split.png Graphic file (type png)
 <use figures/shap_offense_defense_split.png>
 Package pdftex.def Info: figures/shap_offense_defense_split.png  used on input 
 line 423.
-(pdftex.def)             Requested size: 396.9131pt x 168.05249pt.
-<figures/shap_by_era.png, id=228, 714.7503pt x 426.1521pt>
+(pdftex.def)             Requested size: 396.9131pt x 168.09145pt.
+<figures/shap_by_era.png, id=232, 714.5094pt x 426.1521pt>
 File: figures/shap_by_era.png Graphic file (type png)
 <use figures/shap_by_era.png>
 Package pdftex.def Info: figures/shap_by_era.png  used on input line 430.
-(pdftex.def)             Requested size: 396.9131pt x 236.65376pt.
- [10] [11 <C:/Users/jonwi/Documents/Projects/CoachingProject/latex/figures/shap
-_offense_defense_split.png> <C:/Users/jonwi/Documents/Projects/CoachingProject/
-latex/figures/shap_by_era.png>]
+(pdftex.def)             Requested size: 396.9131pt x 236.7318pt.
+ [11 <./figures/shap_offense_defense_split.png>]
 LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <8.0> not available
 (Font)              Font shape `T1/lmss/m/sl' tried instead on input line 446.
 
@@ -998,7 +984,7 @@ Underfull \hbox (badness 7451) in paragraph at lines 449--450
 -side the minds of NFL coaches. Avail-able at: 
  []
 
-[12]
+[12 <./figures/shap_by_era.png>]
 LaTeX Font Info:    Calculating math sizes for size <7.0> on input line 525.
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <4.91829> on input line 525.
@@ -1015,15 +1001,12 @@ Package pdftex.def Info: figures/tenure_distribution.png  used on input line 68
 (pdftex.def)             Requested size: 352.81538pt x 218.09637pt.
  [17
 
- <C:/Users/jonwi/Documents/Projects/CoachingProject/latex/figures/tenure_distri
-bution.png>] [18
+ <./figures/tenure_distribution.png>] [18
 
 ]
 
 enddocument/afterlastpage (AED): lastpage setting LastPage.
-
-(C:/Users\jonwi\Documents\Projects\CoachingProject\latex\2026-Williamson-Jon-Po
-rtfolio-Coaching-Project.aux)
+(2026-Williamson-Jon-Portfolio-Coaching-Project.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
@@ -1038,13 +1021,13 @@ ct.out' has not changed.
 (rerunfilecheck)             Checksum: 550C0363103D9D29805E990F6F2EA830;5127.
  ) 
 Here is how much of TeX's memory you used:
- 18565 strings out of 467871
- 305656 string characters out of 5418376
- 769871 words of memory out of 5000000
- 46748 multiletter control sequences out of 15000+600000
- 728558 words of font info for 222 fonts, out of 8000000 for 9000
+ 18582 strings out of 467871
+ 305418 string characters out of 5418376
+ 771418 words of memory out of 5000000
+ 46752 multiletter control sequences out of 15000+600000
+ 734767 words of font info for 230 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 90i,12n,131p,1376b,540s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 90i,12n,131p,1343b,540s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/jonwi/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
 cmmi8.pfb><C:/Users/jonwi/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsf
 onts/cm/cmr6.pfb><C:/Users/jonwi/AppData/Local/Programs/MiKTeX/fonts/type1/publ
@@ -1063,10 +1046,10 @@ X/fonts/type1/public/lm/lmss8.pfb><C:/Users/jonwi/AppData/Local/Programs/MiKTeX
 eX/fonts/type1/public/lm/lmsso8.pfb><C:/Users/jonwi/AppData/Local/Programs/MiKT
 eX/fonts/type1/public/lm/lmsy10.pfb><C:/Users/jonwi/AppData/Local/Programs/MiKT
 eX/fonts/type1/public/lm/lmsy7.pfb>
-Output written on C:/Users\jonwi\Documents\Projects\CoachingProject\latex\2026-
-Williamson-Jon-Portfolio-Coaching-Project.pdf (18 pages, 1576823 bytes).
+Output written on 2026-Williamson-Jon-Portfolio-Coaching-Project.pdf (18 pages,
+ 1567247 bytes).
 PDF statistics:
  358 PDF objects out of 1000 (max. 8388607)
  75 named destinations out of 1000 (max. 500000)
- 52989 words of extra memory for PDF output out of 61914 (max. 10000000)
+ 57085 words of extra memory for PDF output out of 61914 (max. 10000000)
 
