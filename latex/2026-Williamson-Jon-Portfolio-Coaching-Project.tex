@@ -48,9 +48,9 @@
 %\affil[1]{\protect\raggedright
 %Des Moines, Iowa, e-mail: jon@williamsonconsultinggroup.com}
 
-\abstract{What if NFL teams could predict which head coach candidates would be successful? This project predicts the tenure classification of NFL head coach hires using statistics available at the time the hire was made. Using 150 engineered features spanning coach experience, historical team performance during prior coordinator and head coaching roles, and hiring team context, we implement ordinal classification via the Frank-Hall binary decomposition method with XGBoost base classifiers. This approach respects the natural ordering of tenure classes (short, medium, long) and penalizes distant misclassifications more heavily than adjacent errors. The ordinal model, optimized using Quadratic Weighted Kappa (QWK), achieves a QWK of 0.754, mean absolute error of 0.307, and 98.4\% adjacent accuracy on held-out test data---outperforming a standard multiclass approach on all ordinal metrics. Analysis of feature importance reveals that third-down conversion efficiency during prior head coaching roles is the strongest predictor of future tenure, followed by years of NFL position coaching experience and hiring team defensive performance. These findings provide actionable insights for NFL teams evaluating head coaching candidates.}
+\abstract{What if NFL teams could predict which head coach candidates would be successful? This project predicts the tenure classification of NFL head coach hires using statistics available at the time the hire was made. Using 150 engineered features spanning coach experience, historical team performance during prior coordinator and head coaching roles, and hiring team context, we implement ordinal classification via the Frank-Hall binary decomposition method with XGBoost base classifiers. This approach respects the natural ordering of tenure classes (short, medium, long) and penalizes distant misclassifications more heavily than adjacent errors. The ordinal model, optimized using Quadratic Weighted Kappa (QWK), achieves a QWK of 0.754, mean absolute error of 0.307, and 98.4\% adjacent accuracy on held-out test data, which outperforms a standard multiclass approach on all ordinal metrics and achieves a 5.3$\times$ improvement over human baseline decisions. Analysis of feature importance reveals that the model draws broadly on all feature categories, with no single category showing significantly higher predictive value per feature. These findings provide actionable insights for NFL teams evaluating head coaching candidates.}
 
-\keywords{NFL, head coach, tenure prediction, sports analytics, XGBoost, machine learning}
+\keywords{head coach, tenure prediction, sports analytics, NFL}
 
 \maketitle
 
@@ -58,7 +58,11 @@
 
 What if the Denver Broncos could have avoided hiring Nathaniel Hackett? Or if the Raiders had not hired Josh McDaniels? Certainly, these teams would be in a different position today if they had hired different candidates. But more broadly, what if NFL teams could predict which head coach candidates would be successful? That is the aim of this project.
 
-Specifically, this project attempts to predict the tenure classification of head coach hires using statistics available at the time the hire was made. This project also provides predictions for recently hired coaches.
+The stakes of head coaching decisions are substantial. NFL teams invest significant resources in coaching searches, and a failed hire carries consequences beyond the win-loss record: organizational instability, wasted draft capital on players who don't fit the new system, and the opportunity cost of not hiring a more successful candidate. Since 2000, approximately half of all NFL head coaching hires have lasted two years or fewer, suggesting that teams systematically struggle to identify candidates who will succeed in the role. Yet despite this high failure rate, the hiring process remains largely subjective, driven by interviews, references, and gut instinct rather than data-driven analysis.
+
+Tenure serves as a more robust measure of coaching success than win-loss percentage because it implicitly accounts for organizational context and expectations. A coach who maintains a .450 winning percentage with a rebuilding franchise may be considered successful and retain their position, while a coach with the same record on a team expected to contend may be fired after two seasons. Tenure captures this reality: it reflects not just on-field performance but also the organization's assessment of whether the coach is meeting expectations given the circumstances. By predicting tenure rather than wins, the model learns patterns that generalize across different team situations without requiring explicit modeling of each organization's unique context.
+
+This project addresses this gap by developing a machine learning model to predict head coach tenure classification using only information available at the time of hiring. By analyzing 150 engineered features spanning coach experience, historical team performance during prior coordinator and head coaching roles, and hiring team context, the model provides an objective, data-driven assessment of coaching candidates. The ordinal classification approach respects the natural ordering of tenure outcomes, distinguishing between short (1--2 years), medium (3--4 years), and long (5+ years) tenures, while penalizing distant misclassifications more heavily than adjacent errors.
 
 \section{Literature Review}
 
@@ -108,13 +112,7 @@ The Frank-Hall method offers several advantages: it works with any base classifi
 
 \subsubsection{Evaluation Metrics}
 
-To evaluate ordinal classification performance, this project uses metrics that account for class ordering:
-\begin{itemize}
-    \item \textbf{Mean Absolute Error (MAE)}: Average absolute distance between predicted and true classes
-    \item \textbf{Quadratic Weighted Kappa (QWK)}: Agreement measure that penalizes distant errors more heavily than adjacent errors
-    \item \textbf{Adjacent Accuracy}: Proportion of predictions within one class of the true label
-    \item \textbf{AUROC}: Macro-averaged one-versus-rest area under the ROC curve
-\end{itemize}
+This project uses Quadratic Weighted Kappa (QWK) as the primary evaluation metric because it is specifically designed for ordinal classification problems. QWK measures agreement between predicted and true classes while weighting disagreements by their squared distance; a prediction of Class 0 for a true Class 2 instance is penalized four times more heavily than a prediction of Class 1. This property aligns with the practical reality that predicting a short tenure for a coach who achieves long tenure (or vice versa) represents a more consequential error than being off by one class. QWK also served as the optimization target during hyperparameter tuning, ensuring that the model explicitly learns to minimize ordinal prediction errors. Secondary metrics include mean absolute error (average class distance between predictions and truth), adjacent accuracy (proportion of predictions within one class), and macro F1 score (for comparison with standard classification approaches).
 
 \subsubsection{Cross-Validation Strategy}
 
@@ -122,11 +120,35 @@ To prevent data leakage, this project implements coach-level stratified cross-va
 
 \subsection{Data Description}
 
-This project utilizes 150 features, two description labels, and the two model outputs for each head coaching hire. Appendix~\ref{app:features} shows the set of 150 features used. Abbreviations included in feature descriptions include offensive coordinator (OC), defensive coordinator (DC), and head coach (HC).
+This project utilizes 150 engineered features for each head coaching hire, organized into five categories as shown in Table~\ref{tab:feature_categories}. Appendix~\ref{app:features} provides the complete list of features.
 
-Features 1--140 are characteristics of head coaches at time of hiring, while features 141--150 are characteristics of the hiring team. Features 9--140 and 141--150 reference average normalized metrics, utilizing a traditional z-score distance from league average. This normalization allows coaches across eras to be compared, as team performance is measured relative to other teams in the same year.
+\begin{table}[!ht]
+\caption{Feature categories and counts}
+\label{tab:feature_categories}
+\small
+\begin{tabular}{llcl}
+\toprule
+Category & Features & Count & Description \\
+\midrule
+Core Experience & 1--8 & 8 & Age, prior HC hires, years at each coaching level \\
+OC Statistics & 9--41 & 33 & Team offensive performance during OC tenure \\
+DC Statistics & 42--74 & 33 & Opponent offensive performance during DC tenure \\
+HC Statistics & 75--107 & 33 & Team offensive performance during HC tenure \\
+HC Opponent Stats & 108--140 & 33 & Opponent offensive performance during HC tenure \\
+Hiring Team Context & 141--150 & 10 & Hiring team's recent performance metrics \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-This project utilizes SVD Matrix Imputation to impute missing values. Figure~\ref{fig:correlation} shows the correlation matrix among all 150 features post imputation. There is some correlation within the sections of features associated with experience as an OC, DC, or HC. Appendix~\ref{app:distributions} shows the distribution of coach tenure classifications across all hiring instances in the history of the NFL.
+\textbf{Core Experience Features (8 features)} capture fundamental coaching background: age at time of hire, number of previous head coaching stints, and years of experience at each level (college position coach, college coordinator, college head coach, NFL position coach, NFL coordinator, and NFL head coach).
+
+\textbf{Coordinator and Head Coach Statistics (132 features)} capture team performance during the coach's prior roles. For each role (OC, DC, HC), 33 statistics are recorded spanning offensive production (points, yards, turnovers), passing efficiency (completions, yards, touchdowns, interceptions, net yards per attempt), rushing performance (attempts, yards, touchdowns), drive metrics (scoring percentage, turnover percentage, plays per drive, yards per drive), and situational effectiveness (third-down conversion rate, fourth-down conversion rate, red zone percentage). For defensive coordinators, these statistics reflect opponent performance (i.e., points allowed, yards allowed). For head coaches, both team and opponent statistics are captured, resulting in 66 features.
+
+\textbf{Hiring Team Context (10 features)} capture the state of the team at the time of hiring: winning percentage, points scored, points allowed, yards of offense, yards allowed, yards per play, yards per play allowed, turnovers forced, turnovers committed, and playoff appearances; averaged over the two seasons prior to the hire.
+
+All performance statistics (features 9--150) are normalized using z-scores relative to league averages for each season, enabling meaningful comparisons across eras. For example, a coach whose offense ranked one standard deviation above league average in 1985 is comparable to a coach whose offense ranked one standard deviation above average in 2020.
+
+This project utilizes SVD-based matrix factorization to impute missing values, which occur when coaches lack experience at certain levels (e.g., a first-time head coach has no prior HC statistics). Figure~\ref{fig:correlation} shows the correlation matrix among all 150 features post-imputation. Notable correlation exists within feature categories, particularly among offensive statistics during OC tenure and among statistics during HC tenure, reflecting the interdependence of team performance metrics. Appendix~\ref{app:distributions} shows the distribution of coach tenure classifications across all hiring instances.
 
 \begin{figure}[!ht]
 \centering
@@ -171,7 +193,7 @@ Model Improvement$^2$ & 5.3$\times$ \\
 \end{tabular}
 \end{table}
 
-The ordinal model achieves a quadratic weighted kappa of 0.754, indicating substantial agreement between predictions and true labels while accounting for ordinal distance. The model achieves 98.4\% adjacent accuracy, meaning nearly all predictions are within one class of the true label---a critical property for ordinal classification.
+The ordinal model achieves a quadratic weighted kappa of 0.754, indicating substantial agreement between predictions and true labels while accounting for ordinal distance. The model achieves 98.4\% adjacent accuracy, meaning nearly all predictions are within one class of the true label, which is a critical property for ordinal classification.
 
 \subsubsection{Comparison with Standard Multiclass Classification}
 
@@ -207,54 +229,25 @@ Figure~\ref{fig:tenure_predictions} shows the sorted validation set with corresp
 \label{fig:tenure_predictions}
 \end{figure}
 
-Figure~\ref{fig:tenure_importance} shows the feature weight distributions resulting from the best models found within the outer ten-fold cross-validation. These importance values for these features do not infer a monotonic relationship between feature value and predicted value. Rather, these importance values result from feature prevalence in the model's weak estimators. A feature with higher importance is present in more estimators than a feature with low importance.
-
-\begin{figure}[!ht]
-\centering
-\includegraphics[width=0.9\textwidth]{figures/tenure_feature_importance.png}
-\caption{Top 20 feature importances for the ordinal classifier, colored by feature category.}
-\label{fig:tenure_importance}
-\end{figure}
-
-Figure~\ref{fig:category_importance} shows the total and average feature importance aggregated by category. The Core Experience category (8 features) has the highest average importance per feature, indicating that fundamental coaching experience metrics are individually more predictive than any single performance statistic. However, the HC Stats category (66 features capturing both team and opponent performance during prior head coaching roles) contributes the highest total importance, reflecting the large number of features and the predictive value of prior head coaching performance.
+Figure~\ref{fig:category_importance} shows the total and average feature importance aggregated by category.
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.48\textwidth]{figures/category_importance_total.png}
 \includegraphics[width=0.48\textwidth]{figures/category_importance_avg.png}
-\caption{Feature importance aggregated by category. Left: Total importance (sum across all features in category). Right: Average importance (mean per feature). Core Experience features have highest average importance, while HC Stats (including opponent statistics) contribute highest total importance.}
+\caption{Feature importance aggregated by category. Left: Total importance (sum across all features in category). Right: Average importance (mean per feature). HC Stats contribute highest total importance due to the large number of features, while average importance per feature is similar across categories.}
 \label{fig:category_importance}
 \end{figure}
 
-The features with the highest average importance are shown in Table~\ref{tab:tenure_feature_importance}. The most important feature is third-down conversion percentage during prior head coaching roles, highlighting that in-game execution efficiency is a strong predictor of future tenure. Multiple features related to both offensive and defensive performance during prior head coaching roles appear in the top 10, suggesting that past head coaching performance is a strong predictor of future performance. Interestingly, hiring team context (specifically yards allowed) also ranks highly, indicating that the quality of the team inherited plays a role in tenure outcomes.
+The HC Stats category (66 features) contributes the highest total importance (0.459), reflecting the large number of features capturing prior head coaching performance. This aligns with intuition: coaches who have previously succeeded as head coaches carry demonstrated evidence of their capabilities. DC Stats (0.256) and OC Stats (0.166) contribute less total importance, while Core Experience (0.064) and Hiring Team (0.056) contribute the least due to their smaller feature counts.
 
-\begin{table}[!ht]
-\caption{Ordinal classifier feature importance for top 10 most important features}
-\label{tab:tenure_feature_importance}
-\small
-\begin{tabular}{clc}
-\toprule
-Rank & Feature Description & Importance \\
-\midrule
-1 & During years as NFL HC, team's avg 3rd down conv. \% & 0.0341 \\
-2 & Number of years' experience as NFL position coach & 0.0276 \\
-3 & During years as NFL OC, team's avg turnovers & 0.0274 \\
-4 & Hiring team's avg yards allowed in previous two years & 0.0269 \\
-5 & During years as NFL HC, opp. team's avg rushing TDs & 0.0241 \\
-6 & During years as NFL OC, team's avg points per drive & 0.0234 \\
-7 & During years as NFL HC, team's avg penalty 1st downs & 0.0213 \\
-8 & During years as NFL HC, team's avg passing TDs & 0.0208 \\
-9 & During years as NFL DC, opp. team's avg 3rd down conv. \% & 0.0195 \\
-10 & During years as NFL HC, opp. team's avg 3rd down conv. \% & 0.0193 \\
-\bottomrule
-\end{tabular}
-\end{table}
+When examining average importance per feature, a Kruskal-Wallis test reveals no statistically significant differences across categories ($H = 2.42$, $p = 0.66$). The mean importance values are similar: Core Experience (0.0080), DC Stats (0.0078), HC Stats (0.0069), Hiring Team (0.0056), and OC Stats (0.0050). This finding suggests that the model draws broadly on information from all feature categories rather than relying heavily on any single type of predictor. The predictive signal for tenure classification is distributed across coaching experience, prior performance at multiple levels, and team context.
 
 \subsubsection{Predicting the Tenure of Recent Head Coach Hires}
 
 Table~\ref{tab:tenure_predictions} shows the ordinal model's predictions for coach tenure for the 21 head coaches hired in the last four years. This table also shows the probabilities associated with each class prediction; these probabilities sum to 1, and the class with the greatest probability is the final predicted class. As a reminder, Class 0 represents coaches who remain a head coach for 1--2 years, Class 1 represents coaches who remain a head coach for 3--4 years, and Class 2 represents coaches who remain a head coach for 5+ years.
 
-\textbf{Data Leakage Prevention:} Seven coaches in the prediction set (marked with *) have prior head coaching stints in the training data. To prevent data leakage---where the model could ``know'' about their past tenure outcomes---these coaches are predicted using a model retrained with their prior instances excluded. This ensures predictions are based solely on their characteristics at time of hire, not on the model having seen their past outcomes.
+Seven coaches in the prediction set (marked with *) have prior head coaching stints that appear in the training data. To prevent data leakage, these coaches are predicted using a model retrained with their prior instances excluded. This ensures predictions are based solely on their characteristics at time of hire, not on the model having seen their past outcomes.
 
 \begin{table}[!ht]
 \caption{Ordinal classifier coach tenure predictions for 21 recent head coach hires}
@@ -292,15 +285,15 @@ Todd Bowles* & 2022 & 0 & 86.8\% & 12.3\% & 0.8\% \\
 {\footnotesize *Predicted with model retrained to exclude coach's prior HC data}
 \end{table}
 
-After applying the data leakage fix, the ordinal model predicts only 1 of the 21 recent hires to achieve Class 2 (5+ years): Mike Vrabel (58.7\% confidence). Notably, Pete Carroll---who would have been predicted Class 2 without the leakage fix due to the model having learned from his successful 14-year Seattle tenure---is instead predicted Class 1 (64.3\%) when his prior outcomes are excluded from training. This demonstrates the importance of preventing data leakage for fair predictions. The model shows highest confidence (95.7\%) that Raheem Morris will have a short tenure, while DeMeco Ryans and Dan Quinn receive strong Class 1 predictions (93.6\% and 91.4\%, respectively), suggesting moderate expected tenure with high confidence.
+After applying the data leakage fix, the ordinal model predicts only 1 of the 21 recent hires to achieve Class 2 (5+ years): Mike Vrabel (58.7\% confidence). Notably, Pete Carroll, who would have been predicted Class 2 without the leakage fix due to the model having learned from his successful 14-year Seattle tenure, is instead predicted Class 1 (64.3\%) when his prior outcomes are excluded from training. This demonstrates the importance of preventing data leakage for fair predictions. The model shows highest confidence (95.7\%) that Raheem Morris will have a short tenure, while DeMeco Ryans and Dan Quinn receive strong Class 1 predictions (93.6\% and 91.4\%, respectively), suggesting moderate expected tenure with high confidence.
 
 \section{Conclusion}
 
 The ordinal classification approach using the Frank-Hall binary decomposition method, optimized with Quadratic Weighted Kappa (QWK), demonstrates strong predictive performance for NFL head coach tenure. The model achieves a QWK of 0.754, AUROC of 0.881, and 98.4\% adjacent accuracy on held-out test data, indicating that predictions are both accurate and, when incorrect, typically only off by one class. Compared to a standard multiclass approach, the ordinal model shows improvements across all metrics, with a notable 62.3\% improvement in the challenging middle-class (3--4 year tenure) F1 score (0.581 vs.\ 0.358).
 
-Feature importance analysis reveals that third-down conversion efficiency during prior head coaching roles is the strongest predictor of future tenure, suggesting that in-game execution and coaching decisions under pressure are more predictive than raw offensive or defensive statistics. The number of years of experience as an NFL position coach also ranks highly, indicating that foundational coaching experience contributes to tenure longevity. Interestingly, hiring team context (specifically yards allowed in previous seasons) also ranks among the top predictors, suggesting that the quality of the team inherited plays a meaningful role in tenure outcomes.
+Feature importance analysis at the category level reveals that HC Stats (capturing prior head coaching performance) contributes the highest total importance due to its large feature count, while average importance per feature shows no statistically significant differences across categories ($p = 0.66$). This suggests the model draws broadly on information from all feature types, rather than relying heavily on any single category of predictors.
 
-This research demonstrates that head coach characteristics---particularly prior head coaching performance and position coaching experience---can meaningfully predict tenure classification. For NFL teams, this suggests that hiring decisions should focus on candidates with strong prior head coaching performance (particularly third-down efficiency) and extensive position coaching experience. The model's predictions for recent hires, including high confidence that Mike Vrabel will achieve long tenure and that Raheem Morris faces a short tenure, provide actionable insights for evaluating current coaching situations.
+The practical implications of this research extend beyond academic interest. With approximately half of NFL head coaching hires lasting two years or fewer, teams clearly struggle to identify successful candidates through traditional evaluation methods. The model's 5.3$\times$ improvement over the human baseline (Macro F1 of 0.695 vs.\ 0.130) demonstrates that data-driven approaches can substantially outperform intuition-based hiring decisions. While no model can guarantee successful hires, integrating predictive analytics into the evaluation process could help teams avoid high-risk candidates and identify undervalued coaching talent. For a league where a single additional win can mean the difference between playoff contention and a losing season, even modest improvements in hiring decisions translate to meaningful competitive advantages. The model's predictions for recent hires, such as high confidence that Mike Vrabel will achieve long tenure and that Raheem Morris faces a short tenure, illustrate how these insights can inform real-world evaluations and set appropriate expectations for coaching transitions.
 
 \begin{thebibliography}{99}
 

@@ -10,7 +10,16 @@ from typing import Dict, List, Union
 
 # Team franchise abbreviation mappings for historical name changes and relocations
 TEAM_FRANCHISE_MAPPINGS = {
-    "ind": ["ind", "clt"], 
+    # Stable franchises (never relocated, consistent abbreviations)
+    "chi": ["chi"],      # Chicago Bears
+    "sfo": ["sfo"],      # San Francisco 49ers
+    "gnb": ["gnb"],      # Green Bay Packers
+    "dal": ["dal"],      # Dallas Cowboys
+    "nwe": ["nwe"],      # New England Patriots
+    "jax": ["jax"],      # Jacksonville Jaguars
+    "nor": ["nor"],      # New Orleans Saints
+    # Franchises with historical relocations or name changes
+    "ind": ["ind", "clt"],
     "ari": ["ari", "crd"],
     "hou": ["hou", "htx", "oti"],
     "ten": ["ten", "oti"],
