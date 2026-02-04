@@ -42,15 +42,16 @@ DEFAULT_XGBOOST_BINARY_PARAMS: Dict[str, Any] = {
 }
 
 # Optimal parameters discovered from 1000-iteration RandomizedSearchCV
-# with 5-fold coach-level cross-validation (validated Feb 2026)
+# with 5-fold coach-level cross-validation, optimized for QWK (Feb 2026)
+# QWK-tuned model outperforms AUROC-tuned: QWK 0.754 vs 0.700, MAE 0.307 vs 0.339
 OPTIMIZED_XGBOOST_PARAMS: Dict[str, Any] = {
     'n_estimators': 200,
-    'learning_rate': 0.2,
+    'learning_rate': 0.25,
     'max_depth': 2,
-    'gamma': 0.01,
-    'reg_lambda': 0.5,
-    'reg_alpha': 0,
-    'subsample': 0.9,
+    'gamma': 0,
+    'reg_lambda': 0.1,
+    'reg_alpha': 0.01,
+    'subsample': 0.8,
     'colsample_bytree': 0.9,
     'min_child_weight': 3
 }
