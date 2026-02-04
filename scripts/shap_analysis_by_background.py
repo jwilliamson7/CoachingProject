@@ -905,6 +905,8 @@ def plot_refined_category_importance(aggregated_shap: shap.Explanation,
     ax1.set_xlabel('Total Mean |SHAP|', fontsize=12)
     ax1.set_title('Total SHAP Importance by Category', fontsize=14, fontweight='bold')
     ax1.invert_yaxis()
+    # Extend x-axis to accommodate labels
+    ax1.set_xlim(0, max(totals) * 1.25)
 
     for bar, val in zip(bars1, totals):
         ax1.text(val + 0.005, bar.get_y() + bar.get_height()/2,
@@ -915,6 +917,8 @@ def plot_refined_category_importance(aggregated_shap: shap.Explanation,
     ax2.set_xlabel('Average Mean |SHAP| per Feature', fontsize=12)
     ax2.set_title('Average SHAP Importance by Category', fontsize=14, fontweight='bold')
     ax2.invert_yaxis()
+    # Extend x-axis to accommodate labels
+    ax2.set_xlim(0, max(avgs) * 1.25)
 
     for bar, val in zip(bars2, avgs):
         ax2.text(val + 0.0002, bar.get_y() + bar.get_height()/2,
@@ -1134,6 +1138,10 @@ def plot_era_comparison(era_results: Dict, output_dir: str):
     ax.set_xticklabels([f'{e}\n(n={era_results[e]["n"]})' for e in eras], fontsize=11)
     ax.legend(fontsize=11)
 
+    # Extend y-axis to accommodate labels and ratio annotations
+    max_val = max(max(off_values), max(def_values))
+    ax.set_ylim(0, max_val * 1.35)
+
     # Add value labels
     for bars in [bars1, bars2]:
         for bar in bars:
@@ -1144,7 +1152,7 @@ def plot_era_comparison(era_results: Dict, output_dir: str):
     # Add ratio annotations
     for i, era in enumerate(eras):
         ratio = era_results[era]['ratio']
-        ax.annotate(f'{ratio:.1f}x', xy=(i, max(off_values[i], def_values[i]) + 0.0008),
+        ax.annotate(f'{ratio:.1f}x', xy=(i, max(off_values[i], def_values[i]) + 0.0005),
                     ha='center', fontsize=10, fontweight='bold')
 
     plt.tight_layout()
