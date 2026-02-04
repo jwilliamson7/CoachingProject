@@ -1,3 +1,7 @@
+import os
+import sys
+from pathlib import Path
+
 import pandas as pd
 import numpy as np
 from sklearn.decomposition import TruncatedSVD
@@ -5,6 +9,10 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 import warnings
 warnings.filterwarnings('ignore')
+
+# Add project root to path
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root))
 
 def matrix_factorization_imputation(data, n_components=50, max_iter=200, random_state=42):
     """
@@ -138,13 +146,17 @@ def main():
     """Main function to run matrix factorization imputation on master_data.csv"""
     print("SVD-Based Matrix Factorization Imputation for NFL Coaching Data")
     print("=" * 65)
-    
+
+    # Define paths relative to project root
+    data_dir = project_root / "data"
+    input_file = data_dir / "master_data.csv"
+
     # Load the data
     try:
-        df = pd.read_csv('master_data.csv')
-        print(f"Successfully loaded data: {df.shape}")
+        df = pd.read_csv(input_file)
+        print(f"Successfully loaded data from {input_file}: {df.shape}")
     except FileNotFoundError:
-        print("Error: master_data.csv not found in current directory")
+        print(f"Error: {input_file} not found")
         return
     except Exception as e:
         print(f"Error loading data: {e}")
@@ -170,7 +182,7 @@ def main():
             imputed_df.insert(0, 'Unnamed: 0', unnamed_index_col)
         
         # Save the imputed data
-        output_file = 'svd_imputed_master_data.csv'
+        output_file = data_dir / 'svd_imputed_master_data.csv'
         imputed_df.to_csv(output_file, index=False)
         print(f"\nImputed data saved to: {output_file}")
         

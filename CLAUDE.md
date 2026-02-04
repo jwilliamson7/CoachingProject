@@ -6,55 +6,124 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a data science research project analyzing NFL coaching tenure and performance. The project was developed for a Computer Science course (CSCE421) and includes research paper materials for sports analytics conferences (SSAC). The project scrapes NFL coaching and team performance data from pro-football-reference.com to build predictive models for coaching success and tenure.
 
-## Key Components
+## Project Structure
 
-### Data Collection Scripts
-- `coach_scraping.py`: Scrapes individual coach data from pro-football-reference.com, extracting coaching results, rankings, and history
-- `team_data_scraping.py`: Scrapes team performance data by year, including playoff information and team statistics  
-- `create_data.py`: Main feature engineering script that combines coach and team data (this is the current/active version)
-- `transform_team_data.py`: Processes and transforms raw team data into analysis-ready format
-- `matrix_factorization_imputation.py`: Handles missing data imputation using matrix factorization techniques
-- `data_constants.py`: Centralized storage for data constants and configuration parameters
-- `detailed_data_comparison.py`: Data validation and comparison utilities for quality assurance
-
-### Data Structure
-- `Coaches/`: Individual coach directories containing CSV and Feather files with coaching history, results, and rankings
-- `League Data/`: Year-by-year league statistics (1920-2025) with team and opponent data, both raw and normalized
-- `Teams/`: Team-specific data storage with team records and playoff data
-- `master_data.csv`: Consolidated dataset combining all features for model training
-- `*.ipynb`: Jupyter notebooks for model development and analysis (multiple versions for different model iterations)
+```
+CoachingProject/
+├── archive/
+│   └── notebooks/           # Archived Jupyter notebooks (v2-v5)
+├── data/
+│   ├── models/              # Trained model files (.pkl)
+│   ├── master_data.csv      # Raw feature data
+│   └── svd_imputed_master_data.csv  # Imputed data for training
+├── model/                   # Model code package
+│   ├── __init__.py
+│   ├── ordinal_classifier.py    # Frank-Hall ordinal classification
+│   ├── coach_tenure_model.py    # Main model wrapper
+│   ├── cross_validation.py      # Coach-level CV utilities
+│   ├── evaluation.py            # Ordinal metrics (MAE, QWK, etc.)
+│   └── config.py                # Hyperparameters and settings
+├── scripts/
+│   ├── data/                # Data processing scripts
+│   │   ├── coach_scraping.py
+│   │   ├── create_data.py
+│   │   ├── team_data_scraping.py
+│   │   ├── transform_team_data.py
+│   │   ├── matrix_factorization_imputation.py
+│   │   └── detailed_data_comparison.py
+│   ├── train.py             # Model training entry point
+│   ├── evaluate.py          # Model evaluation
+│   └── predict.py           # Predictions for new coaches
+├── Coaches/                 # Raw coach data (scraped)
+├── Teams/                   # Raw team data (scraped)
+├── League Data/             # League statistics by year
+├── data_constants.py        # Shared constants
+├── requirements.txt         # Python dependencies
+└── README.md
+```
 
 ## Development Workflow
 
-### Running Data Collection and Processing
+### Install Dependencies
 ```bash
-# Scrape coach data (be mindful of rate limiting)
-python coach_scraping.py
-
-# Scrape team data  
-python team_data_scraping.py
-
-# Transform and combine data (current version)
-python create_data.py
+pip install -r requirements.txt
 ```
 
-### Analysis Environment
-- Primary dependencies: pandas, numpy, sympy, scipy for data processing
-- Machine learning libraries: scikit-learn, XGBoost for predictive modeling
-- Visualization: matplotlib, seaborn for data analysis and model evaluation
-- Data stored in both CSV and Feather formats for performance
-- No package.json or requirements.txt - dependencies managed manually
+### Data Collection and Processing
+```bash
+# Scrape coach data (be mindful of rate limiting)
+python scripts/data/coach_scraping.py
 
-### Research Output
-- LaTeX files for academic paper formatting (IEEE conference style)
-- Model parameter files (XGBC_best_params variants for different model configurations)
-- Generated visualizations and statistical analysis
-- Excel files with results tables and model comparisons
-- Jupyter notebooks documenting model development iterations (v1-v6)
+# Scrape team data
+python scripts/data/team_data_scraping.py
+
+# Transform team data into league-wide statistics
+python scripts/data/transform_team_data.py
+
+# Create feature dataset
+python scripts/data/create_data.py
+
+# Impute missing values with SVD
+python scripts/data/matrix_factorization_imputation.py
+```
+
+### Model Training and Evaluation
+```bash
+# Train ordinal model (recommended)
+python scripts/train.py
+
+# Train multiclass model
+python scripts/train.py --multiclass
+
+# Train and compare both models
+python scripts/train.py --compare
+
+# Train with hyperparameter tuning
+python scripts/train.py --tune --n-iter 500
+
+# Evaluate trained models
+python scripts/evaluate.py --compare
+
+# Make predictions for recent hires
+python scripts/predict.py
+```
+
+## Model Package (`model/`)
+
+### Ordinal Classification (Frank-Hall Method)
+The project uses ordinal classification for tenure prediction since classes have natural ordering (0 < 1 < 2). The Frank-Hall method trains K-1 binary classifiers:
+- **Classifier 1**: P(Y > 0) - distinguishes class 0 from classes 1+2
+- **Classifier 2**: P(Y > 1) - distinguishes classes 0+1 from class 2
+
+Class probabilities derived as:
+- P(Y = 0) = 1 - P(Y > 0)
+- P(Y = 1) = P(Y > 0) - P(Y > 1)
+- P(Y = 2) = P(Y > 1)
+
+### Key Classes
+- `OrdinalClassifier`: Frank-Hall implementation with sklearn-compatible API
+- `CoachTenureModel`: Main wrapper supporting both ordinal and multiclass modes
+- `CoachLevelStratifiedKFold`: Cross-validation preventing coach data leakage
+
+### Evaluation Metrics
+- **MAE**: Mean Absolute Error (ordinal distance)
+- **QWK**: Quadratic Weighted Kappa (penalizes distant errors)
+- **Adjacent Accuracy**: Predictions within 1 class of true label
+- **AUROC**: Area Under ROC Curve (macro-averaged)
+- **Per-class F1**: Precision/recall balance per tenure class
+
+### Model Performance (Ordinal vs Multiclass)
+| Metric | Ordinal | Multiclass | Winner |
+|--------|---------|------------|--------|
+| MAE | 0.339 | 0.354 | Ordinal |
+| QWK | 0.731 | 0.712 | Ordinal |
+| Adjacent Acc | 98.4% | 97.6% | Ordinal |
+| AUROC | 0.836 | 0.843 | Multiclass |
+| Class 1 F1 | 0.466 | 0.451 | Ordinal (+3.3%) |
 
 ## Data Features and Architecture
 
-The project uses `create_data.py` to engineer 154 features per coaching hire including:
+The project uses `scripts/data/create_data.py` to engineer 150 features per coaching hire:
 
 ### Core Coach Features (8 features)
 - Age at time of hire
@@ -75,9 +144,14 @@ The project uses `create_data.py` to engineer 154 features per coaching hire inc
 
 ## Important Implementation Details
 
+### Coach-Level Cross-Validation
+To prevent data leakage, train/test splits ensure no coach appears in both sets. Coaches with multiple hiring instances (e.g., Bill Belichick 1991, 2000) are kept together.
+
 ### Team Abbreviation Mapping
-- Comprehensive dictionary mapping handles franchise relocations and name changes
-- Examples: Raiders (oak/rai/lvr), Rams (stl/ram/lar), Colts (bal/clt/ind)
+Comprehensive dictionary in `data_constants.py` handles franchise relocations and name changes:
+- Raiders: oak/rai/lvr
+- Rams: stl/ram/lar
+- Colts: bal/clt/ind
 
 ### Career Parsing Logic
 - Excludes interim positions and non-coaching roles
@@ -85,52 +159,20 @@ The project uses `create_data.py` to engineer 154 features per coaching hire inc
 - Handles current coaches hired after 2022 differently (insufficient tenure data)
 - Generates separate data point for each head coaching hire
 
-### Data Quality Controls
-- Validates 154 features per instance
-- Handles missing team data gracefully with error reporting
-- Uses both raw and normalized league statistics
+### Missing Data Handling
+- SVD-based matrix factorization imputation for missing statistics
+- Historical statistics (pre-1990s) naturally have NaN for advanced metrics
+- Imputed data saved to `data/svd_imputed_master_data.csv`
 
-## Current Analysis Focus
-- Model evaluation focuses on coaching tenure prediction and winning percentage forecasting
-- Data spans from 1920 to 2025, covering the complete modern NFL era
-- Recent hires (2025) included as new hire predictions without tenure classification
+## Configuration
 
-## Model Development and Evaluation
+Key configuration in `model/config.py`:
+- `XGBOOST_PARAM_DISTRIBUTIONS`: Hyperparameter search space
+- `OPTIMIZED_XGBOOST_PARAMS`: Best parameters from cross-validation
+- `MODEL_PATHS`: File paths for data and models
+- `ORDINAL_CONFIG`: Tenure class definitions
 
-### Modeling Approach
-- **Gradient Boosting Models**: Primary approach using XGBoost for both classification and regression tasks
-- **Feature Selection**: Recursive feature elimination and importance-based selection
-- **Cross-validation**: Time-aware splitting to prevent data leakage
-- **Hyperparameter Tuning**: Grid search with cross-validation for optimal parameters
-
-### Model Versions
-- Multiple notebook versions (v1-v6) document iterative model improvements
-- Separate models for tenure classification vs winning percentage prediction
-- Best parameters saved for reproducibility
-
-## Data Quality and Historical Context
-
-### NFL Statistics Evolution
-The feature engineering process preserves historical accuracy regarding NFL statistics tracking:
-
-- **Basic statistics** (1920+): Points, yards, wins/losses, basic offensive/defensive stats
-- **Advanced passing metrics** (1960s+): Completion percentage, yards per attempt, passer rating components  
-- **Drive statistics** (1990s+): Average drive length, time of possession, scoring percentage
-- **Situational metrics** (2000s+): Third down conversion, red zone efficiency, fourth down attempts
-
-### Missing Data Patterns
-Some features will naturally be NaN for earlier coaching tenures:
-- **Features 62-74**: Late defensive coordinator metrics (drive stats, situational stats)
-- **Features 95-140**: Advanced head coach performance metrics
-- This is **historically accurate** - the NFL didn't track these statistics in the 1980s and earlier
-
-### Data Processing Logic
-- **Performance data accumulation**: Each coach's performance statistics accumulate chronologically across all roles
-- **Hiring instance creation**: Separate data points generated for each head coaching hire, preserving prior experience
-- **Multi-tenure coaches**: Coaches hired multiple times (e.g., Bill Belichick 1991, 2000) retain accumulated experience from all previous roles
-- **Team franchise mapping**: Handles relocations and name changes (Raiders, Rams, Colts, etc.) correctly
-
-### Known Data Quality Issues (Fixed)
-- ✅ **Multi-hire performance retention**: Fixed bug where coaches lost prior performance data on subsequent hires
-- ✅ **Feature completeness**: Advanced statistics correctly show as NaN for historical periods when not tracked
-- ✅ **Team mapping**: Franchise relocations and abbreviation changes handled properly via comprehensive mapping dictionary
+## Research Output
+- LaTeX files for academic paper formatting (IEEE conference style) in `LaTeX/`
+- Trained models saved to `data/models/`
+- Archived notebooks in `archive/notebooks/`

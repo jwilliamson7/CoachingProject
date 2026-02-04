@@ -1,8 +1,13 @@
+import sys
 import pandas as pd
 import numpy as np
 from pathlib import Path
 from scipy.stats import zscore
 from typing import Dict, List
+
+# Add project root to path
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root))
 
 
 class TeamDataTransformer:
@@ -17,10 +22,10 @@ class TeamDataTransformer:
         'RZPct': lambda x: float(x.rstrip('%')) / 100.0 if isinstance(x, str) else x
     }
     
-    def __init__(self, teams_dir: str = "Teams", output_dir: str = "League Data"):
+    def __init__(self, teams_dir: str = None, output_dir: str = None):
         """Initialize transformer with input and output directories"""
-        self.teams_dir = Path(teams_dir)
-        self.output_dir = Path(output_dir)
+        self.teams_dir = Path(teams_dir) if teams_dir else project_root / "Teams"
+        self.output_dir = Path(output_dir) if output_dir else project_root / "League Data"
         self.output_dir.mkdir(exist_ok=True)
         
     def _discover_team_directories(self) -> List[Path]:
