@@ -11,7 +11,10 @@ from sklearn.metrics import (
     f1_score,
     roc_auc_score,
     accuracy_score,
-    classification_report
+    classification_report,
+    mean_absolute_error,
+    mean_squared_error,
+    r2_score
 )
 from typing import Dict, Any, Optional
 
@@ -269,6 +272,86 @@ def ordinal_metrics(
             metrics['auroc'] = None
 
     return metrics
+
+
+def regression_metrics(
+    y_true: np.ndarray,
+    y_pred: np.ndarray
+) -> Dict[str, float]:
+    """
+    Compute standard regression metrics.
+
+    Parameters
+    ----------
+    y_true : array-like of shape (n_samples,)
+        True target values.
+
+    y_pred : array-like of shape (n_samples,)
+        Predicted target values.
+
+    Returns
+    -------
+    metrics : dict
+        Dictionary containing:
+        - 'mae': Mean Absolute Error
+        - 'mse': Mean Squared Error
+        - 'rmse': Root Mean Squared Error
+        - 'r2': R-squared (coefficient of determination)
+        - 'correlation': Pearson correlation coefficient
+    """
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
+
+    mse = mean_squared_error(y_true, y_pred)
+
+    metrics = {
+        'mae': mean_absolute_error(y_true, y_pred),
+        'mse': mse,
+        'rmse': np.sqrt(mse),
+        'r2': r2_score(y_true, y_pred),
+        'correlation': np.corrcoef(y_true, y_pred)[0, 1] if len(y_true) > 1 else 0.0
+    }
+
+    return metrics
+
+
+def format_regression_report(
+    metrics: Dict[str, float],
+    title: str = "Regression Report"
+) -> str:
+    """
+    Format regression metrics dictionary as a readable string report.
+
+    Parameters
+    ----------
+    metrics : dict
+        Metrics dictionary from regression_metrics().
+
+    title : str
+        Title for the report.
+
+    Returns
+    -------
+    report : str
+        Formatted string report.
+    """
+    lines = [
+        "=" * 60,
+        title.center(60),
+        "=" * 60,
+        "",
+        "REGRESSION METRICS",
+        "-" * 40,
+        f"Mean Absolute Error (MAE):  {metrics['mae']:.4f}",
+        f"Mean Squared Error (MSE):   {metrics['mse']:.6f}",
+        f"Root MSE (RMSE):            {metrics['rmse']:.4f}",
+        f"R-squared (R²):             {metrics['r2']:.4f}",
+        f"Pearson Correlation:        {metrics['correlation']:.4f}",
+        "",
+        "=" * 60
+    ]
+
+    return "\n".join(lines)
 
 
 def format_metrics_report(

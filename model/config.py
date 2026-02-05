@@ -41,6 +41,16 @@ DEFAULT_XGBOOST_BINARY_PARAMS: Dict[str, Any] = {
     'random_state': 42
 }
 
+# Default XGBoost parameters for regression (WAR prediction)
+DEFAULT_XGBOOST_REGRESSION_PARAMS: Dict[str, Any] = {
+    'verbosity': 1,
+    'objective': 'reg:squarederror',
+    'n_jobs': -1,
+    'tree_method': 'hist',
+    'max_bin': 256,
+    'random_state': 42
+}
+
 # Optimal parameters discovered from 1000-iteration RandomizedSearchCV
 # with 5-fold coach-level cross-validation, optimized for QWK (Feb 2026)
 # QWK-tuned model outperforms AUROC-tuned: QWK 0.754 vs 0.700, MAE 0.307 vs 0.339
@@ -56,6 +66,22 @@ OPTIMIZED_XGBOOST_PARAMS: Dict[str, Any] = {
     'min_child_weight': 3
 }
 
+# Optimal parameters for WAR regression from 1000-iteration RandomizedSearchCV
+# with 5-fold coach-level cross-validation, optimized for MSE (Feb 2026)
+# Model trained EXCLUDING recent hires (tenure class -1) to avoid data leakage
+# Test set: R² = 0.276, MAE = 0.051, Correlation = 0.525
+OPTIMIZED_WAR_PARAMS: Dict[str, Any] = {
+    'n_estimators': 200,
+    'learning_rate': 0.1,
+    'max_depth': 3,
+    'gamma': 0,
+    'reg_lambda': 0,
+    'reg_alpha': 0,
+    'subsample': 0.9,
+    'colsample_bytree': 0.9,
+    'min_child_weight': 1
+}
+
 # Ordinal classification configuration
 ORDINAL_CONFIG: Dict[str, Any] = {
     'n_classes': 3,
@@ -69,6 +95,16 @@ ORDINAL_CONFIG: Dict[str, Any] = {
         1: (3, 4),   # 3-4 years tenure
         2: (5, None) # 5+ years tenure
     }
+}
+
+# WAR regression model configuration
+WAR_CONFIG: Dict[str, Any] = {
+    'n_features': 140,  # Excludes hiring team factors (Features 141-150)
+    'feature_columns_start': 2,  # Features start after Coach Name, Year
+    'feature_columns_end': 142,  # Features 1-140 (0-indexed: columns 2-141)
+    'target_column': 'avg_war_per_season',
+    'coach_name_column': 'Coach Name',
+    'year_column': 'Year'
 }
 
 # Model training configuration
@@ -89,7 +125,10 @@ MODEL_PATHS: Dict[str, str] = {
     'models_dir': 'data/models',
     'default_model_output': 'data/models/coach_tenure_model.pkl',
     'ordinal_model_output': 'data/models/coach_tenure_ordinal_model.pkl',
-    'multiclass_model_output': 'data/models/coach_tenure_multiclass_model.pkl'
+    'multiclass_model_output': 'data/models/coach_tenure_multiclass_model.pkl',
+    'war_data_file': 'data/war_prediction_data.csv',
+    'war_trajectories_file': 'data/coach_war_trajectories_with_team.csv',
+    'war_model_output': 'data/models/coach_war_model.pkl'
 }
 
 # Feature configuration
@@ -158,6 +197,29 @@ def get_binary_xgboost_params(custom_params: Dict[str, Any] = None) -> Dict[str,
     """
     params = DEFAULT_XGBOOST_BINARY_PARAMS.copy()
     params.update(OPTIMIZED_XGBOOST_PARAMS)
+
+    if custom_params:
+        params.update(custom_params)
+
+    return params
+
+
+def get_regression_xgboost_params(custom_params: Dict[str, Any] = None) -> Dict[str, Any]:
+    """
+    Get XGBoost parameters for regression (WAR prediction).
+
+    Parameters
+    ----------
+    custom_params : dict, optional
+        Custom parameters to override defaults.
+
+    Returns
+    -------
+    params : dict
+        Combined parameter dictionary for regression.
+    """
+    params = DEFAULT_XGBOOST_REGRESSION_PARAMS.copy()
+    params.update(OPTIMIZED_WAR_PARAMS)
 
     if custom_params:
         params.update(custom_params)

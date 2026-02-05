@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a data science research project analyzing NFL coaching tenure and performance. The project was developed for a Computer Science course (CSCE421) and includes research paper materials for sports analytics conferences (SSAC). The project scrapes NFL coaching and team performance data from pro-football-reference.com to build predictive models for coaching success and tenure.
+This is a data science research project analyzing NFL coaching tenure and performance. The project was developed for a Computer Science course (CSCE421) and includes research paper materials for sports analytics conferences (SSAC/JQAS). The project scrapes NFL coaching and team performance data from pro-football-reference.com to build predictive models for:
+1. **Coaching tenure** (ordinal classification: 1-2 years, 3-4 years, 5+ years)
+2. **Coach WAR** (regression: average Wins Above Replacement per season)
 
 ## Project Structure
 
@@ -15,23 +17,28 @@ CoachingProject/
 ├── data/
 │   ├── models/              # Trained model files (.pkl)
 │   ├── master_data.csv      # Raw feature data
-│   └── svd_imputed_master_data.csv  # Imputed data for training
+│   ├── svd_imputed_master_data.csv  # Imputed data for training
+│   ├── coach_war_trajectories_with_team.csv  # WAR data by coach/team/year
+│   └── war_prediction_data.csv  # Merged WAR prediction dataset
 ├── model/                   # Model code package
 │   ├── __init__.py
 │   ├── ordinal_classifier.py    # Frank-Hall ordinal classification
 │   ├── coach_tenure_model.py    # Main model wrapper
+│   ├── war_regressor.py         # WAR regression model
 │   ├── cross_validation.py      # Coach-level CV utilities
-│   ├── evaluation.py            # Ordinal metrics (MAE, QWK, etc.)
+│   ├── evaluation.py            # Ordinal and regression metrics
 │   └── config.py                # Hyperparameters and settings
 ├── scripts/
 │   ├── data/                # Data processing scripts
 │   │   ├── coach_scraping.py
 │   │   ├── create_data.py
+│   │   ├── create_war_data.py   # Merge WAR with features
 │   │   ├── team_data_scraping.py
 │   │   ├── transform_team_data.py
 │   │   ├── matrix_factorization_imputation.py
 │   │   └── detailed_data_comparison.py
-│   ├── train.py             # Model training entry point
+│   ├── train.py             # Tenure model training
+│   ├── train_war.py         # WAR model training
 │   ├── evaluate.py          # Model evaluation
 │   └── predict.py           # Predictions for new coaches
 ├── Coaches/                 # Raw coach data (scraped)
@@ -67,7 +74,7 @@ python scripts/data/create_data.py
 python scripts/data/matrix_factorization_imputation.py
 ```
 
-### Model Training and Evaluation
+### Tenure Model Training and Evaluation
 ```bash
 # Train ordinal model (recommended)
 python scripts/train.py
@@ -88,6 +95,18 @@ python scripts/evaluate.py --compare
 python scripts/predict.py
 ```
 
+### WAR Model Training
+```bash
+# Create WAR prediction dataset (merges WAR trajectories with features)
+python scripts/data/create_war_data.py
+
+# Train WAR regression model (uses optimized params by default)
+python scripts/train_war.py
+
+# Train with hyperparameter tuning
+python scripts/train_war.py --tune --n-iter 1000
+```
+
 ## Model Package (`model/`)
 
 ### Ordinal Classification (Frank-Hall Method)
@@ -103,6 +122,7 @@ Class probabilities derived as:
 ### Key Classes
 - `OrdinalClassifier`: Frank-Hall implementation with sklearn-compatible API
 - `CoachTenureModel`: Main wrapper supporting both ordinal and multiclass modes
+- `WARRegressor`: XGBoost regression model for predicting coach WAR
 - `CoachLevelStratifiedKFold`: Cross-validation preventing coach data leakage
 
 ### Evaluation Metrics
@@ -120,6 +140,19 @@ Class probabilities derived as:
 | Adjacent Acc | 98.4% | 97.6% | Ordinal |
 | AUROC | 0.836 | 0.843 | Multiclass |
 | Class 1 F1 | 0.466 | 0.451 | Ordinal (+3.3%) |
+
+### WAR Regression Model
+Predicts average WAR (Wins Above Replacement) per season during a coach's tenure. Uses 140 features (excludes hiring team factors) since WAR measures coaching ability independent of team context. Model is trained excluding recent hires (tenure class -1) to allow unbiased predictions.
+
+| Metric | Value |
+|--------|-------|
+| R² | 0.276 |
+| Pearson Correlation | 0.525 |
+| MAE | 0.051 (5.1 pct points) |
+| RMSE | 0.063 |
+| vs Baseline | +27.8% |
+
+WAR is expressed in percentage terms (proportion of wins above replacement).
 
 ## Data Features and Architecture
 
@@ -168,9 +201,11 @@ Comprehensive dictionary in `data_constants.py` handles franchise relocations an
 
 Key configuration in `model/config.py`:
 - `XGBOOST_PARAM_DISTRIBUTIONS`: Hyperparameter search space
-- `OPTIMIZED_XGBOOST_PARAMS`: Best parameters from cross-validation
+- `OPTIMIZED_XGBOOST_PARAMS`: Best parameters for tenure classification
+- `OPTIMIZED_WAR_PARAMS`: Best parameters for WAR regression
 - `MODEL_PATHS`: File paths for data and models
 - `ORDINAL_CONFIG`: Tenure class definitions
+- `WAR_CONFIG`: WAR model feature configuration
 
 ## Research Output
 - LaTeX files for academic paper formatting (IEEE conference style) in `LaTeX/`

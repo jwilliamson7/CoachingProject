@@ -257,27 +257,27 @@ Seven coaches in the prediction set (marked with *) have prior head coaching sti
 \toprule
 Coach Name & Year & Pred. & P(C0) & P(C1) & P(C2) \\
 \midrule
-Aaron Glenn & 2025 & 0 & 56.4\% & 42.1\% & 1.5\% \\
-Ben Johnson & 2025 & 0 & 68.8\% & 30.8\% & 0.4\% \\
-Brian Callahan & 2024 & 0 & 68.5\% & 28.9\% & 2.6\% \\
-Brian Daboll & 2022 & 0 & 77.1\% & 22.6\% & 0.3\% \\
-Brian Schottenheimer & 2025 & 1 & 37.4\% & 62.0\% & 0.6\% \\
-Dan Quinn* & 2024 & 1 & 6.7\% & 91.4\% & 1.9\% \\
-Dave Canales & 2024 & 0 & 55.9\% & 43.1\% & 1.0\% \\
-DeMeco Ryans & 2023 & 1 & 4.6\% & 93.6\% & 1.7\% \\
-Jim Harbaugh* & 2024 & 0 & 69.6\% & 0.0\% & 30.4\% \\
-Jonathan Gannon & 2023 & 1 & 48.0\% & 49.4\% & 2.6\% \\
-Kellen Moore & 2025 & 0 & 73.1\% & 26.5\% & 0.4\% \\
-Kevin O'Connell & 2022 & 1 & 24.0\% & 68.5\% & 7.5\% \\
-Liam Coen & 2025 & 0 & 51.4\% & 44.8\% & 3.8\% \\
-Mike Macdonald & 2024 & 1 & 21.9\% & 69.0\% & 9.1\% \\
-Mike McDaniel & 2022 & 0 & 75.0\% & 24.1\% & 0.9\% \\
-Mike Vrabel* & 2025 & 2 & 0.6\% & 40.7\% & 58.7\% \\
-Pete Carroll* & 2025 & 1 & 8.8\% & 64.3\% & 26.9\% \\
-Raheem Morris* & 2024 & 0 & 95.7\% & 2.3\% & 1.9\% \\
-Sean Payton* & 2023 & 1 & 10.2\% & 89.2\% & 0.6\% \\
-Shane Steichen & 2023 & 0 & 62.8\% & 36.9\% & 0.4\% \\
-Todd Bowles* & 2022 & 0 & 86.8\% & 12.3\% & 0.8\% \\
+Aaron Glenn & 2025 & 0 & 58.1\% & 41.0\% & 0.9\% \\
+Ben Johnson & 2025 & 0 & 98.9\% & 1.0\% & 0.1\% \\
+Brian Callahan & 2024 & 1 & 32.0\% & 42.4\% & 25.7\% \\
+Brian Daboll & 2022 & 0 & 95.5\% & 4.4\% & 0.1\% \\
+Brian Schottenheimer & 2025 & 0 & 99.6\% & 0.4\% & 0.0\% \\
+Dan Quinn* & 2024 & 1 & 5.4\% & 93.7\% & 0.9\% \\
+Dave Canales & 2024 & 0 & 61.9\% & 17.3\% & 20.8\% \\
+DeMeco Ryans & 2023 & 1 & 36.2\% & 54.8\% & 9.0\% \\
+Jim Harbaugh* & 2024 & 0 & 97.5\% & 0.5\% & 2.0\% \\
+Jonathan Gannon & 2023 & 0 & 98.4\% & 0.3\% & 1.4\% \\
+Kellen Moore & 2025 & 0 & 77.2\% & 22.6\% & 0.2\% \\
+Kevin O'Connell & 2022 & 0 & 57.6\% & 42.0\% & 0.5\% \\
+Liam Coen & 2025 & 1 & 2.2\% & 80.8\% & 17.1\% \\
+Mike Macdonald & 2024 & 1 & 5.4\% & 81.2\% & 13.4\% \\
+Mike McDaniel & 2022 & 0 & 92.3\% & 7.5\% & 0.3\% \\
+Mike Vrabel* & 2025 & 2 & 1.1\% & 20.2\% & 78.8\% \\
+Pete Carroll* & 2025 & 1 & 18.5\% & 45.2\% & 36.3\% \\
+Raheem Morris* & 2024 & 0 & 99.6\% & 0.2\% & 0.2\% \\
+Sean Payton* & 2023 & 1 & 26.6\% & 73.3\% & 0.2\% \\
+Shane Steichen & 2023 & 0 & 95.7\% & 2.4\% & 1.9\% \\
+Todd Bowles* & 2022 & 0 & 98.9\% & 0.9\% & 0.2\% \\
 \bottomrule
 \end{tabular}
 \vspace{0.5em}
@@ -285,7 +285,7 @@ Todd Bowles* & 2022 & 0 & 86.8\% & 12.3\% & 0.8\% \\
 {\footnotesize *Predicted with model retrained to exclude coach's prior HC data}
 \end{table}
 
-After applying the data leakage fix, the ordinal model predicts only 1 of the 21 recent hires to achieve Class 2 (5+ years): Mike Vrabel (58.7\% confidence). Notably, Pete Carroll, who would have been predicted Class 2 without the leakage fix due to the model having learned from his successful 14-year Seattle tenure, is instead predicted Class 1 (64.3\%) when his prior outcomes are excluded from training. This demonstrates the importance of preventing data leakage for fair predictions. The model shows highest confidence (95.7\%) that Raheem Morris will have a short tenure, while DeMeco Ryans and Dan Quinn receive strong Class 1 predictions (93.6\% and 91.4\%, respectively), suggesting moderate expected tenure with high confidence.
+After applying the data leakage fix, the ordinal model predicts only 1 of the 21 recent hires to achieve Class 2 (5+ years): Mike Vrabel (78.8\% confidence). Notably, Pete Carroll, who would have been predicted Class 2 without the leakage fix due to the model having learned from his successful 14-year Seattle tenure, is instead predicted Class 1 (45.2\%) when his prior outcomes are excluded from training. This demonstrates the importance of preventing data leakage for fair predictions. The model shows highest confidence (99.6\%) that Raheem Morris and Brian Schottenheimer will have short tenures, while Dan Quinn receives a strong Class 1 prediction (93.7\%), suggesting moderate expected tenure with high confidence.
 
 \section{Feature Importance Analysis}
 \label{sec:feature_importance}

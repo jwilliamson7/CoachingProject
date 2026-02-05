@@ -101,15 +101,16 @@ def retrain_model_excluding_coaches(
 
 
 def load_recent_hires(data_path: str = None) -> pd.DataFrame:
-    """Load recent coaching hires (tenure class == -1)."""
+    """Load recent coaching hires (tenure class == -1).
+
+    Uses SVD imputed data for consistency with model training.
+    """
     if data_path is None:
-        data_path = os.path.join(project_root, MODEL_PATHS['raw_data_file'])
+        # Use SVD imputed data (same as training) for consistency
+        data_path = os.path.join(project_root, MODEL_PATHS['data_file'])
 
     print(f"Loading data from {data_path}...")
     df = pd.read_csv(data_path, index_col=0)
-
-    # Handle missing values
-    df.fillna(0, inplace=True)
 
     # Filter to recent hires only (tenure class == -1)
     df_recent = df[df[FEATURE_CONFIG['target_column']] == -1]
