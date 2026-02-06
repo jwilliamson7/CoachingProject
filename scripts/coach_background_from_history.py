@@ -324,7 +324,8 @@ def create_background_war_analysis(font_family='Helvetica'):
     ax.set_xticks(range(1, 16))
     
     # Save the plot
-    output_file = 'analysis/outputs/png/coach_background_from_history_15seasons.png'
+    output_file = 'figures/backgrounds/coach_background_from_history_15seasons.png'
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
     plt.savefig(output_file, dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
     print(f"\nPlot saved as: {output_file}")
 
@@ -586,14 +587,15 @@ def create_background_war_analysis(font_family='Helvetica'):
         print("Insufficient data for statistical comparison")
 
     # Save detailed data
-    coach_backgrounds.to_csv('analysis/outputs/csv/coach_backgrounds_from_history.csv', index=False)
-    avg_trajectories.to_csv('analysis/outputs/csv/coach_background_trajectories_from_history_15seasons.csv', index=False)
-    matched_data.to_csv('analysis/outputs/csv/coach_matched_war_background_data.csv', index=False)
-    
+    os.makedirs('analysis', exist_ok=True)
+    coach_backgrounds.to_csv('analysis/coach_backgrounds_from_history.csv', index=False)
+    avg_trajectories.to_csv('analysis/coach_background_trajectories_from_history_15seasons.csv', index=False)
+    matched_data.to_csv('analysis/coach_matched_war_background_data.csv', index=False)
+
     print(f"\nDetailed data saved:")
-    print("  - coach_backgrounds_from_history.csv: Coach background classifications from actual history")
-    print("  - coach_background_trajectories_from_history_15seasons.csv: Average trajectories by background (first 15 seasons)")
-    print("  - coach_matched_war_background_data.csv: Individual coach-season data with backgrounds")
+    print("  - analysis/coach_backgrounds_from_history.csv: Coach background classifications from actual history")
+    print("  - analysis/coach_background_trajectories_from_history_15seasons.csv: Average trajectories by background (first 15 seasons)")
+    print("  - analysis/coach_matched_war_background_data.csv: Individual coach-season data with backgrounds")
     
     plt.close()
     

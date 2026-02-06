@@ -73,7 +73,7 @@ def load_coach_backgrounds() -> pd.DataFrame:
     # Try to load pre-computed backgrounds
     cache_paths = [
         os.path.join(project_root, 'data', 'coach_backgrounds.csv'),
-        os.path.join(project_root, 'analysis', 'outputs', 'csv', 'coach_backgrounds_from_history.csv'),
+        os.path.join(project_root, 'analysis', 'coach_backgrounds_from_history.csv'),
     ]
 
     for cache_path in cache_paths:
@@ -1174,23 +1174,25 @@ def main():
 
     print(f"\nData loaded: {X.shape[0]} samples, {X.shape[1]} features")
 
-    # Output directory
-    output_dir = os.path.join(project_root, 'latex', 'figures')
-    os.makedirs(output_dir, exist_ok=True)
+    # Output directories
+    paper_dir = os.path.join(project_root, 'latex', 'figures')
+    exploratory_dir = os.path.join(project_root, 'figures', 'tenure')
+    os.makedirs(paper_dir, exist_ok=True)
+    os.makedirs(exploratory_dir, exist_ok=True)
 
     # 1. Refined category analysis
     refined_results, agg_results = analyze_refined_categories(aggregated_shap, feature_names)
 
     # 2. Create visualizations
     print("\nGenerating visualizations...")
-    plot_refined_category_importance(aggregated_shap, output_dir)
-    off_def_results = plot_offense_vs_defense_summary(aggregated_shap, output_dir)
+    plot_refined_category_importance(aggregated_shap, paper_dir)
+    off_def_results = plot_offense_vs_defense_summary(aggregated_shap, exploratory_dir)
 
     # 3. Statistical tests for offense vs defense
-    stat_results = statistical_tests_offense_vs_defense(aggregated_shap, output_dir)
+    stat_results = statistical_tests_offense_vs_defense(aggregated_shap, exploratory_dir)
 
     # 4. Analyze by era
-    era_results = analyze_by_era(df, aggregated_shap, output_dir)
+    era_results = analyze_by_era(df, aggregated_shap, paper_dir)
 
     # 5. Statistical tests for era comparison
     era_stat_results = statistical_tests_by_era(df, aggregated_shap)
@@ -1201,7 +1203,7 @@ def main():
         backgrounds_df = load_coach_backgrounds()
         if not backgrounds_df.empty:
             bg_results = analyze_by_coach_background(X, aggregated_shap, coach_names,
-                                                      backgrounds_df, feature_names, output_dir)
+                                                      backgrounds_df, feature_names, exploratory_dir)
     except Exception as e:
         print(f"\nCould not analyze by coach background: {e}")
         print("To enable this analysis, ensure coach background data is available.")
