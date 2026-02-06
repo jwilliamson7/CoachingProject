@@ -32,11 +32,13 @@ from model import (
 from model.config import MODEL_PATHS, FEATURE_CONFIG, MODEL_CONFIG, ORDINAL_CONFIG
 
 
-def setup_output_dir():
-    """Create output directory for figures."""
-    output_dir = os.path.join(project_root, 'latex', 'figures')
-    os.makedirs(output_dir, exist_ok=True)
-    return output_dir
+def setup_output_dirs():
+    """Create output directories for figures."""
+    paper_dir = os.path.join(project_root, 'latex', 'figures')
+    exploratory_dir = os.path.join(project_root, 'figures', 'tenure')
+    os.makedirs(paper_dir, exist_ok=True)
+    os.makedirs(exploratory_dir, exist_ok=True)
+    return paper_dir, exploratory_dir
 
 
 def load_data():
@@ -471,8 +473,9 @@ def main():
     print("="*60)
 
     # Setup
-    output_dir = setup_output_dir()
-    print(f"Output directory: {output_dir}\n")
+    paper_dir, exploratory_dir = setup_output_dirs()
+    print(f"Paper figures directory: {paper_dir}")
+    print(f"Exploratory figures directory: {exploratory_dir}\n")
 
     # Load data
     print("Loading data...")
@@ -486,11 +489,11 @@ def main():
     print(f"  Loaded ordinal model\n")
 
     # Generate figures
-    generate_correlation_matrix(X, output_dir)
-    generate_predictions_plot(df, X, y, model, output_dir)
-    generate_feature_importance_plot(model, output_dir)
-    generate_category_importance_plots(model, output_dir)
-    generate_distribution_plot(y, output_dir)
+    generate_correlation_matrix(X, paper_dir)
+    generate_predictions_plot(df, X, y, model, paper_dir)
+    generate_feature_importance_plot(model, exploratory_dir)
+    generate_category_importance_plots(model, paper_dir)
+    generate_distribution_plot(y, paper_dir)
 
     print("\n" + "="*60)
     print("All figures generated successfully!")

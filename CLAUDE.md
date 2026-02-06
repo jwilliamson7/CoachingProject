@@ -20,6 +20,13 @@ CoachingProject/
 │   ├── svd_imputed_master_data.csv  # Imputed data for training
 │   ├── coach_war_trajectories_with_team.csv  # WAR data by coach/team/year
 │   └── war_prediction_data.csv  # Merged WAR prediction dataset
+├── latex/
+│   └── figures/             # Paper figures ONLY (7 files used in LaTeX)
+├── figures/                 # All exploratory/supplementary figures
+│   ├── tenure/              # Tenure model figures (SHAP, feature importance)
+│   ├── war/                 # WAR model figures
+│   └── backgrounds/         # Coach background analysis figures
+├── analysis/                # Generated analysis data (CSVs + text reports)
 ├── model/                   # Model code package
 │   ├── __init__.py
 │   ├── ordinal_classifier.py    # Frank-Hall ordinal classification
@@ -37,6 +44,12 @@ CoachingProject/
 │   │   ├── transform_team_data.py
 │   │   ├── matrix_factorization_imputation.py
 │   │   └── detailed_data_comparison.py
+│   ├── generate_figures.py      # Paper + exploratory tenure figures
+│   ├── generate_war_figures.py  # WAR model figures
+│   ├── shap_analysis.py        # SHAP exploratory analysis
+│   ├── shap_analysis_by_background.py  # SHAP by coach background
+│   ├── analyze_war_subgroups.py # WAR subgroup analysis
+│   ├── coach_background_from_history.py  # Coach background classification
 │   ├── train.py             # Tenure model training
 │   ├── train_war.py         # WAR model training
 │   ├── evaluate.py          # Model evaluation

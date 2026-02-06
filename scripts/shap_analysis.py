@@ -400,7 +400,9 @@ def generate_shap_report(shap_values_dict: Dict[str, shap.Explanation],
     """Generate a text report summarizing SHAP findings."""
     print("\nGenerating SHAP analysis report...")
 
-    report_path = os.path.join(output_dir, 'shap_analysis_report.txt')
+    analysis_dir = os.path.join(project_root, 'analysis')
+    os.makedirs(analysis_dir, exist_ok=True)
+    report_path = os.path.join(analysis_dir, 'shap_analysis_report.txt')
 
     mean_abs_shap = np.abs(aggregated_shap.values).mean(axis=0)
     top_indices = np.argsort(mean_abs_shap)[::-1]
@@ -489,8 +491,8 @@ def main():
         help='Number of top features to display (default: 20)'
     )
     parser.add_argument(
-        '--output-dir', type=str, default='latex/figures',
-        help='Output directory for figures (default: latex/figures)'
+        '--output-dir', type=str, default='figures/tenure',
+        help='Output directory for figures (default: figures/tenure)'
     )
     parser.add_argument(
         '--model-path', type=str, default=None,
