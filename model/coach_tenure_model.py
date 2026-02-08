@@ -9,6 +9,7 @@ import pickle
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import RandomizedSearchCV
+from sklearn.metrics import make_scorer
 from sklearn.impute import SimpleImputer
 from xgboost import XGBClassifier
 from typing import Dict, Any, Optional, Tuple, Union
@@ -19,7 +20,7 @@ from .cross_validation import (
     stratified_coach_level_cv_split,
     CoachLevelStratifiedKFold
 )
-from .evaluation import ordinal_metrics, format_metrics_report
+from .evaluation import ordinal_metrics, format_metrics_report, quadratic_weighted_kappa
 from .config import (
     XGBOOST_PARAM_DISTRIBUTIONS,
     DEFAULT_XGBOOST_PARAMS,
@@ -192,37 +193,44 @@ class CoachTenureModel:
             model_type = "ordinal" if self.use_ordinal else "multiclass"
             print(f"Tuning {model_type} model with {n_iter} iterations...")
 
-        # For ordinal classification, tune the base estimator
+        # For ordinal classification, tune the full ordinal model on QWK
         if self.use_ordinal:
             base_params = get_binary_xgboost_params()
             base_estimator = XGBClassifier(**base_params)
 
+            ordinal_estimator = OrdinalClassifier(
+                base_estimator=base_estimator,
+                n_classes=self.n_classes,
+            )
+
+            # Prefix param keys for nested estimator
+            ordinal_param_distributions = {
+                f'base_estimator__{k}': v
+                for k, v in XGBOOST_PARAM_DISTRIBUTIONS.items()
+            }
+
             cv = cv_splits if cv_splits else 3
+            qwk_scorer = make_scorer(quadratic_weighted_kappa)
 
             search = RandomizedSearchCV(
-                base_estimator,
-                param_distributions=XGBOOST_PARAM_DISTRIBUTIONS,
+                ordinal_estimator,
+                param_distributions=ordinal_param_distributions,
                 n_iter=n_iter,
-                scoring='roc_auc',
+                scoring=qwk_scorer,
                 n_jobs=-1,
                 cv=cv,
                 verbose=verbose,
                 random_state=self.random_state
             )
 
-            # Train on binary task: P(Y > 0) for tuning
-            y_binary = (y > 0).astype(int)
-            search.fit(X, y_binary)
+            search.fit(X, y)
 
-            self.best_params_ = search.best_params_
-            best_base = search.best_estimator_
-
-            # Create ordinal classifier with tuned base estimator
-            self.model_ = OrdinalClassifier(
-                base_estimator=best_base,
-                n_classes=self.n_classes
-            )
-            self.model_.fit(X, y)
+            # Extract the base estimator params (strip prefix for storage)
+            self.best_params_ = {
+                k.replace('base_estimator__', ''): v
+                for k, v in search.best_params_.items()
+            }
+            self.model_ = search.best_estimator_
 
         else:
             # Multiclass tuning

@@ -18,6 +18,8 @@ from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from xgboost import XGBClassifier
 from typing import Optional, List, Dict, Any
 
+from .evaluation import quadratic_weighted_kappa
+
 
 class OrdinalClassifier(BaseEstimator, ClassifierMixin):
     """
@@ -192,6 +194,26 @@ class OrdinalClassifier(BaseEstimator, ClassifierMixin):
         """
         proba = self.predict_proba(X)
         return np.argmax(proba, axis=1)
+
+    def score(self, X, y, sample_weight=None):
+        """
+        Return Quadratic Weighted Kappa for the given test data and labels.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Test samples.
+
+        y : array-like of shape (n_samples,)
+            True labels.
+
+        Returns
+        -------
+        score : float
+            QWK score.
+        """
+        y_pred = self.predict(X)
+        return quadratic_weighted_kappa(np.asarray(y), y_pred)
 
     def get_feature_importances(self, aggregation: str = 'mean') -> np.ndarray:
         """
