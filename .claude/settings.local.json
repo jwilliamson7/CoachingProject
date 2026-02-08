@@ -19,7 +19,8 @@
       "Bash(cmd.exe /c \"python scripts\\\\shap_analysis.py --save-shap\")",
       "Bash(/mnt/c/Users/jonwi/AppData/Local/Microsoft/WindowsApps/python.exe scripts/shap_analysis.py:*)",
       "Bash(py -3 scripts/shap_analysis.py:*)",
-      "WebFetch(domain:www.degruyterbrill.com)"
+      "WebFetch(domain:www.degruyterbrill.com)",
+      "Bash(python3:*)"
     ],
     "deny": [],
     "ask": []

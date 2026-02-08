@@ -15,6 +15,7 @@ import os
 import sys
 import pickle
 import warnings
+import argparse
 
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
@@ -24,7 +25,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import shap
 from scipy import stats
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 
 from model import CoachTenureModel
 from model.config import MODEL_PATHS
@@ -34,18 +35,37 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=UserWarning)
 
 
-def get_refined_feature_categories() -> Dict[str, Tuple[int, int]]:
+def get_refined_feature_categories(selected_indices=None) -> Dict[str, Tuple[int, int]]:
     """
     Get refined feature categories splitting HC into offense/defense.
 
-    Feature layout (0-indexed):
+    Feature layout (0-indexed, for full 150-feature model):
     - 0-7: Core Experience (8 features)
     - 8-40: OC Stats (33 features) - offensive performance as OC
     - 41-73: DC Stats (33 features) - defensive performance as DC
     - 74-106: HC Team Stats (33 features) - team's offensive performance as HC
     - 107-139: HC Opponent Stats (33 features) - opponent's performance (your defense) as HC
     - 140-149: Hiring Team Context (10 features)
+
+    If selected_indices is provided, remaps to the subsetted feature space.
     """
+    if selected_indices is not None:
+        orig = {
+            'Core Experience': (0, 8),
+            'OC Stats (Offense)': (8, 41),
+            'DC Stats (Defense)': (41, 74),
+            'HC Team Stats (Offense)': (74, 107),
+            'HC Opp Stats (Defense)': (107, 140),
+            'Hiring Team': (140, 150)
+        }
+        mapped = {}
+        for cat_name, (start, end) in orig.items():
+            indices_in_cat = [new_i for new_i, orig_i in enumerate(selected_indices)
+                              if start <= orig_i < end]
+            if indices_in_cat:
+                mapped[cat_name] = (min(indices_in_cat), max(indices_in_cat) + 1)
+        return mapped
+
     return {
         'Core Experience': (0, 8),
         'OC Stats (Offense)': (8, 41),
@@ -56,8 +76,14 @@ def get_refined_feature_categories() -> Dict[str, Tuple[int, int]]:
     }
 
 
-def get_offense_defense_categories() -> Dict[str, List[Tuple[int, int]]]:
-    """Group categories into offensive vs defensive."""
+def get_offense_defense_categories(selected_indices=None) -> Dict[str, List[Tuple[int, int]]]:
+    """Group categories into offensive vs defensive.
+    If selected_indices is provided, remaps to the subsetted feature space."""
+    if selected_indices is not None:
+        from scripts.bootstrap_analysis import build_category_mapping
+        _, off_def_mapped = build_category_mapping(selected_indices)
+        return off_def_mapped
+
     return {
         'Offensive Metrics': [(8, 41), (74, 107)],  # OC Stats + HC Team Stats
         'Defensive Metrics': [(41, 74), (107, 140)],  # DC Stats + HC Opp Stats
@@ -247,13 +273,9 @@ def compute_coach_backgrounds_from_data() -> pd.DataFrame:
     return pd.DataFrame(backgrounds)
 
 
-def load_data_and_shap() -> Tuple[np.ndarray, np.ndarray, pd.DataFrame, Dict, shap.Explanation]:
-    """Load data, model, and cached SHAP values."""
-    # Load model
-    model_path = os.path.join(project_root, MODEL_PATHS['ordinal_model_output'])
-    print(f"Loading model from {model_path}...")
-    model = CoachTenureModel.load(model_path)
-
+def load_data_and_shap(top_k=None):
+    """Load data, model, and cached SHAP values.
+    If top_k is provided, loads the top-K feature SHAP cache."""
     # Load data
     data_path = os.path.join(project_root, MODEL_PATHS['data_file'])
     print(f"Loading data from {data_path}...")
@@ -268,6 +290,28 @@ def load_data_and_shap() -> Tuple[np.ndarray, np.ndarray, pd.DataFrame, Dict, sh
     X = df[feature_cols].values
     y = df['Coach Tenure Class'].values
 
+    selected_indices = None
+
+    if top_k is not None:
+        # Load the top-K SHAP cache
+        shap_cache_path = os.path.join(project_root, 'data', f'shap_values_cache_top{top_k}.pkl')
+        if not os.path.exists(shap_cache_path):
+            raise FileNotFoundError(
+                f"SHAP cache for top-{top_k} not found at {shap_cache_path}. "
+                f"Run: python scripts/shap_analysis.py --top-k {top_k} --save-shap")
+
+        # Subset X to match
+        orig_cache_path = os.path.join(project_root, 'data', 'shap_values_cache.pkl')
+        with open(orig_cache_path, 'rb') as f:
+            orig_cache = pickle.load(f)
+        orig_agg = orig_cache['aggregated_shap']
+        mean_abs = np.abs(orig_agg.values).mean(axis=0)
+        ranking = np.argsort(mean_abs)[::-1]
+        selected_indices = np.array(sorted(ranking[:top_k]))
+        X = X[:, selected_indices]
+    else:
+        shap_cache_path = os.path.join(project_root, 'data', 'shap_values_cache.pkl')
+
     # Get coach names
     if 'Coach Name' in df.columns:
         coach_names = df['Coach Name'].values
@@ -275,20 +319,20 @@ def load_data_and_shap() -> Tuple[np.ndarray, np.ndarray, pd.DataFrame, Dict, sh
         coach_names = df.iloc[:, 1].values
 
     # Load cached SHAP values
-    shap_cache_path = os.path.join(project_root, 'data', 'shap_values_cache.pkl')
     if os.path.exists(shap_cache_path):
-        print(f"Loading cached SHAP values...")
+        print(f"Loading cached SHAP values from {shap_cache_path}...")
         with open(shap_cache_path, 'rb') as f:
             cache = pickle.load(f)
             shap_values_dict = cache['shap_values_dict']
             aggregated_shap = cache['aggregated_shap']
     else:
-        raise FileNotFoundError("SHAP cache not found. Run shap_analysis.py --save-shap first.")
+        raise FileNotFoundError(f"SHAP cache not found at {shap_cache_path}. Run shap_analysis.py --save-shap first.")
 
-    return X, y, df, shap_values_dict, aggregated_shap, coach_names
+    return X, y, df, shap_values_dict, aggregated_shap, coach_names, selected_indices
 
 
-def statistical_tests_offense_vs_defense(aggregated_shap: shap.Explanation, output_dir: str):
+def statistical_tests_offense_vs_defense(aggregated_shap: shap.Explanation, output_dir: str,
+                                          selected_indices=None):
     """
     Perform statistical tests comparing offensive vs defensive SHAP values.
 
@@ -303,7 +347,7 @@ def statistical_tests_offense_vs_defense(aggregated_shap: shap.Explanation, outp
     print("=" * 70)
 
     mean_abs_shap = np.abs(aggregated_shap.values).mean(axis=0)
-    off_def = get_offense_defense_categories()
+    off_def = get_offense_defense_categories(selected_indices)
 
     # Extract SHAP values for offensive and defensive features
     off_indices = []
@@ -441,15 +485,64 @@ def statistical_tests_offense_vs_defense(aggregated_shap: shap.Explanation, outp
     else:
         print(f"  Result: Cannot reject that distributions are identical")
 
+    # 5. Per-Coach (Per-Instance) Analysis
+    print("\n" + "-" * 50)
+    print("5. PER-COACH DEFENSIVE/OFFENSIVE RATIO ANALYSIS")
+    print("-" * 50)
+
+    shap_all = np.abs(aggregated_shap.values)
+    n_coaches = shap_all.shape[0]
+    coach_ratios = []
+    for i in range(n_coaches):
+        sample = shap_all[i]
+        off_avg_i = np.mean([sample[s:e].mean() for s, e in off_def['Offensive Metrics']])
+        def_avg_i = np.mean([sample[s:e].mean() for s, e in off_def['Defensive Metrics']])
+        if off_avg_i > 0:
+            coach_ratios.append(def_avg_i / off_avg_i)
+        else:
+            coach_ratios.append(np.nan)
+    coach_ratios = np.array(coach_ratios)
+    valid_ratios = coach_ratios[~np.isnan(coach_ratios)]
+
+    n_def_dominant = np.sum(valid_ratios > 1.0)
+    pct_def_dominant = n_def_dominant / len(valid_ratios) * 100
+    median_ratio = np.median(valid_ratios)
+
+    print(f"  Coaches with Def > Off: {n_def_dominant}/{len(valid_ratios)} ({pct_def_dominant:.1f}%)")
+    print(f"  Median Def/Off ratio: {median_ratio:.2f}")
+
+    # Bootstrap CI for median
+    np.random.seed(42)
+    boot_medians = []
+    for _ in range(10000):
+        boot_sample = np.random.choice(valid_ratios, size=len(valid_ratios), replace=True)
+        boot_medians.append(np.median(boot_sample))
+    boot_medians = np.array(boot_medians)
+    median_ci_lower = np.percentile(boot_medians, 2.5)
+    median_ci_upper = np.percentile(boot_medians, 97.5)
+    print(f"  Bootstrap 95% CI (Median): [{median_ci_lower:.2f}, {median_ci_upper:.2f}]")
+
+    # Wilcoxon signed-rank test: H0: median ratio = 1.0
+    wilcoxon_stat, wilcoxon_p = stats.wilcoxon(valid_ratios - 1.0, alternative='greater')
+    print(f"  Wilcoxon signed-rank test (H1: ratio > 1): p = {wilcoxon_p:.6f}")
+
+    # Sign test: proportion with ratio > 1
+    from scipy.stats import binomtest
+    sign_result = binomtest(int(n_def_dominant), len(valid_ratios), p=0.5, alternative='greater')
+    print(f"  Sign test (H1: proportion > 50%): p = {sign_result.pvalue:.2e}")
+
     # Summary
     print("\n" + "=" * 70)
     print("STATISTICAL SUMMARY")
     print("=" * 70)
-    print(f"\nDefensive metrics have {observed_ratio:.2f}x higher average |SHAP| than offensive metrics")
+    print(f"\nFeature-level: Defensive metrics have {observed_ratio:.2f}x higher average |SHAP| than offensive metrics")
     print(f"  - 95% Bootstrap CI: [{ci_lower:.2f}, {ci_upper:.2f}]")
     print(f"  - Mann-Whitney p-value: {p_value_mw:.4f}")
     print(f"  - Permutation p-value: {p_value_perm:.4f}")
     print(f"  - Effect size (rank-biserial r): {r_rb:.3f} ({effect_interp})")
+    print(f"\nPer-coach: {n_def_dominant}/{len(valid_ratios)} ({pct_def_dominant:.1f}%) have Def > Off")
+    print(f"  - Median ratio: {median_ratio:.2f}, 95% CI: [{median_ci_lower:.2f}, {median_ci_upper:.2f}]")
+    print(f"  - Wilcoxon p: {wilcoxon_p:.6f}, Sign test p: {sign_result.pvalue:.2e}")
 
     return {
         'observed_ratio': observed_ratio,
@@ -458,11 +551,20 @@ def statistical_tests_offense_vs_defense(aggregated_shap: shap.Explanation, outp
         'mann_whitney_p': p_value_mw,
         'permutation_p': p_value_perm,
         'effect_size_r': r_rb,
-        'ks_p': p_value_ks
+        'ks_p': p_value_ks,
+        'n_def_dominant': n_def_dominant,
+        'n_total': len(valid_ratios),
+        'pct_def_dominant': pct_def_dominant,
+        'median_ratio': median_ratio,
+        'median_ci_lower': median_ci_lower,
+        'median_ci_upper': median_ci_upper,
+        'wilcoxon_p': wilcoxon_p,
+        'sign_test_p': sign_result.pvalue
     }
 
 
-def statistical_tests_by_era(df: pd.DataFrame, aggregated_shap: shap.Explanation):
+def statistical_tests_by_era(df: pd.DataFrame, aggregated_shap: shap.Explanation,
+                              selected_indices=None):
     """
     Test if defensive bias differs significantly across eras.
     Uses Kruskal-Wallis test and pairwise comparisons.
@@ -484,7 +586,7 @@ def statistical_tests_by_era(df: pd.DataFrame, aggregated_shap: shap.Explanation
     }
 
     shap_values = aggregated_shap.values
-    off_def = get_offense_defense_categories()
+    off_def = get_offense_defense_categories(selected_indices)
 
     # For each sample, compute the defensive/offensive ratio
     def compute_sample_ratio(sample_shap):
@@ -525,10 +627,11 @@ def statistical_tests_by_era(df: pd.DataFrame, aggregated_shap: shap.Explanation
     return era_ratios
 
 
-def analyze_refined_categories(aggregated_shap: shap.Explanation, feature_names: List[str]):
+def analyze_refined_categories(aggregated_shap: shap.Explanation, feature_names: List[str],
+                                selected_indices=None):
     """Analyze SHAP importance with refined offensive/defensive split."""
 
-    categories = get_refined_feature_categories()
+    categories = get_refined_feature_categories(selected_indices)
     mean_abs_shap = np.abs(aggregated_shap.values).mean(axis=0)
 
     print("\n" + "=" * 70)
@@ -558,7 +661,7 @@ def analyze_refined_categories(aggregated_shap: shap.Explanation, feature_names:
     print("AGGREGATED: OFFENSIVE vs DEFENSIVE")
     print("-" * 65)
 
-    off_def = get_offense_defense_categories()
+    off_def = get_offense_defense_categories(selected_indices)
     agg_results = {}
 
     for group_name, ranges in off_def.items():
@@ -581,7 +684,8 @@ def analyze_refined_categories(aggregated_shap: shap.Explanation, feature_names:
 
 def analyze_by_coach_background(X: np.ndarray, aggregated_shap: shap.Explanation,
                                  coach_names: np.ndarray, backgrounds_df: pd.DataFrame,
-                                 feature_names: List[str], output_dir: str):
+                                 feature_names: List[str], output_dir: str,
+                                 selected_indices=None):
     """
     Analyze SHAP values segmented by coach background.
 
@@ -621,7 +725,7 @@ def analyze_by_coach_background(X: np.ndarray, aggregated_shap: shap.Explanation
     # Get SHAP values for each group
     shap_values = aggregated_shap.values
 
-    off_def = get_offense_defense_categories()
+    off_def = get_offense_defense_categories(selected_indices)
 
     # Store results for comparison
     bg_results = {}
@@ -686,12 +790,13 @@ def analyze_by_coach_background(X: np.ndarray, aggregated_shap: shap.Explanation
         plot_background_comparison(bg_results, output_dir)
 
         # Run statistical tests
-        statistical_tests_by_background(shap_values, bg_results, off_def)
+        statistical_tests_by_background(shap_values, bg_results, off_def, selected_indices)
 
     return bg_results
 
 
-def statistical_tests_by_background(shap_values: np.ndarray, bg_results: Dict, off_def: Dict):
+def statistical_tests_by_background(shap_values: np.ndarray, bg_results: Dict, off_def: Dict,
+                                     selected_indices=None):
     """
     Statistical tests for coach background analysis.
 
@@ -867,10 +972,10 @@ def plot_background_comparison(bg_results: Dict, output_dir: str):
 
 
 def plot_refined_category_importance(aggregated_shap: shap.Explanation,
-                                      output_dir: str):
+                                      output_dir: str, selected_indices=None):
     """Create visualization with refined offensive/defensive categories."""
 
-    categories = get_refined_feature_categories()
+    categories = get_refined_feature_categories(selected_indices)
     mean_abs_shap = np.abs(aggregated_shap.values).mean(axis=0)
 
     # Calculate stats
@@ -943,11 +1048,12 @@ def plot_refined_category_importance(aggregated_shap: shap.Explanation,
     return cat_stats
 
 
-def plot_offense_vs_defense_summary(aggregated_shap: shap.Explanation, output_dir: str):
+def plot_offense_vs_defense_summary(aggregated_shap: shap.Explanation, output_dir: str,
+                                     selected_indices=None):
     """Create a simple offense vs defense comparison chart."""
 
     mean_abs_shap = np.abs(aggregated_shap.values).mean(axis=0)
-    off_def = get_offense_defense_categories()
+    off_def = get_offense_defense_categories(selected_indices)
 
     # Calculate totals and averages
     results = {}
@@ -1017,7 +1123,8 @@ def get_feature_names() -> List[str]:
     return readable_names
 
 
-def analyze_by_era(df: pd.DataFrame, aggregated_shap: shap.Explanation, output_dir: str):
+def analyze_by_era(df: pd.DataFrame, aggregated_shap: shap.Explanation, output_dir: str,
+                    selected_indices=None):
     """
     Analyze SHAP values segmented by era to see if defensive emphasis changed over time.
 
@@ -1048,7 +1155,7 @@ def analyze_by_era(df: pd.DataFrame, aggregated_shap: shap.Explanation, output_d
     }
 
     shap_values = aggregated_shap.values
-    off_def = get_offense_defense_categories()
+    off_def = get_offense_defense_categories(selected_indices)
 
     era_results = {}
 
@@ -1164,13 +1271,30 @@ def plot_era_comparison(era_results: Dict, output_dir: str):
 
 
 def main():
+    parser = argparse.ArgumentParser(
+        description='Enhanced SHAP analysis: offensive vs defensive metrics',
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument(
+        '--top-k', type=int, default=None,
+        help='Use only top-K SHAP-ranked features (default: all 150)'
+    )
+    args = parser.parse_args()
+
     print("=" * 70)
     print("ENHANCED SHAP ANALYSIS: OFFENSIVE vs DEFENSIVE METRICS")
+    if args.top_k:
+        print(f"  (Using top {args.top_k} SHAP-ranked features)")
     print("=" * 70)
 
     # Load data and SHAP values
-    X, y, df, shap_values_dict, aggregated_shap, coach_names = load_data_and_shap()
-    feature_names = get_feature_names()
+    X, y, df, shap_values_dict, aggregated_shap, coach_names, selected_indices = load_data_and_shap(args.top_k)
+
+    all_feature_names = get_feature_names()
+    if selected_indices is not None:
+        feature_names = [all_feature_names[i] for i in selected_indices]
+    else:
+        feature_names = all_feature_names
 
     print(f"\nData loaded: {X.shape[0]} samples, {X.shape[1]} features")
 
@@ -1181,29 +1305,33 @@ def main():
     os.makedirs(exploratory_dir, exist_ok=True)
 
     # 1. Refined category analysis
-    refined_results, agg_results = analyze_refined_categories(aggregated_shap, feature_names)
+    refined_results, agg_results = analyze_refined_categories(
+        aggregated_shap, feature_names, selected_indices)
 
     # 2. Create visualizations
     print("\nGenerating visualizations...")
-    plot_refined_category_importance(aggregated_shap, paper_dir)
-    off_def_results = plot_offense_vs_defense_summary(aggregated_shap, exploratory_dir)
+    plot_refined_category_importance(aggregated_shap, paper_dir, selected_indices)
+    off_def_results = plot_offense_vs_defense_summary(
+        aggregated_shap, exploratory_dir, selected_indices)
 
     # 3. Statistical tests for offense vs defense
-    stat_results = statistical_tests_offense_vs_defense(aggregated_shap, exploratory_dir)
+    stat_results = statistical_tests_offense_vs_defense(
+        aggregated_shap, exploratory_dir, selected_indices)
 
     # 4. Analyze by era
-    era_results = analyze_by_era(df, aggregated_shap, paper_dir)
+    era_results = analyze_by_era(df, aggregated_shap, paper_dir, selected_indices)
 
     # 5. Statistical tests for era comparison
-    era_stat_results = statistical_tests_by_era(df, aggregated_shap)
+    era_stat_results = statistical_tests_by_era(df, aggregated_shap, selected_indices)
 
     # 6. Load coach backgrounds and analyze by background
     bg_results = None
     try:
         backgrounds_df = load_coach_backgrounds()
         if not backgrounds_df.empty:
-            bg_results = analyze_by_coach_background(X, aggregated_shap, coach_names,
-                                                      backgrounds_df, feature_names, exploratory_dir)
+            bg_results = analyze_by_coach_background(
+                X, aggregated_shap, coach_names,
+                backgrounds_df, feature_names, exploratory_dir, selected_indices)
     except Exception as e:
         print(f"\nCould not analyze by coach background: {e}")
         print("To enable this analysis, ensure coach background data is available.")

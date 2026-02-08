@@ -331,11 +331,16 @@ def plot_shap_by_class(shap_values_dict: Dict[str, shap.Explanation],
 
 
 def plot_category_shap(aggregated_shap: shap.Explanation,
-                       feature_names: List[str], output_dir: str):
+                       feature_names: List[str], output_dir: str,
+                       selected_indices=None):
     """Create SHAP importance by feature category."""
     print("\nGenerating category-level SHAP analysis...")
 
-    categories = get_feature_categories()
+    if selected_indices is not None:
+        from scripts.bootstrap_analysis import build_category_mapping
+        categories, _ = build_category_mapping(selected_indices)
+    else:
+        categories = get_feature_categories()
     mean_abs_shap = np.abs(aggregated_shap.values).mean(axis=0)
 
     category_importance = {}
@@ -396,7 +401,8 @@ def get_top_features(aggregated_shap: shap.Explanation, n: int = 20) -> List[int
 
 def generate_shap_report(shap_values_dict: Dict[str, shap.Explanation],
                          aggregated_shap: shap.Explanation,
-                         feature_names: List[str], output_dir: str):
+                         feature_names: List[str], output_dir: str,
+                         selected_indices=None):
     """Generate a text report summarizing SHAP findings."""
     print("\nGenerating SHAP analysis report...")
 
@@ -425,7 +431,11 @@ def generate_shap_report(shap_values_dict: Dict[str, shap.Explanation],
         f.write("2. IMPORTANCE BY FEATURE CATEGORY\n")
         f.write("-" * 60 + "\n")
 
-        categories = get_feature_categories()
+        if selected_indices is not None:
+            from scripts.bootstrap_analysis import build_category_mapping
+            categories, _ = build_category_mapping(selected_indices)
+        else:
+            categories = get_feature_categories()
         category_data = []
 
         for cat_name, (start, end) in categories.items():
@@ -503,6 +513,10 @@ def main():
         help='Number of samples to explain (default: all)'
     )
     parser.add_argument(
+        '--top-k', type=int, default=None,
+        help='Use only top-K SHAP-ranked features (default: all 150)'
+    )
+    parser.add_argument(
         '--save-shap', action='store_true',
         help='Save computed SHAP values to disk for reuse'
     )
@@ -521,12 +535,48 @@ def main():
     print("=" * 70)
 
     model, df, X, y = load_data_and_model(args.model_path)
-    feature_names = get_feature_names()
+    all_feature_names = get_feature_names()
+    selected_indices = None
+
+    # Feature subsetting
+    if args.top_k is not None:
+        print(f"\nSubsetting to top {args.top_k} SHAP-ranked features...")
+        # Load ranking from original 150-feature SHAP cache
+        orig_cache_path = os.path.join(project_root, 'data', 'shap_values_cache.pkl')
+        with open(orig_cache_path, 'rb') as f:
+            orig_cache = pickle.load(f)
+        orig_agg = orig_cache['aggregated_shap']
+        mean_abs = np.abs(orig_agg.values).mean(axis=0)
+        ranking = np.argsort(mean_abs)[::-1]
+        selected_indices = np.array(sorted(ranking[:args.top_k]))
+
+        # Subset X and feature names
+        X = X[:, selected_indices]
+        feature_names = [all_feature_names[i] for i in selected_indices]
+
+        print(f"  Selected {len(selected_indices)} features")
+        print(f"  X shape: {X.shape}")
+
+        # Train fresh model
+        print("  Training fresh model on subsetted features...")
+        model = CoachTenureModel(use_ordinal=True, n_classes=3, random_state=42)
+        model.fit(pd.DataFrame(X), pd.Series(y), verbose=0)
+        print("  Training complete.")
+
+        # Force recompute (no cache for subsetted features)
+        args.no_cache = True
+        args.save_shap = True
+    else:
+        feature_names = all_feature_names
 
     print(f"\nData shape: {X.shape}")
     print(f"Number of features: {len(feature_names)}")
 
-    shap_cache_path = os.path.join(project_root, 'data', 'shap_values_cache.pkl')
+    # Cache path depends on whether subsetting is used
+    if args.top_k is not None:
+        shap_cache_path = os.path.join(project_root, 'data', f'shap_values_cache_top{args.top_k}.pkl')
+    else:
+        shap_cache_path = os.path.join(project_root, 'data', 'shap_values_cache.pkl')
 
     if os.path.exists(shap_cache_path) and not args.no_cache and not args.save_shap:
         print(f"\nLoading cached SHAP values from {shap_cache_path}...")
@@ -546,7 +596,8 @@ def main():
             with open(shap_cache_path, 'wb') as f:
                 pickle.dump({
                     'shap_values_dict': shap_values_dict,
-                    'aggregated_shap': aggregated_shap
+                    'aggregated_shap': aggregated_shap,
+                    'selected_indices': selected_indices
                 }, f)
 
     print("\n" + "=" * 70)
@@ -573,14 +624,16 @@ def main():
     plot_shap_by_class(shap_values_dict, feature_names, output_dir)
 
     print("\n4. Category SHAP Analysis...")
-    plot_category_shap(aggregated_shap, feature_names, output_dir)
+    plot_category_shap(aggregated_shap, feature_names, output_dir,
+                       selected_indices=selected_indices)
 
     print("\n5. Partial Dependence Plots...")
     top_features = get_top_features(aggregated_shap, n=args.top_n)
     plot_partial_dependence(model, X, feature_names, top_features, output_dir, n_features=6)
 
     print("\n6. Generating Summary Report...")
-    generate_shap_report(shap_values_dict, aggregated_shap, feature_names, output_dir)
+    generate_shap_report(shap_values_dict, aggregated_shap, feature_names, output_dir,
+                         selected_indices=selected_indices)
 
     print("\n" + "=" * 70)
     print("SHAP ANALYSIS COMPLETE")
