@@ -6,37 +6,37 @@ SHAP ANALYSIS REPORT: NFL Coach Tenure Prediction
 ------------------------------------------------------------
 Rank   Feature                                        Mean |SHAP|
 ------------------------------------------------------------
-1      RZAtt (DC)                                          0.0342
-2      4D% (HC Opp)                                        0.0222
-3      3DAtt (HC Opp)                                      0.0176
-4      Sc% (HC Opp)                                        0.0174
-5      3D% (HC)                                            0.0165
-6      Att Rushing (HC Opp)                                0.0119
-7      Att Passing (DC)                                    0.0095
-8      3D% (HC Opp)                                        0.0071
-9      Yds Average Drive (HC)                              0.0058
-10     Yds (HC)                                            0.0051
-11     Yds Average Drive (HC Opp)                          0.0045
-12     TO (HC)                                             0.0041
-13     TO% (HC)                                            0.0040
-14     Y/P (OC)                                            0.0038
-15     Int Passing (HC)                                    0.0037
-16     RZAtt (OC)                                          0.0036
-17     PF (Points For) (HC)                                0.0036
-18     PF (Points For) (HC Opp)                            0.0036
-19     Hiring: turnovers committed                         0.0035
-20     Hiring: yards offense                               0.0033
+1      3D% (HC Opp)                                        0.0550
+2      RZAtt (HC Opp)                                      0.0535
+3      4DAtt (HC Opp)                                      0.0421
+4      Yds (HC)                                            0.0235
+5      Sc% (HC Opp)                                        0.0228
+6      Hiring: yards offense                               0.0217
+7      Yrs nfl coor                                        0.0207
+8      RZPct (HC Opp)                                      0.0196
+9      Att Passing (DC)                                    0.0191
+10     Sc% (HC)                                            0.0181
+11     3D% (HC)                                            0.0138
+12     PF (Points For) (HC)                                0.0098
+13     Cmp Passing (HC Opp)                                0.0098
+14     RZAtt (DC)                                          0.0097
+15     TO% (HC)                                            0.0097
+16     Hiring: yards per play                              0.0095
+17     TO (DC)                                             0.0092
+18     #Dr (HC Opp)                                        0.0090
+19     Yds Average Drive (HC Opp)                          0.0090
+20     TO (HC)                                             0.0090
 
 
 2. IMPORTANCE BY FEATURE CATEGORY
 ------------------------------------------------------------
 Category               Total SHAP     Avg SHAP   # Features
 ------------------------------------------------------------
-HC Stats                   0.2107       0.0032           66
-DC Stats                   0.0881       0.0027           33
-OC Stats                   0.0491       0.0015           33
-Hiring Team                0.0218       0.0022           10
-Core Experience            0.0122       0.0015            8
+HC Stats                   0.3666       0.0153           24
+DC Stats                   0.0505       0.0084            6
+Hiring Team                0.0483       0.0097            5
+Core Experience            0.0231       0.0116            2
+OC Stats                   0.0128       0.0043            3
 
 
 3. TOP FEATURES BY CLASSIFICATION DECISION
@@ -44,29 +44,29 @@ Core Experience            0.0122       0.0015            8
 
 P(Y > 0):
   (What distinguishes short-tenure [Class 0] from longer-tenure coaches)
-   1. RZAtt (DC)                               0.0589
-   2. Sc% (HC Opp)                             0.0305
-   3. 3DAtt (HC Opp)                           0.0249
-   4. 3D% (HC)                                 0.0201
-   5. 4D% (HC Opp)                             0.0186
-   6. Att Rushing (HC Opp)                     0.0111
-   7. 3D% (HC Opp)                             0.0093
-   8. Yds Average Drive (HC)                   0.0078
-   9. PF (Points For) (HC Opp)                 0.0063
-  10. RZAtt (OC)                               0.0057
+   1. RZAtt (HC Opp)                           0.0577
+   2. 4DAtt (HC Opp)                           0.0532
+   3. 3D% (HC Opp)                             0.0492
+   4. Hiring: yards offense                    0.0364
+   5. Yrs nfl coor                             0.0330
+   6. RZPct (HC Opp)                           0.0262
+   7. Sc% (HC Opp)                             0.0237
+   8. Yds (HC)                                 0.0229
+   9. Cmp Passing (HC Opp)                     0.0154
+  10. Att Passing (DC)                         0.0153
 
 P(Y > 1):
   (What distinguishes medium/long-tenure coaches [Classes 1+2])
-   1. 4D% (HC Opp)                             0.0258
-   2. Att Passing (DC)                         0.0144
-   3. 3D% (HC)                                 0.0128
-   4. Att Rushing (HC Opp)                     0.0126
-   5. 3DAtt (HC Opp)                           0.0103
-   6. RZAtt (DC)                               0.0094
-   7. Yds (HC)                                 0.0078
-   8. Yds Average Drive (HC Opp)               0.0059
-   9. PF (Points For) (HC)                     0.0048
-  10. 3D% (HC Opp)                             0.0048
+   1. 3D% (HC Opp)                             0.0608
+   2. RZAtt (HC Opp)                           0.0493
+   3. 4DAtt (HC Opp)                           0.0310
+   4. Yds (HC)                                 0.0241
+   5. Att Passing (DC)                         0.0229
+   6. Sc% (HC)                                 0.0221
+   7. Sc% (HC Opp)                             0.0220
+   8. 3D% (HC)                                 0.0194
+   9. PF (Points For) (HC)                     0.0145
+  10. RZPct (HC Opp)                           0.0130
 
 
 4. KEY FINDINGS

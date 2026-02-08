@@ -52,8 +52,8 @@ DEFAULT_XGBOOST_REGRESSION_PARAMS: Dict[str, Any] = {
 }
 
 # Optimal parameters discovered from 1000-iteration RandomizedSearchCV
-# with 5-fold coach-level cross-validation, optimized for QWK (Feb 2026)
-# QWK-tuned model outperforms AUROC-tuned: QWK 0.754 vs 0.700, MAE 0.307 vs 0.339
+# with 5-fold coach-level cross-validation (Feb 2026)
+# Tuned on QWK directly using full ordinal model in RandomizedSearchCV
 OPTIMIZED_XGBOOST_PARAMS: Dict[str, Any] = {
     'n_estimators': 200,
     'learning_rate': 0.25,
