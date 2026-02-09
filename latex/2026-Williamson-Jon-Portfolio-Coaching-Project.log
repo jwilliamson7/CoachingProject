@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.1.26)  8 FEB 2026 12:51
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.1.26)  9 FEB 2026 08:47
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -960,7 +960,7 @@ LaTeX Warning: Text page 8 contains only floats.
 
 [8] [9 <./figures/confusion_matrix_50seed.png>]
 LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <8.0> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 357.
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 360.
 
 
 LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <9.5> not available
@@ -983,7 +983,7 @@ LaTeX Font Info:    External font `lmex10' loaded for size
  [12
 
 ] [13] [14] [15]
-<figures/tenure_distribution.png, id=280, 570.933pt x 352.9185pt>
+<figures/tenure_distribution.png, id=278, 570.933pt x 352.9185pt>
 File: figures/tenure_distribution.png Graphic file (type png)
 <use figures/tenure_distribution.png>
 Package pdftex.def Info: figures/tenure_distribution.png  used on input line 62
@@ -993,7 +993,7 @@ Package pdftex.def Info: figures/tenure_distribution.png  used on input line 62
 
  <C:/Users/jonwi/Documents/Projects/CoachingProject/latex/figures/tenure_distri
 bution.png>]
-<figures/tenure/shap_partial_dependence.png, id=287, 860.013pt x 887.9574pt>
+<figures/tenure/shap_partial_dependence.png, id=285, 860.013pt x 887.9574pt>
 File: figures/tenure/shap_partial_dependence.png Graphic file (type png)
 <use figures/tenure/shap_partial_dependence.png>
 Package pdftex.def Info: figures/tenure/shap_partial_dependence.png  used on in
@@ -1023,13 +1023,13 @@ ct.out' has not changed.
 (rerunfilecheck)             Checksum: BA90521FE527E92101D9F36A2822D18C;4385.
  ) 
 Here is how much of TeX's memory you used:
- 18702 strings out of 467871
- 307251 string characters out of 5418376
- 771195 words of memory out of 5000000
- 46810 multiletter control sequences out of 15000+600000
- 756072 words of font info for 260 fonts, out of 8000000 for 9000
+ 18714 strings out of 467871
+ 307376 string characters out of 5418376
+ 771452 words of memory out of 5000000
+ 46808 multiletter control sequences out of 15000+600000
+ 756761 words of font info for 267 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 90i,12n,131p,1348b,691s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 90i,12n,131p,1494b,689s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/jonwi/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
 cmmi8.pfb><C:/Users/jonwi/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsf
 onts/cm/cmr8.pfb><C:/Users/jonwi/AppData/Local/Programs/MiKTeX/fonts/type1/publ
@@ -1046,9 +1046,9 @@ ublic/lm/lmssbx10.pfb><C:/Users/jonwi/AppData/Local/Programs/MiKTeX/fonts/type1
 /public/lm/lmsy10.pfb><C:/Users/jonwi/AppData/Local/Programs/MiKTeX/fonts/type1
 /public/lm/lmsy7.pfb>
 Output written on C:\Users\jonwi\Documents\Projects\CoachingProject\latex\2026-
-Williamson-Jon-Portfolio-Coaching-Project.pdf (18 pages, 1680781 bytes).
+Williamson-Jon-Portfolio-Coaching-Project.pdf (18 pages, 1681959 bytes).
 PDF statistics:
- 369 PDF objects out of 1000 (max. 8388607)
+ 368 PDF objects out of 1000 (max. 8388607)
  82 named destinations out of 1000 (max. 500000)
  70374 words of extra memory for PDF output out of 74296 (max. 10000000)
 
