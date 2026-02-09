@@ -20,7 +20,17 @@
       "Bash(/mnt/c/Users/jonwi/AppData/Local/Microsoft/WindowsApps/python.exe scripts/shap_analysis.py:*)",
       "Bash(py -3 scripts/shap_analysis.py:*)",
       "WebFetch(domain:www.degruyterbrill.com)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "WebFetch(domain:onlinelibrary.wiley.com)",
+      "WebFetch(domain:www.nyulawreview.org)",
+      "WebFetch(domain:www.degruyter.com)",
+      "WebFetch(domain:ideas.repec.org)",
+      "WebFetch(domain:www.eng.buffalo.edu)",
+      "WebFetch(domain:link.springer.com)",
+      "WebFetch(domain:journals.humankinetics.com)",
+      "WebFetch(domain:www.kdd.org)",
+      "WebFetch(domain:jmlr.org)",
+      "WebFetch(domain:papers.nips.cc)"
     ],
     "deny": [],
     "ask": []
