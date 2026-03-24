@@ -311,9 +311,91 @@ def generate_partial_dependence():
     print(f"  Saved: {path}")
 
 
+# ---- Figure 5: Tenure Predictions ----
+def generate_predictions_plot():
+    print("Generating predictions plot...")
+    import matplotlib.patches as mpatches
+
+    df, X, y = load_data()
+    top_k = 40
+    X_sub = subset_features(X, top_k)
+
+    X_train, X_test, y_train, y_test, _ = stratified_coach_level_split(
+        df, X_sub, y,
+        test_size=MODEL_CONFIG['test_size'],
+        random_state=MODEL_CONFIG['random_state'],
+    )
+
+    model = CoachTenureModel(use_ordinal=True, n_classes=3, random_state=42)
+    model.fit(X_train, y_train, verbose=0)
+
+    y_pred = model.predict(X_test)
+
+    # Sort by true class then by predicted class
+    sort_idx = np.lexsort((y_pred, y_test.values))
+    y_test_sorted = y_test.values[sort_idx]
+    y_pred_sorted = y_pred[sort_idx]
+
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 4), sharex=True,
+                                    gridspec_kw={'height_ratios': [1, 1], 'hspace': 0.1})
+
+    colors = ['#e41a1c', '#377eb8', '#4daf4a']
+    class_labels = ['Class 0 (1-2 yrs)', 'Class 1 (3-4 yrs)', 'Class 2 (5+ yrs)']
+    n_samples = len(y_test_sorted)
+
+    for i, true_val in enumerate(y_test_sorted):
+        ax1.bar(i, 1, color=colors[int(true_val)], width=1.0, edgecolor='none')
+
+    for i, (true_val, pred_val) in enumerate(zip(y_test_sorted, y_pred_sorted)):
+        if true_val == pred_val:
+            ax2.bar(i, 1, color=colors[int(pred_val)], width=1.0, edgecolor='none')
+        else:
+            ax2.bar(i, 1, color=colors[int(pred_val)], width=1.0, edgecolor='black',
+                   linewidth=1.5, hatch='///')
+
+    ax1.set_ylabel('Ground\nTruth', fontsize=10, rotation=0, ha='right', va='center')
+    ax2.set_ylabel('Predicted', fontsize=10, rotation=0, ha='right', va='center')
+    ax1.set_yticks([])
+    ax2.set_yticks([])
+    ax1.set_xlim(-0.5, n_samples - 0.5)
+    ax2.set_xlim(-0.5, n_samples - 0.5)
+
+    class_counts = [sum(y_test_sorted == c) for c in [0, 1, 2]]
+    boundaries = [class_counts[0], class_counts[0] + class_counts[1]]
+    for boundary in boundaries:
+        ax1.axvline(x=boundary - 0.5, color='black', linestyle='-', linewidth=1.5)
+        ax2.axvline(x=boundary - 0.5, color='black', linestyle='-', linewidth=1.5)
+
+    class_centers = [class_counts[0]/2,
+                     class_counts[0] + class_counts[1]/2,
+                     class_counts[0] + class_counts[1] + class_counts[2]/2]
+    for center, label, count in zip(class_centers, class_labels, class_counts):
+        ax1.text(center, 1.15, f'{label}\n(n={count})', ha='center', va='bottom', fontsize=9)
+
+    accuracy = (y_test_sorted == y_pred_sorted).mean()
+    n_wrong = n_samples - sum(y_test_sorted == y_pred_sorted)
+
+    patches = [mpatches.Patch(color=colors[i], label=f'Class {i}') for i in range(3)]
+    patches.append(mpatches.Patch(facecolor='gray', edgecolor='black', hatch='///',
+                                  label=f'Misclassified (n={n_wrong})'))
+
+    ax2.set_xlabel('Test Set Instances (sorted by true class, then predicted class)', fontsize=10)
+    fig.legend(handles=patches, loc='lower center', fontsize=8, ncol=4,
+               bbox_to_anchor=(0.5, -0.08))
+    fig.suptitle(f'Ordinal Model: Ground Truth vs Predictions (Test Set, n={n_samples}, Accuracy={accuracy:.1%})',
+                 fontsize=12, y=1.02)
+    plt.subplots_adjust(bottom=0.15)
+
+    path = os.path.join(OUTPUT_DIR, 'tenure_predictions.png')
+    fig.savefig(path, dpi=300, bbox_inches='tight')
+    plt.close(fig)
+    print(f"  Saved: {path}")
+
+
 if __name__ == '__main__':
     generate_parsimony_curve()
     generate_confusion_matrix_fig()
     generate_tenure_distribution()
     generate_partial_dependence()
+    generate_predictions_plot()
     print(f"\nAll figures saved to: {OUTPUT_DIR}")
