@@ -168,9 +168,14 @@ def main():
     print("  Brier by horizon:", dict(zip(BRIER_GRID.astype(int), np.round(bs_curve, 3))))
 
     # ---- 6. hazard ratios (cluster-robust) + PH test ----
+    # UNPENALIZED for the reported inference: with ~5 near-uncorrelated features
+    # and EPV ~64 (319 events) the model is stable without a ridge, and penalized
+    # coefficients have no nominal frequentist coverage. Verified in
+    # survival_robustness_check.py: penalizer 0.1->0 leaves p-values/CIs
+    # materially unchanged and pushes the internal-hire HR away from 1 (1.55->1.62).
     Xsel = pd.DataFrame(Ximp_full[:, stable_idx], columns=stable, index=X.index)
-    hr, cph = cox_hazard_ratios(Xsel, dur, cause, df["Coach Name"].values)
-    pht = ph_test(Xsel, dur, cause)
+    hr, cph = cox_hazard_ratios(Xsel, dur, cause, df["Coach Name"].values, penalizer=0.0)
+    pht = ph_test(Xsel, dur, cause, penalizer=0.0)
     hr.index = [nm(c) for c in hr.index]
     print("\nHazard ratios (cause-specific firing, cluster-robust SE on coach):")
     print(hr.round(3).to_string())
