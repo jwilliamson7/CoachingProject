@@ -1,0 +1,358 @@
+coach,hire_year,duration,last_year,final_record,final_winpct,age_at_exit,notes,hc_elsewhere_next,hc_elsewhere_after,label_source,resolved_label,event,confidence,reason,source
+Sid Gillman,1974,1,1974,7-7,0.5,63.0,,0,0,research,censor,0,high,"Sid Gillman retired on top after 1974 (7-7, NFL Coach of the Year); hand-picked successor Bum Phillips",Wikipedia
+Paul Brown,1970,6,1975,11-3,0.786,67.0,,0,0,research,censor,0,high,"Paul Brown retired voluntarily on top after 1975 (11-3); named own successor, stayed on as GM/owner",Wikipedia/Bengals.com
+Jack Pardee,1975,3,1977,9-5,0.643,41.0,,1,1,research,censor,0,high,"Jack Pardee voluntarily resigned from Bears after 1977; rejected GM Finks offer to stay, chose Redskins job",Washington Post
+Chuck Fairbanks,1973,6,1978,11-4,0.733,45.0,,0,0,research,censor,0,high,Chuck Fairbanks voluntarily left Patriots after 1978 (11-4) for Univ. of Colorado; Patriots sued to block move,Wikipedia/Boston Globe
+John Madden,1970,9,1978,9-7,0.563,42.0,,0,0,research,censor,0,high,John Madden retired on top after 1978 (9-7) due to ulcer/burnout while successful and wanted,Wikipedia
+Bill Walsh,1979,10,1988,10-6,0.625,57.0,Super Bowl Champions,0,0,research,censor,0,high,Bill Walsh retired Jan 1989 days after winning Super Bowl XXIII due to burnout while wanted; voluntary on top,UPI/ESPN
+Bill Parcells,1983,8,1990,13-3,0.813,49.0,Super Bowl Champions,0,1,research,censor,0,high,"Bill Parcells resigned from Giants May 1991 after Super Bowl XXV citing health; voluntary while wanted, took 2 years off",Washington Post
+Jerry Burns,1986,6,1991,8-8,0.5,64.0,,0,0,research,censor,0,medium,"Jerry Burns announced own retirement Dec 1991 at age 64 after 8-8; self-initiated, no pressure, beloved departure",Wikipedia/obits
+Joe Gibbs,1981,12,1992,9-7,0.563,52.0,,0,0,research,censor,0,high,"Joe Gibbs retired March 1993 for health/family; voluntary, owner unaware it was coming, team wanted him",Washington Post
+Bill Parcells,1993,4,1996,11-5,0.688,55.0,AFC Champions,1,1,research,censor,0,high,Bill Parcells resigned from Patriots after 1996 Super Bowl run in personnel-control dispute to take Jets job; Kraft wanted him,SI/ESPN
+Bobby Ross,1992,5,1996,8-8,0.5,61.0,,1,1,research,censor,0,high,Bobby Ross voluntarily left Chargers after 1996 for Lions HC job with more control/money; Chargers wanted to retain him,Wikipedia/CBS
+Mike Holmgren,1992,7,1998,11-5,0.688,50.0,,1,1,research,censor,0,high,Mike Holmgren voluntarily resigned from Packers after 1998 to take Seahawks HC+GM job for total control; Packers wanted him,Packers.com/ESPN
+Bill Parcells,1997,3,1999,8-8,0.5,58.0,,0,1,research,censor,0,high,"Bill Parcells retired as Jets HC after 1999 on his own terms, moving to football ops with Belichick set to succeed; not performance-driven",ESPN/CBS
+Dick Vermeil,1997,3,1999,13-3,0.813,63.0,Super Bowl Champions,0,1,research,censor,0,high,Dick Vermeil retired on top after winning Super Bowl XXXIV with 1999 Rams (13-3); walked away voluntarily while wanted,Wikipedia/ESPN
+Jimmy Johnson,1996,4,1999,9-7,0.563,56.0,,0,0,research,censor,0,high,"Jimmy Johnson voluntarily retired after 1999 Dolphins season; burnout, time with family, team would have kept him",CBS/ESPN
+Al Groh,2000,1,2000,9-7,0.563,56.0,,0,0,research,censor,0,high,Al Groh voluntarily resigned Jets after 2000 (9-7) to take Virginia (alma mater) college HC job,UPI/ESPN
+Bobby Ross,1997,4,2000,5-4,0.556,65.0,Resigned after week 10,0,0,research,censor,0,medium,"Bobby Ross voluntarily resigned mid-2000 citing burnout, player effort, and leg blood clots; owner praised decision, team viable",Washington Post
+Jon Gruden,1998,4,2001,10-6,0.625,38.0,,1,1,research,censor,0,user,User+verified: traded to TB for 2 firsts/2 seconds/$8M and continued as a wanted NFL HC (not a firing),NBC Sports Bay Area
+Dick Vermeil,2001,5,2005,10-6,0.625,69.0,,0,0,research,censor,0,high,"Dick Vermeil voluntarily retired after 2005 (10-6), walked away on top still wanted (one more year chants)",Wikipedia/Arrowhead Pride
+Bill Cowher,1992,15,2006,8-8,0.5,49.0,,0,0,research,censor,0,high,"Bill Cowher voluntarily stepped down/retired Jan 2007 after 15 seasons, still wanted (won SB XL the prior year)",Pro Football HOF
+Bill Parcells,2003,4,2006,9-7,0.563,65.0,,0,0,research,censor,0,high,"Bill Parcells voluntarily retired from coaching Jan 2007 after 4 Dallas seasons; his own choice, Jones wanted him back",ESPN
+Joe Gibbs,2004,4,2007,9-7,0.563,67.0,,0,0,research,censor,0,high,Joe Gibbs resigned Jan 2008 for family/non-football reasons (grandson's leukemia); voluntary departure,Washington Post
+Tony Dungy,2002,7,2008,12-4,0.75,53.0,,0,0,research,censor,0,high,Tony Dungy retired voluntarily Jan 2009 on top after 12-4 playoff season to be with family; hand-picked successor Caldwell,ESPN
+Gary Kubiak,2015,2,2016,9-7,0.563,55.0,,0,0,research,censor,0,high,"Gary Kubiak retired Jan 2017 for health reasons (migraine condition/seizures, ambulance during season); non-football",ESPN/NFL.com
+Bruce Arians,2013,5,2017,8-8,0.5,65.0,,0,1,research,censor,0,high,Bruce Arians retired Jan 2018 (Cardinals) citing family after 42-yr career; left as franchise winningest coach by choice,CBS/Yahoo
+Bruce Arians,2019,3,2021,13-4,0.765,69.0,,0,0,research,censor,0,high,"Bruce Arians voluntarily stepped down March 2022 (Bucs) while successful (SB winner), hand-picked successor Bowles, moved to front office",NFL.com/ESPN
+Sean Payton,2006,16,2021,9-8,0.529,58.0,,0,1,research,censor,0,high,"Sean Payton voluntarily retired/stepped away Jan 2022 (Saints) after 9-8, wanting time off; team would have kept him (un-retired 2023)",NFL.com/PFF
+Andy Reid,2013,13,2025,,,,,0,0,deterministic,censor,0,high,active,record/Notes
+Dan Campbell,2021,5,2025,,,,,0,0,deterministic,censor,0,high,active,record/Notes
+John Harbaugh,2008,18,2025,,,,,0,0,deterministic,censor,0,high,active,record/Notes
+Kevin Stefanski,2020,6,2025,,,,,0,0,deterministic,censor,0,high,active,record/Notes
+Kyle Shanahan,2017,9,2025,,,,,0,0,deterministic,censor,0,high,active,record/Notes
+Matt LaFleur,2019,7,2025,,,,,0,0,deterministic,censor,0,high,active,record/Notes
+Mike Tomlin,2007,19,2025,,,,,0,0,deterministic,censor,0,high,active,record/Notes
+Nick Sirianni,2021,5,2025,,,,,0,0,deterministic,censor,0,high,active,record/Notes
+Sean McDermott,2017,9,2025,,,,,0,0,deterministic,censor,0,high,active,record/Notes
+Sean McVay,2017,9,2025,,,,,0,0,deterministic,censor,0,high,active,record/Notes
+Zac Taylor,2019,7,2025,,,,,0,0,deterministic,censor,0,high,active,record/Notes
+Bill Austin,1970,1,1970,6-8,0.429,42.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Charlie Waller,1970,1,1970,5-6-3,0.455,49.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Clive Rush,1970,1,1970,1-6,0.143,39.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+John Rauch,1970,1,1970,3-10-1,0.231,43.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Wally Lemm,1970,1,1970,3-10-1,0.231,51.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Ed Hughes,1971,1,1971,4-9-1,0.308,44.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Harvey Johnson,1971,1,1971,1-13,0.071,52.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Lou Saban,1970,2,1971,2-6-1,0.25,50.0,,1,1,deterministic,event,1,high,losing_finale,record/Notes
+Sid Gillman,1971,1,1971,4-6,0.4,60.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Bob Hollway,1971,2,1972,4-9-1,0.321,46.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Don McCafferty,1970,3,1972,1-4,0.2,51.0,,1,1,deterministic,event,1,high,losing_finale,record/Notes
+Ed Khayat,1972,1,1972,2-11-1,0.179,37.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+J.D. Roberts,1970,3,1972,2-11-1,0.179,40.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+John Mazur,1971,2,1972,2-7,0.222,42.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Tommy Prothro,1971,2,1972,6-7-1,0.464,52.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Bill Peterson,1972,2,1973,0-5,0.0,50.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Don McCafferty,1973,1,1973,6-7-1,0.464,52.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Harland Svare,1972,2,1973,1-6-1,0.188,43.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Weeb Ewbank,1970,4,1973,4-10,0.286,66.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Abe Gibron,1972,3,1974,4-10,0.286,49.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Dan Devine,1971,4,1974,6-8,0.429,50.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Hank Stram,1970,5,1974,5-9,0.357,50.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Howard Schnellenberger,1973,2,1974,0-3,0.0,40.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Nick Skorich,1971,4,1974,4-10,0.286,53.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Charley Winner,1974,2,1975,2-7,0.222,51.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+John North,1973,3,1975,1-5,0.167,54.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Mike McCormack,1973,3,1975,4-10,0.286,45.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+John Ralston,1972,5,1976,9-5,0.643,49.0,,0,0,research,event,1,high,John Ralston resigned under pressure after 1976 (9-5) following player revolt; stripped of GM title before resigning,Wikipedia
+Monte Clark,1976,1,1976,8-6,0.571,39.0,,0,1,research,event,1,high,Monte Clark fired by 49ers Apr 1977 over personnel-authority dispute with GM Joe Thomas; sat out 1977 before Detroit,Wikipedia
+Bill Arnsparger,1974,3,1976,0-7,0.0,50.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Bill Arnsparger,1976,1,1976,0-7,0.0,50.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Lou Holtz,1976,1,1976,3-10,0.231,39.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Lou Saban,1972,5,1976,2-3,0.4,55.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Marion Campbell,1975,2,1976,1-4,0.2,47.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Rick Forzano,1974,3,1976,1-3,0.25,48.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Chuck Knox,1973,5,1977,10-4,0.714,45.0,,1,1,research,event,1,high,Chuck Knox pre-emptively jumped to Buffalo Jan 1978 to avoid being fired by owner Rosenbloom after Mud Bowl loss,Wikipedia/ESPN
+Don Coryell,1973,5,1977,7-7,0.5,53.0,,1,1,research,event,1,high,Don Coryell forced out after 1977 (7-7) following falling out with owner Bill Bidwill; dismissed Feb 1978,Wikipedia
+George Allen,1971,7,1977,9-5,0.643,59.0,,0,0,research,event,1,high,George Allen fired by Redskins Jan 1978 despite 9-5; contract/budget dispute with Edward Bennett Williams,Washington Post/Wikipedia
+Forrest Gregg,1975,3,1977,6-7,0.462,44.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Hank Stram,1976,2,1977,3-11,0.214,53.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Jim Ringo,1977,1,1977,3-11,0.214,46.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Ken Meyer,1977,1,1977,5-9,0.357,51.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Paul Wiggin,1975,3,1977,1-6,0.143,43.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Tommy Hudspeth,1977,1,1977,6-8,0.429,46.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Bill Johnson,1976,3,1978,0-5,0.0,52.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+John McVay,1977,2,1978,6-10,0.375,47.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Pete McCulley,1978,1,1978,1-8,0.111,47.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Tommy Prothro,1974,5,1978,1-3,0.25,58.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Bud Wilkinson,1978,2,1979,3-10,0.231,63.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Homer Rice,1979,1,1979,4-12,0.25,52.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Ted Marchibroda,1975,5,1979,5-11,0.313,48.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Bum Phillips,1975,6,1980,11-5,0.688,57.0,,1,1,research,event,1,high,Bum Phillips fired by Oilers owner Bud Adams Dec 31 1980 despite 11-5 (expected extension); Saints job came after,UPI/Wikipedia
+Red Miller,1977,4,1980,8-8,0.5,53.0,,0,0,research,event,1,high,Red Miller fired by new Broncos owner spring 1981 after 8-8 missed playoffs,Wikipedia
+Dick Nolan,1978,3,1980,0-12,0.0,48.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Jack Pardee,1978,3,1980,6-10,0.375,44.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Mike McCormack,1980,2,1981,2-14,0.125,51.0,,1,1,deterministic,event,1,high,losing_finale,record/Notes
+Neill Armstrong,1978,4,1981,6-10,0.375,55.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Ron Erhardt,1979,3,1981,2-14,0.125,49.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Leeman Bennett,1977,6,1982,5-4,0.556,44.0,,0,1,research,event,1,high,Leeman Bennett fired by Falcons Jan 1983 after strike-shortened 5-4; said he was surprised,UPI/Wikipedia
+Walt Michaels,1977,6,1982,6-3,0.667,53.0,,0,0,research,event,1,medium,Walt Michaels forced/pressured resignation Feb 1983; ownership gave a package and told him to resign,UPI/Wikipedia
+Chuck Knox,1978,5,1982,4-5,0.444,50.0,,1,1,deterministic,event,1,high,losing_finale,record/Notes
+Dick Vermeil,1976,7,1982,3-6,0.333,46.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Jack Patera,1976,7,1982,0-2,0.0,49.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Marv Levy,1978,5,1982,3-6,0.333,57.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Ray Malavasi,1978,5,1982,2-7,0.222,52.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Ray Perkins,1979,4,1982,4-5,0.444,41.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Bart Starr,1975,9,1983,8-8,0.5,49.0,,0,0,research,event,1,high,Bart Starr fired by Packers Dec 19 1983 day after 8-8 missed playoffs; said he was shocked,UPI/Wikipedia
+Ed Biles,1981,3,1983,0-6,0.0,52.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Forrest Gregg,1980,4,1983,7-9,0.438,50.0,,1,1,deterministic,event,1,high,losing_finale,record/Notes
+Ron Meyer,1982,3,1984,5-3,0.625,43.0,,0,1,research,event,1,high,Ron Meyer fired midway through 1984 by Patriots after firing his DC; replaced by Raymond Berry,Wikipedia
+Frank Kush,1982,3,1984,4-11,0.267,55.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Frank Kush,1984,1,1984,4-11,0.267,55.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+John McKay,1976,9,1984,6-10,0.375,61.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Les Steckel,1984,1,1984,3-13,0.188,38.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Monte Clark,1978,7,1984,4-11-1,0.281,47.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Sam Rutigliano,1978,7,1984,1-7,0.125,52.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Bud Grant,1985,1,1985,7-9,0.438,58.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Bum Phillips,1981,5,1985,4-8,0.333,62.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Hugh Campbell,1984,2,1985,5-9,0.357,44.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Jim Hanifan,1980,6,1985,5-11,0.313,52.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Kay Stephenson,1983,3,1985,0-4,0.0,41.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Marion Campbell,1983,3,1985,6-9,0.4,56.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+John Mackovic,1983,4,1986,10-6,0.625,43.0,,0,0,research,event,1,high,"John Mackovic fired by Chiefs days after 1986 despite playoffs, following a player revolt to owner Lamar Hunt",Wikipedia
+Dan Henning,1983,4,1986,7-8-1,0.469,44.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Don Coryell,1979,8,1986,1-7,0.125,62.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Hank Bullough,1986,1,1986,2-7,0.222,52.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Leeman Bennett,1985,2,1986,2-14,0.125,48.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Rod Dowhower,1985,2,1986,0-13,0.0,43.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Forrest Gregg,1984,4,1987,5-9-1,0.367,54.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Tom Flores,1979,9,1987,5-10,0.333,50.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Tom Flores,1982,6,1987,5-10,0.333,50.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Marty Schottenheimer,1985,4,1988,10-6,0.625,45.0,,1,1,research,event,1,high,Marty Schottenheimer forced resignation Browns Dec 1988 after Modell ultimatum to hire an OC/strip role; KC hired after,Wikipedia
+Al Saunders,1987,2,1988,6-10,0.375,41.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Darryl Rogers,1985,4,1988,2-9,0.182,54.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Frank Gansz,1987,2,1988,4-11-1,0.281,50.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Jerry Glanville,1986,4,1989,9-7,0.563,48.0,,1,1,research,event,1,high,Jerry Glanville fired by Oilers Jan 1990 after season-ending losing skid; Atlanta hired him a week later,Wikipedia
+Gene Stallings,1986,4,1989,5-6,0.455,54.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Gene Stallings,1988,2,1989,5-6,0.455,54.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Joe Walton,1983,7,1989,4-12,0.25,54.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Marion Campbell,1987,3,1989,3-9,0.25,60.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Mike Shanahan,1988,2,1989,1-3,0.25,37.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Raymond Berry,1985,5,1989,5-11,0.313,56.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Buddy Ryan,1986,5,1990,10-6,0.625,59.0,,0,1,research,event,1,high,Buddy Ryan fired by Eagles Jan 1991 after third straight first-round playoff exit,Washington Post
+Bud Carson,1989,2,1990,2-7,0.222,59.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Ray Perkins,1987,4,1990,5-8,0.385,49.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Rod Rust,1990,1,1990,1-15,0.063,62.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Chuck Knox,1983,9,1991,7-9,0.438,59.0,,1,1,deterministic,event,1,high,losing_finale,record/Notes
+Dan Henning,1989,3,1991,4-12,0.25,49.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+John Robinson,1983,9,1991,3-13,0.188,56.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Lindy Infante,1988,4,1991,4-12,0.25,51.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Richard Williamson,1991,1,1991,3-13,0.188,50.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Ron Meyer,1987,5,1991,0-5,0.0,50.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Sam Wyche,1984,8,1991,3-13,0.188,46.0,,1,1,deterministic,event,1,high,losing_finale,record/Notes
+Dan Reeves,1981,12,1992,8-8,0.5,48.0,,1,1,research,event,1,high,Dan Reeves fired by Broncos owner Bowlen Dec 1992 amid Elway feud after 8-8,UPI
+Dick MacPherson,1991,2,1992,2-14,0.125,62.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Mike Ditka,1982,11,1992,5-11,0.313,53.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Ray Handley,1991,2,1992,6-10,0.375,48.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Bruce Coslet,1990,4,1993,8-8,0.5,47.0,,0,1,research,event,1,high,Bruce Coslet fired by Jets Jan 1994 (never a winning season); GM cited philosophy disagreement,Seattle Times
+Jimmy Johnson,1989,5,1993,12-4,0.75,50.0,Super Bowl Champions,0,1,research,event,1,medium,Jimmy Johnson and Cowboys mutually parted March 1994 after power struggle with Jerry Jones; effectively forced out,ESPN
+Jerry Glanville,1990,4,1993,6-10,0.375,52.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Joe Bugel,1990,4,1993,7-9,0.438,53.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Richie Petitbon,1993,1,1993,4-12,0.25,55.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Art Shell,1990,5,1994,9-7,0.563,48.0,,0,0,research,event,1,high,Art Shell fired by Raiders owner Al Davis after 1994 (9-7) missed playoffs; Davis later regretted it,ESPN/Wikipedia
+Chuck Knox,1992,3,1994,4-12,0.25,62.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Jack Pardee,1990,5,1994,1-9,0.1,58.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Pete Carroll,1994,1,1994,6-10,0.375,43.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Rich Kotite,1991,4,1994,7-9,0.438,52.0,,1,1,deterministic,event,1,high,losing_finale,record/Notes
+Tom Flores,1992,3,1994,6-10,0.375,57.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Wade Phillips,1993,2,1994,7-9,0.438,47.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Don Shula,1970,26,1995,9-7,0.563,65.0,,0,0,research,event,1,medium,"Don Shula resigned after 1995 amid heavy fan/media pressure with Jimmy Johnson waiting; team moved on, hired Johnson days later",Baltimore Sun
+Ted Marchibroda,1992,4,1995,9-7,0.563,64.0,,1,1,research,event,1,medium,Ted Marchibroda left Colts Feb 1996 after team rejected his 2-yr extension demand (offered 1) and promoted a replacement; Ravens 6 days later,Baltimore Sun
+Bill Belichick,1991,5,1995,5-11,0.313,43.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Buddy Ryan,1994,2,1995,4-12,0.25,64.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Sam Wyche,1992,4,1995,7-9,0.438,50.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+George Seifert,1989,8,1996,12-4,0.75,56.0,,0,1,research,event,1,high,"George Seifert forced out after 1996; 49ers offered no extension, gave ultimatum to accept demotion behind named successor Mariucci",Washington Post
+Dan Reeves,1993,4,1996,6-10,0.375,52.0,,1,1,deterministic,event,1,high,losing_finale,record/Notes
+David Shula,1992,5,1996,1-6,0.143,37.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+June Jones,1994,3,1996,3-13,0.188,43.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Mike White,1995,2,1996,7-9,0.438,60.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Rich Brooks,1995,2,1996,6-10,0.375,55.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Rich Kotite,1995,2,1996,1-15,0.063,54.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Wayne Fontes,1989,8,1996,5-11,0.313,56.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Barry Switzer,1994,4,1997,6-10,0.375,60.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Joe Bugel,1997,1,1997,4-12,0.25,57.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Lindy Infante,1996,2,1997,3-13,0.188,57.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Marv Levy,1987,11,1997,6-10,0.375,72.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Dennis Erickson,1995,4,1998,8-8,0.5,51.0,,0,1,research,event,1,high,Dennis Erickson fired by Seahawks Dec 1998 after fourth straight non-playoff season (8-8); one of five fired that day,CBS/Wikipedia
+Dave Wannstedt,1993,6,1998,4-12,0.25,46.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Dom Capers,1995,4,1998,4-12,0.25,48.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Kevin Gilbride,1997,2,1998,2-4,0.333,47.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Marty Schottenheimer,1989,10,1998,7-9,0.438,55.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Ray Rhodes,1995,4,1998,3-13,0.188,48.0,,1,1,deterministic,event,1,high,losing_finale,record/Notes
+Ted Marchibroda,1996,3,1998,6-10,0.375,67.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Chan Gailey,1998,2,1999,8-8,0.5,47.0,,0,1,research,event,1,high,Chan Gailey fired by Cowboys Jan 2000 after two playoff seasons; Jerry Jones cited scheme fit and later called it a regret,CBS/ESPN
+Pete Carroll,1997,3,1999,8-8,0.5,48.0,,0,1,research,event,1,high,Pete Carroll fired by Patriots Jan 2000 after 8-8 collapse; Kraft replaced him with Belichick,ESPN/Patriots.com
+Ray Rhodes,1999,1,1999,8-8,0.5,49.0,,0,0,research,event,1,high,Ray Rhodes fired by Packers GM Ron Wolf Jan 2000 after lone 8-8 season missing playoffs,SI/Wikipedia
+Mike Ditka,1997,3,1999,3-13,0.188,60.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Wade Phillips,1998,3,2000,8-8,0.5,53.0,,0,1,research,event,1,high,Wade Phillips fired by Bills owner Ralph Wilson after 2000 (8-8) for refusing to fire his special teams coach,CBS/ESPN
+Bruce Coslet,1997,4,2000,0-3,0.0,54.0,Fired after week 4,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Chris Palmer,1999,2,2000,3-13,0.188,51.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Gunther Cunningham,1999,2,2000,7-9,0.438,54.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Norv Turner,1994,7,2000,7-6,0.538,48.0,Fired after week 14,0,1,deterministic,event,1,high,fired_notes,record/Notes
+Vince Tobin,1996,5,2000,2-5,0.286,57.0,Fired after week 8,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Marty Schottenheimer,2001,1,2001,8-8,0.5,58.0,,1,1,research,event,1,high,Marty Schottenheimer fired by Dan Snyder after lone 2001 Washington season (8-8) in power struggle; Spurrier hired,ESPN/Washington Post
+Tony Dungy,1996,6,2001,9-7,0.563,46.0,,1,1,research,event,1,high,"Tony Dungy fired by Buccaneers Jan 2002 after repeated playoff failures; Colts hired him after, but fired first",ESPN/Wikipedia
+Dennis Green,1992,10,2001,5-10,0.333,52.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+George Seifert,1999,3,2001,1-15,0.063,61.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Mike Riley,1999,3,2001,5-11,0.313,48.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Steve Mariucci,1997,6,2002,10-6,0.625,47.0,,1,1,research,event,1,high,"Steve Mariucci fired by 49ers Jan 2003 after losing power struggle with GM/owner; Lions hired him after, but fired first",Washington Post
+Dave Campo,2000,3,2002,5-11,0.313,55.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Dick LeBeau,2001,2,2002,2-14,0.125,65.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Marty Mornhinweg,2001,2,2002,3-13,0.188,40.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Tom Coughlin,1995,8,2002,6-10,0.375,56.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Bill Callahan,2002,2,2003,4-12,0.25,47.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Dan Reeves,1997,7,2003,3-10,0.231,59.0,Fired after week 14,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Dave McGinnis,2001,3,2003,4-12,0.25,52.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Dick Jauron,1999,5,2003,7-9,0.438,53.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Gregg Williams,2001,3,2003,6-10,0.375,45.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Jim Fassel,1997,7,2003,4-12,0.25,54.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Steve Spurrier,2002,2,2003,5-11,0.313,58.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Butch Davis,2001,4,2004,3-8,0.273,53.0,Fired after week 12,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Dave Wannstedt,2000,5,2004,1-8,0.111,52.0,Fired after week 9,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Dennis Erickson,2003,2,2004,2-14,0.125,57.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Mike Tice,2002,4,2005,9-7,0.563,46.0,,0,0,research,event,1,high,Mike Tice fired by Vikings Jan 1 2006; owner Zygi Wilf declined to renew right after 9-7 finale,ESPN/NFL.com
+Dom Capers,2002,4,2005,2-14,0.125,55.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Herm Edwards,2001,5,2005,4-12,0.25,51.0,,1,1,deterministic,event,1,high,losing_finale,record/Notes
+Jim Haslett,2000,6,2005,3-13,0.188,50.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Mike Martz,2000,6,2005,2-3,0.4,54.0,Fired after week 5,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Mike Mularkey,2004,2,2005,5-11,0.313,44.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Mike Sherman,2000,6,2005,4-12,0.25,51.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Norv Turner,2004,2,2005,4-12,0.25,53.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Steve Mariucci,2003,3,2005,4-7,0.364,50.0,Fired after week 12,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Marty Schottenheimer,2002,5,2006,14-2,0.875,63.0,,0,0,research,event,1,high,"Marty Schottenheimer fired by Chargers Feb 2007 despite NFL-best 14-2, over GM A.J. Smith dysfunction",ESPN
+Art Shell,2006,1,2006,2-14,0.125,60.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Dennis Green,2004,3,2006,5-11,0.313,57.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Jim Mora,2004,3,2006,7-9,0.438,45.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Nick Saban,2005,2,2006,6-10,0.375,55.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Bobby Petrino,2007,1,2007,3-10,0.231,46.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Brian Billick,1999,9,2007,5-11,0.313,53.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Cam Cameron,2007,1,2007,1-15,0.063,46.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Eric Mangini,2006,3,2008,9-7,0.563,37.0,,1,1,research,event,1,high,"Eric Mangini fired by Jets Dec 2008 after 1-4 collapse; Browns hired him after, but fired first",NFL.com
+Jon Gruden,2002,7,2008,9-7,0.563,45.0,,0,1,research,event,1,high,Jon Gruden fired by Buccaneers Jan 2009 after winless December and playoff miss,Britannica/Wikipedia
+Mike Shanahan,1995,14,2008,8-8,0.5,56.0,,0,1,research,event,1,high,"Mike Shanahan fired by owner Bowlen Dec 2008 after late collapse (8-8) missed playoffs 3rd straight, ending 14-yr tenure",ESPN/Wikipedia
+Herm Edwards,2006,3,2008,2-14,0.125,54.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Lane Kiffin,2007,2,2008,1-3,0.25,33.0,Fired after Week 4,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Mike Holmgren,1999,10,2008,4-12,0.25,60.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Mike Nolan,2005,4,2008,2-5,0.286,49.0,Fired after Week 7,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Rod Marinelli,2006,3,2008,0-16,0.0,59.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Romeo Crennel,2005,4,2008,4-12,0.25,61.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Scott Linehan,2006,3,2008,0-4,0.0,45.0,Fired after Week 4,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Dick Jauron,2006,4,2009,3-6,0.333,59.0,Fired after Week 10,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Jim Mora,2009,1,2009,5-11,0.313,48.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Jim Zorn,2008,2,2009,4-12,0.25,56.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Tom Cable,2009,2,2010,8-8,0.5,46.0,,0,0,research,event,1,high,Tom Cable not retained: Al Davis declined his contract option Jan 2011 despite 8-8 (first non-losing season in years),ESPN/Raiders.com
+Brad Childress,2006,5,2010,3-7,0.3,54.0,Fired after Week 11,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Eric Mangini,2009,2,2010,5-11,0.313,39.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Jeff Fisher,1995,16,2010,6-10,0.375,52.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Jeff Fisher,1997,14,2010,6-10,0.375,52.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+John Fox,2002,9,2010,2-14,0.125,55.0,,1,1,deterministic,event,1,high,losing_finale,record/Notes
+Josh McDaniels,2009,2,2010,3-9,0.25,34.0,Fired after Week 13,0,1,deterministic,event,1,high,fired_notes,record/Notes
+Mike Singletary,2009,2,2010,5-10,0.333,52.0,Fired after Week 16,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Wade Phillips,2007,4,2010,1-7,0.125,63.0,Fired after Week 9,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Hue Jackson,2011,1,2011,8-8,0.5,46.0,,0,1,research,event,1,high,Hue Jackson fired Jan 2012 by new GM Reggie McKenzie after one 8-8 season; personnel-control clash,NFL.com
+Jack Del Rio,2003,9,2011,3-8,0.273,48.0,Fired after Week 12,0,1,deterministic,event,1,high,fired_notes,record/Notes
+Jim Caldwell,2009,3,2011,2-14,0.125,56.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Raheem Morris,2009,3,2011,4-12,0.25,35.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Steve Spagnuolo,2009,3,2011,2-14,0.125,52.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Todd Haley,2009,3,2011,5-8,0.385,44.0,Fired after week 14,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Tony Sparano,2008,4,2011,4-9,0.308,50.0,Fired after week 14,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Lovie Smith,2004,9,2012,10-6,0.625,54.0,,0,1,research,event,1,high,Lovie Smith fired Dec 2012 after 10-6 missed playoffs (collapsed from 7-1); GM Phil Emery decision,ESPN/NFL.com
+Andy Reid,1999,14,2012,4-12,0.25,54.0,,1,1,deterministic,event,1,high,losing_finale,record/Notes
+Chan Gailey,2010,3,2012,6-10,0.375,60.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Ken Whisenhunt,2007,6,2012,5-11,0.313,50.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Mike Mularkey,2012,1,2012,2-14,0.125,51.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Norv Turner,2007,6,2012,7-9,0.438,60.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Pat Shurmur,2011,2,2012,5-11,0.313,47.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Romeo Crennel,2012,1,2012,2-14,0.125,65.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Gary Kubiak,2006,8,2013,2-11,0.154,52.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Greg Schiano,2012,2,2013,4-12,0.25,47.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Jim Schwartz,2009,5,2013,7-9,0.438,47.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Leslie Frazier,2011,3,2013,5-10-1,0.344,54.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Mike Munchak,2011,3,2013,7-9,0.438,53.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Mike Shanahan,2010,4,2013,3-13,0.188,61.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Rob Chudzinski,2013,1,2013,4-12,0.25,45.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Doug Marrone,2013,2,2014,9-7,0.563,50.0,,0,1,research,event,1,user,User+verified: new owners declined to extend him; he opted out and took an ASSISTANT job (not another HC role),NFL.com/ESPN
+Jim Harbaugh,2011,4,2014,8-8,0.5,51.0,,0,1,research,event,1,high,Jim Harbaugh mutual parting Dec 2014 after down 8-8 amid management feud; effectively pushed out (Michigan came after),ESPN/SI
+John Fox,2011,4,2014,12-4,0.75,59.0,,1,1,research,event,1,high,John Fox forced out/parted ways Jan 2015 by Elway after 12-4 ended in divisional loss; Chicago hired him after,ESPN/SI
+Dennis Allen,2012,3,2014,0-4,0.0,42.0,Fired after week 4,0,1,deterministic,event,1,high,fired_notes,record/Notes
+Marc Trestman,2013,2,2014,5-11,0.313,58.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Mike Smith,2008,7,2014,6-10,0.375,55.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Rex Ryan,2009,6,2014,4-12,0.25,52.0,,1,1,deterministic,event,1,high,losing_finale,record/Notes
+Chip Kelly,2013,3,2015,6-9,0.4,52.0,Fired after Week 16,1,1,deterministic,event,1,high,fired_notes,record/Notes
+Jim Tomsula,2015,1,2015,5-11,0.313,47.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Joe Philbin,2012,4,2015,1-3,0.25,54.0,Fired after Week 4,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Ken Whisenhunt,2014,2,2015,1-6,0.143,53.0,Fired after Week 8,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Lovie Smith,2014,2,2015,6-10,0.375,57.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Mike Pettine,2014,2,2015,3-13,0.188,49.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Tom Coughlin,2004,12,2015,6-10,0.375,69.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Chip Kelly,2016,1,2016,2-14,0.125,53.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Gus Bradley,2013,4,2016,2-12,0.143,50.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Jeff Fisher,2012,5,2016,4-9,0.308,58.0,Fired after Week 14,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Jeff Fisher,2016,1,2016,4-9,0.308,58.0,Fired after Week 14,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Mike McCoy,2013,4,2016,5-11,0.313,44.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Rex Ryan,2015,2,2016,7-8,0.467,54.0,Fired after Week 16,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Jim Caldwell,2014,4,2017,9-7,0.563,62.0,,0,0,research,event,1,high,"Jim Caldwell fired by Lions Jan 2018 after 9-7; GM Bob Quinn wanted a new voice, cited record vs good teams",ESPN/NFL.com
+Mike Mularkey,2016,2,2017,9-7,0.563,56.0,,0,0,research,event,1,high,Mike Mularkey fired/parted by Titans Jan 2018 days after winning a wild-card game; ownership saw different paths,CBS Sports
+Ben McAdoo,2016,2,2017,2-10,0.167,40.0,Fired 12/04,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Chuck Pagano,2012,6,2017,4-12,0.25,57.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Jack Del Rio,2015,3,2017,6-10,0.375,54.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+John Fox,2015,3,2017,5-11,0.313,62.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Adam Gase,2016,3,2018,7-9,0.438,40.0,,1,1,deterministic,event,1,high,losing_finale,record/Notes
+Dirk Koetter,2016,3,2018,5-11,0.313,59.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Hue Jackson,2016,3,2018,2-5-1,0.313,53.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Hue Jackson,2018,1,2018,2-5-1,0.313,53.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Marvin Lewis,2003,16,2018,6-10,0.375,60.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Mike McCarthy,2006,13,2018,4-7-1,0.375,55.0,Fired after Week 13,0,1,deterministic,event,1,high,fired_notes,record/Notes
+Steve Wilks,2018,1,2018,3-13,0.188,49.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Todd Bowles,2015,4,2018,4-12,0.25,55.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Vance Joseph,2017,2,2018,6-10,0.375,46.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Jason Garrett,2011,9,2019,8-8,0.5,53.0,,0,0,research,event,1,high,Jason Garrett fired (parted ways) by Cowboys Jan 2020 after 8-8 missed playoffs; replaced by McCarthy,NFL.com
+Freddie Kitchens,2019,1,2019,6-10,0.375,45.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Jay Gruden,2014,6,2019,0-5,0.0,52.0,Fired after Week 5,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Pat Shurmur,2018,2,2019,4-12,0.25,54.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Ron Rivera,2011,9,2019,5-7,0.417,57.0,Fired after Week 13,1,1,deterministic,event,1,high,fired_notes,record/Notes
+Adam Gase,2019,2,2020,2-14,0.125,42.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Anthony Lynn,2017,4,2020,7-9,0.438,52.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Bill O'Brien,2014,7,2020,0-4,0.0,51.0,Fired after week 4,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Dan Quinn,2015,6,2020,0-5,0.0,50.0,Fired after week 5,0,1,deterministic,event,1,high,fired_notes,record/Notes
+Doug Marrone,2017,4,2020,1-15,0.063,56.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Doug Pederson,2016,5,2020,4-11-1,0.281,52.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Matt Patricia,2018,3,2020,4-7,0.364,46.0,Fired after week 12,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Brian Flores,2019,3,2021,9-8,0.529,40.0,,0,0,research,event,1,high,Brian Flores fired by Dolphins Jan 2022 after 9-8 despite back-to-back winning seasons; Flores then sued NFL,NFL.com/CNN
+Jon Gruden,2018,4,2021,3-2,0.6,58.0,Resigned after Week 5,0,0,research,event,1,high,Duplicate of rid 75 (Jon Gruden Oct 2021 forced resignation amid email scandal); spurious 2020 hire row in data,CNN/SI
+David Culley,2021,1,2021,4-13,0.235,66.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Joe Judge,2020,2,2021,4-13,0.235,40.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Matt Nagy,2018,4,2021,6-11,0.353,43.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Mike Zimmer,2014,8,2021,8-9,0.471,65.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Urban Meyer,2021,1,2021,2-11,0.154,57.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Vic Fangio,2019,3,2021,7-10,0.412,63.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Frank Reich,2018,5,2022,3-5-1,0.389,61.0,Fired after week 9,1,1,deterministic,event,1,high,fired_notes,record/Notes
+Kliff Kingsbury,2019,4,2022,4-13,0.235,43.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Lovie Smith,2022,1,2022,3-13-1,0.206,64.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Matt Rhule,2020,3,2022,1-4,0.2,47.0,Fired after week 5,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Nathaniel Hackett,2022,1,2022,4-11,0.267,43.0,Fired after week 16,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Pete Carroll,2010,14,2023,9-8,0.529,72.0,,0,1,research,event,1,medium,Pete Carroll out as Seahawks coach Jan 2024 after 9-8; he wanted to return but ownership forced him into an advisor role,ESPN/Seattle Times
+Arthur Smith,2021,3,2023,7-10,0.412,41.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Bill Belichick,2000,24,2023,4-13,0.235,71.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Brandon Staley,2021,3,2023,5-9,0.357,41.0,fired after week 15,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Frank Reich,2023,1,2023,1-10,0.091,62.0,fired after week 12,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Josh McDaniels,2022,2,2023,3-5,0.375,47.0,Fired after week 8,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Mike Vrabel,2018,6,2023,6-11,0.353,48.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
+Ron Rivera,2020,4,2023,4-13,0.235,61.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Antonio Pierce,2024,1,2024,4-13,0.235,46.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Dennis Allen,2022,3,2024,2-7,0.222,52.0,fired after week 9,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Doug Pederson,2022,3,2024,4-13,0.235,56.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Jerod Mayo,2024,1,2024,4-13,0.235,38.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Matt Eberflus,2022,3,2024,4-8,0.333,54.0,fired after week 13,0,0,deterministic,event,1,high,fired_notes,record/Notes
+Mike McCarthy,2020,5,2024,7-10,0.412,61.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
+Robert Saleh,2021,4,2024,2-3,0.4,45.0,fired after week 5,0,0,deterministic,event,1,high,fired_notes,record/Notes

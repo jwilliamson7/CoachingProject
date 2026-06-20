@@ -124,7 +124,11 @@ class TunableOrdinalClassifier(BaseEstimator, ClassifierMixin):
         return XGBClassifier(**params)
 
     def fit(self, X, y):
-        """Fit the ordinal classifier."""
+        """Fit the ordinal classifier.
+
+        X is expected to be already imputed by the caller (imputation is fit on
+        the training partition once, before tuning). See train_qwk.py.
+        """
         base_estimator = self._create_base_estimator()
         self.ordinal_classifier_ = OrdinalClassifier(
             base_estimator=base_estimator,

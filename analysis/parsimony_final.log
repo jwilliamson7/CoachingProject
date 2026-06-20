@@ -1,0 +1,168 @@
+======================================================================
+PARSIMONIOUS MODEL ANALYSIS
+(50 seeds, 12 feature counts)
+======================================================================
+Loaded 373 instances with 171 features
+Computing leakage-free SHAP ranking from raw data...
+
+Computing SHAP values (TreeExplainer, exact) for 373 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+Saving leakage-free SHAP cache to C:\Users\jonwi\Documents\Projects\CoachingProject\data\shap_values_cache.pkl...
+
+Top 10 features by SHAP importance:
+   1. age                                           |SHAP| = 0.3106
+   2. 1stD Rushing (HC Opp)                         |SHAP| = 0.3036
+   3. Yds (HC Opp)                                  |SHAP| = 0.2736
+   4. 1stPy (HC)                                    |SHAP| = 0.2660
+   5. 4DAtt (HC Opp)                                |SHAP| = 0.2266
+   6. Yds Average Drive (HC Opp)                    |SHAP| = 0.2225
+   7. 4D% (DC)                                      |SHAP| = 0.1735
+   8. TO% (OC)                                      |SHAP| = 0.1706
+   9. rf_avg_winpct_pctl                            |SHAP| = 0.1523
+  10. 4D% (HC Opp)                                  |SHAP| = 0.1396
+
+======================================================================
+PARSIMONY ANALYSIS (50 seeds)
+======================================================================
+
+  Top 5 features across 50 seeds...
+    QWK: 0.1344 +/- 0.1027 [-0.0358, 0.3287]
+    MAE: 0.7695 +/- 0.0725 [0.6088, 0.8979]
+
+  Top 10 features across 50 seeds...
+    QWK: 0.1635 +/- 0.1072 [-0.0234, 0.3622]
+    MAE: 0.7415 +/- 0.0835 [0.5825, 0.9043]
+
+  Top 20 features across 50 seeds...
+    QWK: 0.1954 +/- 0.1075 [-0.0480, 0.3635]
+    MAE: 0.7285 +/- 0.0702 [0.6203, 0.8644]
+
+  Top 30 features across 50 seeds...
+    QWK: 0.2083 +/- 0.1170 [-0.0193, 0.4195]
+    MAE: 0.7133 +/- 0.0829 [0.5823, 0.8719]
+
+  Top 40 features across 50 seeds...
+    QWK: 0.2050 +/- 0.1065 [0.0077, 0.4037]
+    MAE: 0.7119 +/- 0.0765 [0.5872, 0.8467]
+
+  Top 50 features across 50 seeds...
+    QWK: 0.1783 +/- 0.1062 [-0.0492, 0.3692]
+    MAE: 0.7311 +/- 0.0812 [0.5939, 0.9020]
+
+  Top 60 features across 50 seeds...
+    QWK: 0.1848 +/- 0.1231 [-0.0598, 0.4030]
+    MAE: 0.7251 +/- 0.0873 [0.5399, 0.9020]
+
+  Top 80 features across 50 seeds...
+    QWK: 0.1714 +/- 0.1207 [-0.0426, 0.3796]
+    MAE: 0.7253 +/- 0.0819 [0.5719, 0.8544]
+
+  Top 100 features across 50 seeds...
+    QWK: 0.1858 +/- 0.1089 [-0.0095, 0.3832]
+    MAE: 0.7210 +/- 0.0699 [0.5853, 0.8509]
+
+  Top 120 features across 50 seeds...
+    QWK: 0.1688 +/- 0.0968 [-0.0259, 0.3520]
+    MAE: 0.7300 +/- 0.0732 [0.5666, 0.8748]
+
+  Top 150 features across 50 seeds...
+    QWK: 0.1643 +/- 0.1067 [-0.0242, 0.3580]
+    MAE: 0.7353 +/- 0.0614 [0.6131, 0.8373]
+
+  Top 171 features across 50 seeds...
+    QWK: 0.1666 +/- 0.1013 [-0.0109, 0.3706]
+    MAE: 0.7317 +/- 0.0635 [0.6267, 0.8341]
+
+Generating parsimony curve figure...
+  Saved: C:\Users\jonwi\Documents\Projects\CoachingProject\figures/tenure\parsimony_curve.png
+  Saved: C:\Users\jonwi\Documents\Projects\CoachingProject\latex\figures\parsimony_curve.png
+
+======================================================================
+PARSIMONY RESULTS TABLE
+======================================================================
+
+  # Feat                QWK                MAE            Adj Acc                 F1              AUROC
+----------------------------------------------------------------------------------------------------
+       5   0.134+/-0.103   0.769+/-0.072   0.840+/-0.037   0.387+/-0.055   0.570+/-0.054
+      10   0.163+/-0.107   0.741+/-0.083   0.860+/-0.039   0.395+/-0.061   0.585+/-0.051
+      20   0.195+/-0.107   0.728+/-0.070   0.882+/-0.038   0.386+/-0.058   0.583+/-0.046
+      30   0.208+/-0.117   0.713+/-0.083   0.885+/-0.040   0.398+/-0.060   0.596+/-0.052
+      40   0.205+/-0.106   0.712+/-0.077   0.886+/-0.036   0.398+/-0.056   0.592+/-0.055
+      50   0.178+/-0.106   0.731+/-0.081   0.882+/-0.031   0.381+/-0.067   0.584+/-0.052
+      60   0.185+/-0.123   0.725+/-0.087   0.885+/-0.040   0.385+/-0.061   0.584+/-0.050
+      80   0.171+/-0.121   0.725+/-0.082   0.882+/-0.034   0.386+/-0.065   0.577+/-0.050
+     100   0.186+/-0.109   0.721+/-0.070   0.890+/-0.034   0.383+/-0.056   0.577+/-0.049
+     120   0.169+/-0.097   0.730+/-0.073   0.887+/-0.033   0.375+/-0.056   0.569+/-0.049
+     150   0.164+/-0.107   0.735+/-0.061   0.887+/-0.033   0.369+/-0.048   0.560+/-0.045
+     171   0.167+/-0.101   0.732+/-0.064   0.892+/-0.034   0.368+/-0.049   0.560+/-0.047
+
+  Best QWK at 30 features: 0.208
+
+--- LaTeX Table ---
+
+\begin{table}[!ht]
+\caption{Model performance with SHAP-ranked feature subsets. Values are mean $\pm$ standard deviation across 50 independent train/test splits.}
+\label{tab:parsimony}
+\small
+\begin{tabular}{rcccc}
+\toprule
+\# Features & QWK & MAE & Adj.\ Acc.\ & Macro F1 \\
+\midrule
+5 & 0.134 $\pm$ 0.103 & 0.769 $\pm$ 0.072 & 84.0\% $\pm$ 3.7\% & 0.387 $\pm$ 0.055 \\
+10 & 0.163 $\pm$ 0.107 & 0.741 $\pm$ 0.083 & 86.0\% $\pm$ 3.9\% & 0.395 $\pm$ 0.061 \\
+20 & 0.195 $\pm$ 0.107 & 0.728 $\pm$ 0.070 & 88.2\% $\pm$ 3.8\% & 0.386 $\pm$ 0.058 \\
+30 & \textbf{0.208 $\pm$ 0.117} & 0.713 $\pm$ 0.083 & 88.5\% $\pm$ 4.0\% & 0.398 $\pm$ 0.060 \\
+40 & 0.205 $\pm$ 0.106 & 0.712 $\pm$ 0.077 & 88.6\% $\pm$ 3.6\% & 0.398 $\pm$ 0.056 \\
+50 & 0.178 $\pm$ 0.106 & 0.731 $\pm$ 0.081 & 88.2\% $\pm$ 3.1\% & 0.381 $\pm$ 0.067 \\
+60 & 0.185 $\pm$ 0.123 & 0.725 $\pm$ 0.087 & 88.5\% $\pm$ 4.0\% & 0.385 $\pm$ 0.061 \\
+80 & 0.171 $\pm$ 0.121 & 0.725 $\pm$ 0.082 & 88.2\% $\pm$ 3.4\% & 0.386 $\pm$ 0.065 \\
+100 & 0.186 $\pm$ 0.109 & 0.721 $\pm$ 0.070 & 89.0\% $\pm$ 3.4\% & 0.383 $\pm$ 0.056 \\
+120 & 0.169 $\pm$ 0.097 & 0.730 $\pm$ 0.073 & 88.7\% $\pm$ 3.3\% & 0.375 $\pm$ 0.056 \\
+150 & 0.164 $\pm$ 0.107 & 0.735 $\pm$ 0.061 & 88.7\% $\pm$ 3.3\% & 0.369 $\pm$ 0.048 \\
+171 & 0.167 $\pm$ 0.101 & 0.732 $\pm$ 0.064 & 89.2\% $\pm$ 3.4\% & 0.368 $\pm$ 0.049 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+--- Top 10 Features (by SHAP rank) ---
+   1. age                                           |SHAP| = 0.3106
+   2. 1stD Rushing (HC Opp)                         |SHAP| = 0.3036
+   3. Yds (HC Opp)                                  |SHAP| = 0.2736
+   4. 1stPy (HC)                                    |SHAP| = 0.2660
+   5. 4DAtt (HC Opp)                                |SHAP| = 0.2266
+   6. Yds Average Drive (HC Opp)                    |SHAP| = 0.2225
+   7. 4D% (DC)                                      |SHAP| = 0.1735
+   8. TO% (OC)                                      |SHAP| = 0.1706
+   9. rf_avg_winpct_pctl                            |SHAP| = 0.1523
+  10. 4D% (HC Opp)                                  |SHAP| = 0.1396
+
+--- Top 20 Features (by SHAP rank) ---
+   1. age                                           |SHAP| = 0.3106
+   2. 1stD Rushing (HC Opp)                         |SHAP| = 0.3036
+   3. Yds (HC Opp)                                  |SHAP| = 0.2736
+   4. 1stPy (HC)                                    |SHAP| = 0.2660
+   5. 4DAtt (HC Opp)                                |SHAP| = 0.2266
+   6. Yds Average Drive (HC Opp)                    |SHAP| = 0.2225
+   7. 4D% (DC)                                      |SHAP| = 0.1735
+   8. TO% (OC)                                      |SHAP| = 0.1706
+   9. rf_avg_winpct_pctl                            |SHAP| = 0.1523
+  10. 4D% (HC Opp)                                  |SHAP| = 0.1396
+  11. Att Passing (HC Opp)                          |SHAP| = 0.1324
+  12. Y/A Rushing (DC)                              |SHAP| = 0.1287
+  13. TO (HC)                                       |SHAP| = 0.1277
+  14. TO% (HC)                                      |SHAP| = 0.1259
+  15. 4D% (HC)                                      |SHAP| = 0.1210
+  16. 1stPy (HC Opp)                                |SHAP| = 0.1180
+  17. NY/A Passing (HC)                             |SHAP| = 0.1110
+  18. cf_age_first_job                              |SHAP| = 0.1037
+  19. Plays Average Drive (HC)                      |SHAP| = 0.1027
+  20. Yds Rushing (OC)                              |SHAP| = 0.1027
+
+Results saved to: C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\parsimony_results.pkl
+CSV saved to: C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\parsimony_results.csv
+
+======================================================================
+PARSIMONY ANALYSIS COMPLETE
+======================================================================

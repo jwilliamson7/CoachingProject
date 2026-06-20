@@ -1,0 +1,46 @@
+357 stints | 94 feats | fired=319 voluntary=27 active-censored=11 | seeds=25
+
+Cox params {'penalizer': 0.5, 'l1_ratio': 0.25}
+
+Cox-native stability selection: 100 subsamples, top-15...
+stable set (5 feats, freq>= 0.5):
+  cf_internal_hire             cf_internal_hire 0.83
+  num_yr_nfl_pos               Feature 6      0.69
+  tq_dsrs                      tq_dsrs        0.63
+  hiring_team_win_pct          Feature 42     0.61
+  age                          Feature 1      0.51
+  freq>=0.6: 4 | >=0.7: 1
+
+  selection frequencies (top 18):
+    cf_internal_hire             0.83
+    num_yr_nfl_pos               0.69
+    tq_dsrs                      0.63
+    hiring_team_win_pct          0.61
+    age                          0.51
+    cf_nfl_share                 0.46
+    cf_age_first_job             0.46
+    1stD Rushing__unit           0.39
+    hire_starter_exp             0.37
+    hire_starter_av              0.37
+    cf_pre_level_nfl             0.36
+    rf_final_winpct_pctl         0.30
+    hire_roster_av               0.28
+    hiring_team_num_playoff_appearances 0.26
+    hiring_team_points_allowed   0.24
+    num_yr_col_hc                0.23
+    rf_unit_traj                 0.23
+    hiring_team_yards_per_play   0.23
+
+Cox stable-set discrimination: Harrell C 0.599 [0.580,0.619]  Uno C 0.602 [0.583,0.621]
+
+Hazard ratios (cause-specific firing, cluster-robust SE on coach):
+                        HR  CI_low  CI_high      p
+cf_internal_hire     1.548   1.194    2.007  0.001
+age                  1.024   1.007    1.040  0.005
+num_yr_nfl_pos       1.025   0.997    1.054  0.085
+tq_dsrs              1.017   0.986    1.049  0.292
+hiring_team_win_pct  0.923   0.415    2.055  0.844
+
+PH test: all p>0.05? True (min p=0.097)
+
+Saved C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\survival_cox_native.pkl

@@ -1,3 +1,10 @@
 __pycache__/
 *.pyc
 ~$*
+
+# Supermemory local container config (personal tag — do not commit)
+.claude/.supermemory-claude/
+
+# Scratch/safety backups (LEAKY/overfit/era snapshots; not reproducible artifacts)
+*.bak
+data/master_data_4block_backup.csv

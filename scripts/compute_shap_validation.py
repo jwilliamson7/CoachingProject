@@ -21,9 +21,9 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
-from model import CoachTenureModel
-from model.config import MODEL_CONFIG, MODEL_PATHS, FEATURE_CONFIG
-from model.cross_validation import stratified_coach_level_split
+from model.pipeline import (
+    load_modeling_data, shap_feature_ranking, best_k, leakage_free_split, fit_model, ordinal_model,
+)
 from scripts.shap_analysis import (
     compute_shap_values, compute_aggregated_shap, get_feature_names
 )
@@ -32,39 +32,32 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=UserWarning)
 
 
-def get_shap_feature_ranking():
-    """Load cached SHAP values and return feature ranking by mean |SHAP|."""
-    cache_path = os.path.join(project_root, 'data', 'shap_values_cache.pkl')
-    with open(cache_path, 'rb') as f:
-        cache = pickle.load(f)
-    aggregated = cache['aggregated_shap']
-    mean_abs = np.abs(aggregated.values).mean(axis=0)
-    ranking = np.argsort(mean_abs)[::-1]
-    return ranking
-
-
 def main():
     n_seeds = 50
-    top_k = 40
 
-    # Load data
-    data_path = os.path.join(project_root, MODEL_PATHS['data_file'])
-    df = pd.read_csv(data_path, index_col=0)
-    df = df[df[FEATURE_CONFIG['target_column']] != -1].copy()
-    X = df.iloc[:, FEATURE_CONFIG['feature_columns_start']:FEATURE_CONFIG['feature_columns_end']]
-    y = df[FEATURE_CONFIG['target_column']]
+    # best-K from the locked parsimony results (single source of truth)
+    top_k = best_k()
 
-    # Get feature ranking and select top-K (sorted by original index, matching bootstrap_analysis.py)
-    ranking = get_shap_feature_ranking()
-    selected_indices = sorted(ranking[:top_k])
-    X = X.iloc[:, selected_indices]
+    # Load RAW modeling data (171 features); imputation is fit per train split.
+    df, X, y = load_modeling_data()
+    n_total_feats = X.shape[1]
 
-    all_feature_names = get_feature_names()
-    feature_names = [all_feature_names[i] for i in selected_indices]
+    # Leakage-free SHAP ranking; top-K in importance order to match
+    # parsimonious_model.py exactly (unsorted ranking[:k]). Do NOT subset X
+    # up front: imputation is fit on the full feature set per split, then the
+    # top-K columns are selected, identical to the parsimony protocol.
+    ranking = shap_feature_ranking()
+    selected_indices = list(ranking[:top_k])
 
-    # Category mapping for the 40-feature subset
-    # Original ranges: Core(0-7), OC(8-40), DC(41-73), HC Team(74-106), HC Opp(107-139), Hiring(140-149)
-    orig_categories = {
+    # Full readable names = 150 base names + engineered (cf_/rf_) column names
+    base_names = get_feature_names()
+    feature_names_full = base_names + list(X.columns[len(base_names):])
+    feature_names = [feature_names_full[i] for i in selected_indices]
+
+    # Category of each ORIGINAL feature index. Base ranges cover features 0-149;
+    # the engineered features (indices 150+) are classified by column prefix
+    # (cf_ = career path, rf_ = rank/recency).
+    base_ranges = {
         'Core Experience': (0, 8),
         'OC Stats': (8, 41),
         'DC Stats': (41, 74),
@@ -74,20 +67,26 @@ def main():
     }
 
     def get_orig_cat(orig_idx):
-        for cat, (s, e) in orig_categories.items():
+        col = str(X.columns[orig_idx])
+        if col.startswith('cf_'):
+            return 'Career Path'
+        if col.startswith('rf_'):
+            return 'Rank/Recency'
+        for cat, (s, e) in base_ranges.items():
             if s <= orig_idx < e:
                 return cat
         return None
 
-    # Map each position in the 40-feature subset to its original category
+    all_categories = list(base_ranges.keys()) + ['Career Path', 'Rank/Recency']
     feature_categories = [get_orig_cat(orig_idx) for orig_idx in selected_indices]
 
-    # Offensive = OC Stats + HC Team Stats; Defensive = DC Stats + HC Opp Stats
+    # Offensive = OC Stats + HC Team Stats; Defensive = DC Stats + HC Opp Stats.
+    # Engineered features are neither (excluded from the def/off ratio).
     off_cats = {'OC Stats', 'HC Team Stats'}
     def_cats = {'DC Stats', 'HC Opp Stats'}
 
-    print(f"Computing SHAP values across {n_seeds} seeds for top-{top_k} features")
-    print(f"Features: {X.shape[1]} columns")
+    print(f"Computing SHAP values across {n_seeds} seeds for top-{top_k} features "
+          f"(of {n_total_feats}); leakage-free per-split imputation")
     print(f"Category breakdown: {dict(pd.Series(feature_categories).value_counts())}")
     print()
 
@@ -96,21 +95,14 @@ def main():
     seed_category_totals = []  # per-seed category total SHAP
 
     for seed in range(n_seeds):
-        X_train, X_test, y_train, y_test, _ = stratified_coach_level_split(
-            df, X, y,
-            test_size=MODEL_CONFIG['test_size'],
-            random_state=seed,
-        )
+        # Shared leakage-free split (train-only imputation, top-K selection)
+        split = leakage_free_split(df, X, y, seed, feature_indices=selected_indices)
+        model = fit_model(split, ordinal_model, seed)
 
-        model = CoachTenureModel(use_ordinal=True, n_classes=3, random_state=seed)
-        model.fit(X_train, y_train, verbose=0)
-
-        # Compute SHAP
-        shap_dict = compute_shap_values(
-            model, np.asarray(X_test), feature_names, n_background=50
-        )
+        # Compute SHAP on the held-out test partition (already imputed)
+        shap_dict = compute_shap_values(model, split.X_test, feature_names)
         aggregated = compute_aggregated_shap(shap_dict, feature_names)
-        mean_abs = np.abs(aggregated.values).mean(axis=0)  # (40,)
+        mean_abs = np.abs(aggregated.values).mean(axis=0)
 
         # Sanity check
         total_shap = mean_abs.sum()
@@ -122,24 +114,20 @@ def main():
 
         # Category totals
         cat_totals = {}
-        for cat_name in orig_categories:
-            mask = [fc == cat_name for fc in feature_categories]
-            n_in_cat = sum(mask)
+        for cat_name in all_categories:
+            mask = np.array([fc == cat_name for fc in feature_categories])
+            n_in_cat = int(mask.sum())
             if n_in_cat > 0:
                 cat_total = mean_abs[mask].sum()
                 cat_avg = mean_abs[mask].mean()
                 cat_totals[cat_name] = {'total': cat_total, 'avg': cat_avg, 'count': n_in_cat}
         seed_category_totals.append(cat_totals)
 
-        # Def/off ratio
-        off_mask = [fc in off_cats for fc in feature_categories]
-        def_mask = [fc in def_cats for fc in feature_categories]
-        off_shap = mean_abs[off_mask].sum()
-        def_shap = mean_abs[def_mask].sum()
-        n_off = sum(off_mask)
-        n_def = sum(def_mask)
-        off_avg = off_shap / n_off if n_off > 0 else 0
-        def_avg = def_shap / n_def if n_def > 0 else 0
+        # Def/off ratio (per-feature averages, engineered features excluded)
+        off_mask = np.array([fc in off_cats for fc in feature_categories])
+        def_mask = np.array([fc in def_cats for fc in feature_categories])
+        off_avg = mean_abs[off_mask].mean() if off_mask.any() else 0.0
+        def_avg = mean_abs[def_mask].mean() if def_mask.any() else 0.0
         ratio = def_avg / off_avg if off_avg > 1e-8 else np.nan
         seed_def_off_ratios.append(ratio)
 
@@ -167,21 +155,23 @@ def main():
     # Sort by mean importance
     sort_order = np.argsort(feature_means)[::-1]
 
-    print(f"\nPer-feature normalized importance (top 40):")
+    print(f"\nPer-feature normalized importance (top {top_k}):")
     print(f"{'Rank':<5} {'Feature':<30} {'Imp':>6} {'CI_lo':>7} {'CI_hi':>7}")
     print('-' * 60)
     for rank, idx in enumerate(sort_order):
         print(f"{rank+1:<5} {feature_names[idx]:<30} {feature_means[idx]:.3f}  "
               f"[{feature_ci_lo[idx]:.3f}, {feature_ci_hi[idx]:.3f}]")
 
-    # Category summary (unnormalized SHAP)
-    # Combine HC Team + HC Opp into "HC Stats" for paper table
+    # Category summary (unnormalized SHAP). Only categories actually present in
+    # the top-K subset are reported (e.g. Hiring Team may not survive selection).
     print(f"\nCategory importance (unnormalized mean |SHAP|):")
     print(f"{'Category':<30} {'# Feat':>7} {'Total':>8} {'Avg':>8}")
     print('-' * 60)
 
     cat_summary = {}
-    for cat_name in ['HC Team Stats', 'HC Opp Stats', 'DC Stats', 'OC Stats', 'Hiring Team', 'Core Experience']:
+    cat_print_order = ['HC Team Stats', 'HC Opp Stats', 'DC Stats', 'OC Stats',
+                       'Core Experience', 'Hiring Team', 'Career Path', 'Rank/Recency']
+    for cat_name in cat_print_order:
         totals = [ct[cat_name]['total'] for ct in seed_category_totals if cat_name in ct]
         avgs = [ct[cat_name]['avg'] for ct in seed_category_totals if cat_name in ct]
         counts = [ct[cat_name]['count'] for ct in seed_category_totals if cat_name in ct]
@@ -197,13 +187,14 @@ def main():
             }
             print(f"{cat_name:<30} {counts[0]:>7} {np.mean(totals):>8.4f} {np.mean(avgs):>8.4f}")
 
-    # HC Stats combined
-    hc_team_totals = np.array(cat_summary['HC Team Stats']['all_totals'])
-    hc_opp_totals = np.array(cat_summary['HC Opp Stats']['all_totals'])
-    hc_combined_totals = hc_team_totals + hc_opp_totals
-    hc_count = cat_summary['HC Team Stats']['count'] + cat_summary['HC Opp Stats']['count']
-    hc_combined_avgs = hc_combined_totals / hc_count
-    print(f"{'HC Stats (combined)':<30} {hc_count:>7} {hc_combined_totals.mean():>8.4f} {hc_combined_avgs.mean():>8.4f}")
+    # HC Stats combined (only if both HC sub-categories survived selection)
+    if 'HC Team Stats' in cat_summary and 'HC Opp Stats' in cat_summary:
+        hc_team_totals = np.array(cat_summary['HC Team Stats']['all_totals'])
+        hc_opp_totals = np.array(cat_summary['HC Opp Stats']['all_totals'])
+        hc_combined_totals = hc_team_totals + hc_opp_totals
+        hc_count = cat_summary['HC Team Stats']['count'] + cat_summary['HC Opp Stats']['count']
+        hc_combined_avgs = hc_combined_totals / hc_count
+        print(f"{'HC Stats (combined)':<30} {hc_count:>7} {hc_combined_totals.mean():>8.4f} {hc_combined_avgs.mean():>8.4f}")
 
     # Def/Off ratio
     mean_ratio = ratios.mean()

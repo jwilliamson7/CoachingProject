@@ -1,0 +1,31 @@
+Traceback (most recent call last):
+  File "<string>", line 35, in <module>
+    hr.index=[nm(c) for c in hr.index]
+              ~~^^^
+  File "<string>", line 34, in nm
+    return names[int(c.split()[1])-1] if c.startswith('Feature ') else c
+           ~~~~~^^^^^^^^^^^^^^^^^^^^^
+IndexError: list index out of range
+COX-NATIVE stability selection (100 boots, top-15):
+cf_internal_hire        0.83
+Feature 6               0.69
+tq_dsrs                 0.63
+Feature 42              0.61
+Feature 1               0.51
+cf_nfl_share            0.46
+cf_age_first_job        0.46
+Feature 25              0.39
+hire_starter_exp        0.37
+hire_starter_av         0.37
+cf_pre_level_nfl        0.36
+rf_final_winpct_pctl    0.30
+hire_roster_av          0.28
+Feature 51              0.26
+Feature 44              0.24
+Feature 5               0.23
+rf_unit_traj            0.23
+Feature 47              0.23
+stable set (freq>=0.5): 5
+['cf_internal_hire', 'Feature 6', 'tq_dsrs', 'Feature 42', 'Feature 1']
+freq>=0.6: 4 >=0.7: 1
+Cox Harrell C on cox-native stable set: 0.599 [np.float64(0.58), np.float64(0.619)]
