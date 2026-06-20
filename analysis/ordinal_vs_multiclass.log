@@ -1,0 +1,28 @@
+Ordinal vs multiclass: 373 instances, top-20 SHAP features, 50 coach-level splits (test_frac=0.2)
+  ...10/50 seeds
+  ...20/50 seeds
+  ...30/50 seeds
+  ...40/50 seeds
+  ...50/50 seeds
+
+==============================================================================================================
+ORDINAL vs MULTICLASS (means with t-dist 95% CI, and per-seed difference tests)
+==============================================================================================================
+metric                         ordinal          multiclass  mean diff  t-test p  Wilcoxon p  Shapiro p    N-B p
+--------------------------------------------------------------------------------------------------------------
+qwk                   0.221 [0.193,0.249]    0.226 [0.199,0.253]    -0.0046    0.6816      0.5399     0.4443   0.9110
+mae                   0.718 [0.696,0.739]    0.726 [0.705,0.747]    -0.0083    0.3392      0.3259     0.6407   0.7939
+adjacent_accuracy     0.864 [0.853,0.875]    0.852 [0.842,0.862]    +0.0119    0.0060      0.0136     0.0704   0.4385
+exact_accuracy        0.418 [0.403,0.434]    0.422 [0.407,0.436]    -0.0036    0.5989      0.5235     0.2029   0.8860
+macro_f1              0.417 [0.402,0.433]    0.421 [0.406,0.435]    -0.0033    0.6340      0.6322     0.2332   0.8968
+auroc                 0.604 [0.591,0.616]    0.614 [0.601,0.626]    -0.0100    0.0116      0.0171     0.5902   0.4788
+class0_f1             0.433 [0.408,0.457]    0.441 [0.420,0.462]    -0.0080    0.4601      0.2761     0.3959   0.8403
+class1_f1             0.394 [0.372,0.416]    0.375 [0.355,0.396]    +0.0187    0.0667      0.0555     0.9697   0.6121
+class2_f1             0.425 [0.403,0.447]    0.446 [0.423,0.468]    -0.0205    0.0223      0.0337     0.3032   0.5238
+--------------------------------------------------------------------------------------------------------------
+Notes: p-values are two-sided. Shapiro p<0.05 => per-seed diffs are non-normal,
+       so the distribution-free Wilcoxon and the overlap-corrected Nadeau-Bengio
+       tests are the appropriate ones to report. 'ord_wins' (in the pickle) counts
+       seeds where ordinal beat multiclass on that metric.
+
+Saved C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\ordinal_vs_multiclass.pkl

@@ -1,0 +1,186 @@
+======================================================================
+PARSIMONIOUS MODEL ANALYSIS
+(50 seeds, 16 feature counts)
+======================================================================
+Loaded 635 instances with 150 features
+Loading cached SHAP ranking from C:\Users\jonwi\Documents\Projects\CoachingProject\data\shap_values_cache.pkl...
+
+Top 10 features by SHAP importance:
+   1. age                                           |SHAP| = 0.4265
+   2. Yrs nfl pos                                   |SHAP| = 0.2210
+   3. 1stD Passing (DC)                             |SHAP| = 0.2049
+   4. Hiring: turnovers forced                      |SHAP| = 0.1944
+   5. Yds Rushing (OC)                              |SHAP| = 0.1886
+   6. Yds Passing (HC)                              |SHAP| = 0.1885
+   7. 1stPy (HC)                                    |SHAP| = 0.1814
+   8. TD Passing (HC Opp)                           |SHAP| = 0.1791
+   9. TD Passing (HC)                               |SHAP| = 0.1774
+  10. Hiring: yards offense                         |SHAP| = 0.1739
+
+======================================================================
+PARSIMONY ANALYSIS (50 seeds)
+======================================================================
+
+  Top 5 features across 50 seeds...
+    QWK: 0.2501 +/- 0.0653 [0.1282, 0.3846]
+    MAE: 0.6980 +/- 0.0468 [0.6046, 0.7695]
+
+  Top 10 features across 50 seeds...
+    QWK: 0.2743 +/- 0.0641 [0.1414, 0.3880]
+    MAE: 0.6673 +/- 0.0445 [0.5888, 0.7666]
+
+  Top 20 features across 50 seeds...
+    QWK: 0.2810 +/- 0.0810 [0.1349, 0.4270]
+    MAE: 0.6687 +/- 0.0541 [0.5660, 0.7750]
+
+  Top 30 features across 50 seeds...
+    QWK: 0.2911 +/- 0.0818 [0.1370, 0.4337]
+    MAE: 0.6623 +/- 0.0580 [0.5562, 0.7778]
+
+  Top 40 features across 50 seeds...
+    QWK: 0.2906 +/- 0.0889 [0.1321, 0.4515]
+    MAE: 0.6609 +/- 0.0603 [0.5512, 0.7662]
+
+  Top 50 features across 50 seeds...
+    QWK: 0.2924 +/- 0.0823 [0.1593, 0.4289]
+    MAE: 0.6622 +/- 0.0533 [0.5671, 0.7442]
+
+  Top 60 features across 50 seeds...
+    QWK: 0.2826 +/- 0.0811 [0.1101, 0.4262]
+    MAE: 0.6669 +/- 0.0543 [0.5653, 0.7687]
+
+  Top 70 features across 50 seeds...
+    QWK: 0.2920 +/- 0.0684 [0.1653, 0.4518]
+    MAE: 0.6596 +/- 0.0523 [0.5500, 0.7594]
+
+  Top 80 features across 50 seeds...
+    QWK: 0.2902 +/- 0.0769 [0.1334, 0.4223]
+    MAE: 0.6589 +/- 0.0542 [0.5732, 0.7569]
+
+  Top 90 features across 50 seeds...
+    QWK: 0.2819 +/- 0.0822 [0.1566, 0.4278]
+    MAE: 0.6650 +/- 0.0597 [0.5569, 0.7670]
+
+  Top 100 features across 50 seeds...
+    QWK: 0.2776 +/- 0.0780 [0.1301, 0.4056]
+    MAE: 0.6659 +/- 0.0591 [0.5697, 0.7795]
+
+  Top 110 features across 50 seeds...
+    QWK: 0.2808 +/- 0.0790 [0.1267, 0.3980]
+    MAE: 0.6682 +/- 0.0565 [0.5741, 0.7795]
+
+  Top 120 features across 50 seeds...
+    QWK: 0.2633 +/- 0.0773 [0.1336, 0.3854]
+    MAE: 0.6735 +/- 0.0555 [0.5795, 0.7677]
+
+  Top 130 features across 50 seeds...
+    QWK: 0.2757 +/- 0.0761 [0.1563, 0.4101]
+    MAE: 0.6655 +/- 0.0535 [0.5877, 0.7634]
+
+  Top 140 features across 50 seeds...
+    QWK: 0.2765 +/- 0.0705 [0.1511, 0.4059]
+    MAE: 0.6702 +/- 0.0537 [0.5746, 0.7555]
+
+  Top 150 features across 50 seeds...
+    QWK: 0.2830 +/- 0.0636 [0.1732, 0.3891]
+    MAE: 0.6636 +/- 0.0510 [0.5660, 0.7467]
+
+Generating parsimony curve figure...
+  Saved: C:\Users\jonwi\Documents\Projects\CoachingProject\figures/tenure\parsimony_curve.png
+  Saved: C:\Users\jonwi\Documents\Projects\CoachingProject\latex\figures\parsimony_curve.png
+
+======================================================================
+PARSIMONY RESULTS TABLE
+======================================================================
+
+  # Feat                QWK                MAE            Adj Acc                 F1              AUROC
+----------------------------------------------------------------------------------------------------
+       5   0.250+/-0.065   0.698+/-0.047   0.835+/-0.026   0.419+/-0.033   0.638+/-0.031
+      10   0.274+/-0.064   0.667+/-0.045   0.846+/-0.024   0.443+/-0.036   0.652+/-0.035
+      20   0.281+/-0.081   0.669+/-0.054   0.851+/-0.031   0.432+/-0.042   0.646+/-0.035
+      30   0.291+/-0.082   0.662+/-0.058   0.859+/-0.029   0.429+/-0.044   0.647+/-0.034
+      40   0.291+/-0.089   0.661+/-0.060   0.860+/-0.029   0.434+/-0.047   0.648+/-0.034
+      50   0.292+/-0.082   0.662+/-0.053   0.863+/-0.032   0.427+/-0.038   0.641+/-0.028
+      60   0.283+/-0.081   0.667+/-0.054   0.860+/-0.027   0.425+/-0.046   0.643+/-0.034
+      70   0.292+/-0.068   0.660+/-0.052   0.865+/-0.024   0.428+/-0.046   0.645+/-0.035
+      80   0.290+/-0.077   0.659+/-0.054   0.863+/-0.027   0.431+/-0.049   0.639+/-0.033
+      90   0.282+/-0.082   0.665+/-0.060   0.862+/-0.027   0.428+/-0.048   0.644+/-0.039
+     100   0.278+/-0.078   0.666+/-0.059   0.862+/-0.027   0.425+/-0.049   0.639+/-0.038
+     110   0.281+/-0.079   0.668+/-0.056   0.865+/-0.027   0.419+/-0.044   0.635+/-0.038
+     120   0.263+/-0.077   0.673+/-0.055   0.857+/-0.026   0.420+/-0.047   0.638+/-0.038
+     130   0.276+/-0.076   0.665+/-0.053   0.862+/-0.030   0.424+/-0.044   0.638+/-0.034
+     140   0.276+/-0.071   0.670+/-0.054   0.860+/-0.027   0.425+/-0.044   0.635+/-0.040
+     150   0.283+/-0.064   0.664+/-0.051   0.865+/-0.025   0.422+/-0.043   0.636+/-0.041
+
+  Best QWK at 50 features: 0.292
+
+--- LaTeX Table ---
+
+\begin{table}[!ht]
+\caption{Model performance with SHAP-ranked feature subsets. Values are mean $\pm$ standard deviation across 50 independent train/test splits.}
+\label{tab:parsimony}
+\small
+\begin{tabular}{rcccc}
+\toprule
+\# Features & QWK & MAE & Adj.\ Acc.\ & Macro F1 \\
+\midrule
+5 & 0.250 $\pm$ 0.065 & 0.698 $\pm$ 0.047 & 83.5\% $\pm$ 2.6\% & 0.419 $\pm$ 0.033 \\
+10 & 0.274 $\pm$ 0.064 & 0.667 $\pm$ 0.045 & 84.6\% $\pm$ 2.4\% & 0.443 $\pm$ 0.036 \\
+20 & 0.281 $\pm$ 0.081 & 0.669 $\pm$ 0.054 & 85.1\% $\pm$ 3.1\% & 0.432 $\pm$ 0.042 \\
+30 & 0.291 $\pm$ 0.082 & 0.662 $\pm$ 0.058 & 85.9\% $\pm$ 2.9\% & 0.429 $\pm$ 0.044 \\
+40 & 0.291 $\pm$ 0.089 & 0.661 $\pm$ 0.060 & 86.0\% $\pm$ 2.9\% & 0.434 $\pm$ 0.047 \\
+50 & \textbf{0.292 $\pm$ 0.082} & 0.662 $\pm$ 0.053 & 86.3\% $\pm$ 3.2\% & 0.427 $\pm$ 0.038 \\
+60 & 0.283 $\pm$ 0.081 & 0.667 $\pm$ 0.054 & 86.0\% $\pm$ 2.7\% & 0.425 $\pm$ 0.046 \\
+70 & 0.292 $\pm$ 0.068 & 0.660 $\pm$ 0.052 & 86.5\% $\pm$ 2.4\% & 0.428 $\pm$ 0.046 \\
+80 & 0.290 $\pm$ 0.077 & 0.659 $\pm$ 0.054 & 86.3\% $\pm$ 2.7\% & 0.431 $\pm$ 0.049 \\
+90 & 0.282 $\pm$ 0.082 & 0.665 $\pm$ 0.060 & 86.2\% $\pm$ 2.7\% & 0.428 $\pm$ 0.048 \\
+100 & 0.278 $\pm$ 0.078 & 0.666 $\pm$ 0.059 & 86.2\% $\pm$ 2.7\% & 0.425 $\pm$ 0.049 \\
+110 & 0.281 $\pm$ 0.079 & 0.668 $\pm$ 0.056 & 86.5\% $\pm$ 2.7\% & 0.419 $\pm$ 0.044 \\
+120 & 0.263 $\pm$ 0.077 & 0.673 $\pm$ 0.055 & 85.7\% $\pm$ 2.6\% & 0.420 $\pm$ 0.047 \\
+130 & 0.276 $\pm$ 0.076 & 0.665 $\pm$ 0.053 & 86.2\% $\pm$ 3.0\% & 0.424 $\pm$ 0.044 \\
+140 & 0.276 $\pm$ 0.071 & 0.670 $\pm$ 0.054 & 86.0\% $\pm$ 2.7\% & 0.425 $\pm$ 0.044 \\
+150 & 0.283 $\pm$ 0.064 & 0.664 $\pm$ 0.051 & 86.5\% $\pm$ 2.5\% & 0.422 $\pm$ 0.043 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+--- Top 10 Features (by SHAP rank) ---
+   1. age                                           |SHAP| = 0.4265
+   2. Yrs nfl pos                                   |SHAP| = 0.2210
+   3. 1stD Passing (DC)                             |SHAP| = 0.2049
+   4. Hiring: turnovers forced                      |SHAP| = 0.1944
+   5. Yds Rushing (OC)                              |SHAP| = 0.1886
+   6. Yds Passing (HC)                              |SHAP| = 0.1885
+   7. 1stPy (HC)                                    |SHAP| = 0.1814
+   8. TD Passing (HC Opp)                           |SHAP| = 0.1791
+   9. TD Passing (HC)                               |SHAP| = 0.1774
+  10. Hiring: yards offense                         |SHAP| = 0.1739
+
+--- Top 20 Features (by SHAP rank) ---
+   1. age                                           |SHAP| = 0.4265
+   2. Yrs nfl pos                                   |SHAP| = 0.2210
+   3. 1stD Passing (DC)                             |SHAP| = 0.2049
+   4. Hiring: turnovers forced                      |SHAP| = 0.1944
+   5. Yds Rushing (OC)                              |SHAP| = 0.1886
+   6. Yds Passing (HC)                              |SHAP| = 0.1885
+   7. 1stPy (HC)                                    |SHAP| = 0.1814
+   8. TD Passing (HC Opp)                           |SHAP| = 0.1791
+   9. TD Passing (HC)                               |SHAP| = 0.1774
+  10. Hiring: yards offense                         |SHAP| = 0.1739
+  11. Y/A Rushing (DC)                              |SHAP| = 0.1731
+  12. 1stD (OC)                                     |SHAP| = 0.1715
+  13. Yds (OC)                                      |SHAP| = 0.1715
+  14. 3DAtt (DC)                                    |SHAP| = 0.1698
+  15. Pen (OC)                                      |SHAP| = 0.1673
+  16. Hiring: yards allowed                         |SHAP| = 0.1659
+  17. TD Passing (DC)                               |SHAP| = 0.1590
+  18. Cmp Passing (HC Opp)                          |SHAP| = 0.1585
+  19. RZPct (HC Opp)                                |SHAP| = 0.1567
+  20. 4DAtt (HC)                                    |SHAP| = 0.1537
+
+Results saved to: C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\parsimony_results.pkl
+CSV saved to: C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\parsimony_results.csv
+
+======================================================================
+PARSIMONY ANALYSIS COMPLETE
+======================================================================

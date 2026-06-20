@@ -52,18 +52,31 @@ DEFAULT_XGBOOST_REGRESSION_PARAMS: Dict[str, Any] = {
 }
 
 # Optimal parameters discovered from 1000-iteration RandomizedSearchCV
-# with 5-fold coach-level cross-validation (Feb 2026)
-# Tuned on QWK directly using full ordinal model in RandomizedSearchCV
+# with 5-fold coach-level cross-validation, QWK-scored.
+# Re-tuned LEAKAGE-FREE (Jun 2026): imputation is fit on the training partition
+# only (SVD imputer, feature columns only) before tuning, so these parameters
+# are optimized for the honest problem rather than the leaked one. The previous
+# values (n_estimators=200, lr=0.25, reg_lambda=0.1, reg_alpha=0.01,
+# min_child_weight=3) were tuned on the leaked, target-contaminated matrix.
 OPTIMIZED_XGBOOST_PARAMS: Dict[str, Any] = {
-    'n_estimators': 200,
-    'learning_rate': 0.25,
+    # Final config (Jun 2026): re-tuned leakage-free on the modern-era (1970+),
+    # 171-feature dataset with relocation/partial-season-corrected tenure labels,
+    # QWK-scored via 1000-iteration RandomizedSearchCV with 10-fold COACH-LEVEL
+    # cross-validation (imputation fit on each training partition only). The
+    # deeper 10-fold CV selects a regularized optimum (shallow depth-2 trees,
+    # 50 rounds), appropriate for the modest sample (N=373). Best CV QWK 0.339.
+    # (The QWK landscape is flat, so the optimum is only weakly identified; this
+    # set is locked for reproducibility.) Previous 5-fold tune yielded a less
+    # regularized set (max_depth=4, subsample=1.0) that generalized slightly worse.
+    'n_estimators': 50,
+    'learning_rate': 0.1,
     'max_depth': 2,
-    'gamma': 0,
-    'reg_lambda': 0.1,
+    'gamma': 0.05,
+    'reg_lambda': 0,
     'reg_alpha': 0.01,
-    'subsample': 0.8,
+    'subsample': 0.85,
     'colsample_bytree': 0.9,
-    'min_child_weight': 3
+    'min_child_weight': 4
 }
 
 # Optimal parameters for WAR regression from 1000-iteration RandomizedSearchCV
@@ -120,8 +133,19 @@ MODEL_CONFIG: Dict[str, Any] = {
 # File paths (relative to project root)
 MODEL_PATHS: Dict[str, str] = {
     'data_dir': 'data',
+    # DEPRECATED (Jun 2026): this pre-imputed file leaked the imputation across
+    # the train/test split (and the target sat in the SVD matrix). It has been
+    # deleted; the corrected pipeline imputes per split from 'raw_data_file'.
+    # The path is kept only so any unported legacy script fails loudly rather
+    # than silently reading stale/leaked data.
     'data_file': 'data/svd_imputed_master_data.csv',
-    'raw_data_file': 'data/master_data.csv',
+    # Canonical modeling input (Jun 2026): modern-era (1970+) raw features with the
+    # Tier 1+2 engineered career-path/rank features appended (150 + 21 = 171),
+    # un-imputed (imputation is fit per train split). Built by
+    # scripts/data/engineer_career_features.py. The original all-era 150-feature
+    # raw file remains at data/master_data.csv.
+    'raw_data_file': 'data/master_data_extended.csv',
+    'raw_data_file_original': 'data/master_data.csv',
     'models_dir': 'data/models',
     'default_model_output': 'data/models/coach_tenure_model.pkl',
     'ordinal_model_output': 'data/models/coach_tenure_ordinal_model.pkl',

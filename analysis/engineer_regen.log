@@ -1,0 +1,92 @@
+Loaded 656 instances; kept 394 from 1970+ (modern era)
+Population hygiene (Coach_WAR primary-coach resolution): dropped 16 interim/duplicate, re-anchored 16
+    re-anchor Al Saunders: 1986 -> 1987
+    re-anchor Art Shell: 1989 -> 1990
+    re-anchor Don Coryell: 1978 -> 1979
+    re-anchor Ed Khayat: 1971 -> 1972
+    re-anchor Harland Svare: 1971 -> 1972
+    re-anchor Homer Rice: 1978 -> 1979
+    re-anchor Jason Garrett: 2010 -> 2011
+    re-anchor Jim Ringo: 1976 -> 1977
+    re-anchor John McVay: 1976 -> 1977
+    re-anchor Leslie Frazier: 2010 -> 2011
+    re-anchor Marv Levy: 1986 -> 1987
+    re-anchor Raymond Berry: 1984 -> 1985
+    re-anchor Richard Williamson: 1990 -> 1991
+    re-anchor Ron Meyer: 1986 -> 1987
+    re-anchor Sid Gillman: 1973 -> 1974
+    re-anchor Tommy Hudspeth: 1976 -> 1977
+  known-tenure instances 1970+: 357 | corrected labels: 11
+  corrected class dist: {0: np.int64(115), 1: np.int64(123), 2: np.int64(119)}
+Engineered 43 new features (0 coaches missing history) [incl. Tier5/6]
+Wrote C:\Users\jonwi\Documents\Projects\CoachingProject\data\master_data_extended.csv with shape (378, 98)
+
+New-feature coverage and correlation with tenure class (known instances):
+feature                       %nonNaN   corr(y)
+cf_num_nfl_employers             100%    -0.052
+cf_num_college_employers         100%    -0.063
+cf_nfl_share                     100%     0.058
+cf_age_first_job                 100%    -0.064
+cf_age_first_nfl                  91%    -0.081
+cf_gap_before_hire               100%    -0.057
+cf_internal_hire                 100%    -0.190
+cf_years_at_hiring_org           100%    -0.081
+cf_pre_OC                        100%    -0.032
+cf_pre_DC                        100%     0.108
+cf_pre_POS                       100%    -0.044
+cf_pre_HC                        100%    -0.025
+cf_pre_side_off                  100%    -0.061
+cf_pre_side_def                  100%     0.086
+cf_pre_level_nfl                 100%     0.034
+cf_ever_nfl_oc                   100%    -0.017
+cf_ever_nfl_dc                   100%     0.087
+org_prev_coach_tenure             95%     0.026
+org_unique_hc_10yr               100%    -0.025
+hire_qb_av                        94%    -0.002
+hire_roster_av                    94%     0.030
+hire_starter_av                   94%     0.006
+hire_starter_age                  94%     0.033
+hire_roster_age                   94%     0.018
+hire_starter_exp                  94%     0.018
+hire_roster_exp                   94%     0.001
+hire_recent_r1_picks              94%    -0.051
+hire_premium_draft                94%    -0.024
+hire_roster_turnover              92%     0.093
+hire_off_retention                92%     0.033
+hire_def_retention                92%     0.114
+tq_srs                            98%    -0.035
+tq_osrs                           98%     0.057
+tq_dsrs                           98%    -0.114
+tq_mov                            98%    -0.032
+tq_sos                            98%    -0.010
+tq_srs_traj                       98%    -0.100
+rf_final_unit_pctl                79%     0.156
+rf_avg_unit_pctl                  79%     0.170
+rf_unit_traj                      68%    -0.039
+rf_final_winpct_pctl              79%     0.196
+rf_avg_winpct_pctl                79%     0.198
+rf_n_seasons_rank                100%    -0.025
+
+Spot check (Andy Reid 1999):
+  cf_num_nfl_employers = 1
+  cf_num_college_employers = 4
+  cf_internal_hire = 0
+  cf_years_at_hiring_org = 0
+  cf_pre_OC = 0
+  cf_pre_DC = 0
+  cf_pre_side_def = 0
+  cf_pre_level_nfl = 1
+  rf_final_unit_pctl = nan
+  rf_avg_winpct_pctl = nan
+
+Spot check (Jeff Fisher 1995):
+  cf_num_nfl_employers = 4
+  cf_num_college_employers = 0
+  cf_internal_hire = 1
+  cf_years_at_hiring_org = 1
+  cf_pre_OC = 0
+  cf_pre_DC = 1
+  cf_pre_side_def = 1
+  cf_pre_level_nfl = 1
+  rf_final_unit_pctl = 0.03703703703703709
+  rf_avg_winpct_pctl = 0.4444444444444444

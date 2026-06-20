@@ -1,0 +1,28 @@
+Survival analysis: 373 stints, top-20 SHAP features, 50 coach-level splits
+Censoring boundary = 2025; censored (still active) = 11 (2.9%)
+
+Saved figure C:\Users\jonwi\Documents\Projects\CoachingProject\ijcss\figures\survival_km.png
+Kaplan-Meier median tenure = 3 seasons; era log-rank p = 0.502
+
+  ...10/50 seeds
+  ...20/50 seeds
+  ...30/50 seeds
+  ...40/50 seeds
+  ...50/50 seeds
+
+==============================================================================
+COX SURVIVAL (bucketed to classes) vs ORDINAL CLASSIFIER -- same splits
+==============================================================================
+metric                      Cox survival           ordinal clf   mean diff
+------------------------------------------------------------------------------
+qwk                   0.274 [0.243,0.305]    0.221 [0.193,0.249]     +0.0524
+mae                   0.734 [0.710,0.758]    0.718 [0.696,0.739]     +0.0162
+macro_f1              0.396 [0.380,0.412]    0.417 [0.402,0.433]     -0.0211
+adjacent_accuracy     0.816 [0.805,0.828]    0.864 [0.853,0.875]     -0.0477
+auroc                 0.620 [0.609,0.631]    0.604 [0.591,0.616]     +0.0161
+------------------------------------------------------------------------------
+c_index (Cox)         0.628 [0.619,0.638]     (survival-native; no classifier analog)
+
+Note: C-index 0.5 = no discrimination, 1.0 = perfect risk ranking.
+
+Saved C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\survival_results.pkl

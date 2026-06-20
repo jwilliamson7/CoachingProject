@@ -5,7 +5,8 @@ This module contains all the static dictionaries, lists, and mappings
 used throughout the coaching data analysis pipeline.
 """
 
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Optional
+import pandas as pd
 
 
 # Team franchise abbreviation mappings for historical name changes and relocations
@@ -122,13 +123,41 @@ BASE_TEAM_STATISTICS = [
     "RZPct"
 ]
 
-# Role suffixes for team statistics
+# Role suffixes for team statistics.
+# Canonical layout (Jun 2026): ALL FOUR parallel "your-unit" performance blocks
+# are pooled into ONE oriented, season-weighted "__unit" block in create_data
+# (positive = good unit, see unit_stat_sign):
+#   OC offense (team)        -> +sign
+#   HC offense (team)        -> +sign
+#   DC defense (opp allowed) -> -sign   (low allowed = good defense)
+#   HC defense (opp allowed) -> -sign   (the team's defense under the HC; PFR's
+#                                        "Opponent" table is a team's defensive ledger)
+# An HC season contributes BOTH sides (he owns offense and defense); an OC only
+# offense, a DC only defense. The hiring-team CONTEXT block (HIRING_TEAM_FEATURES)
+# stays separate -- it is the inherited team's state, not the coach's performance.
+# Legacy per-role suffixes retained only for the archived 4-block dataset.
 ROLE_SUFFIXES = {
-    "offensive_coordinator": "__oc",
-    "defensive_coordinator": "__dc", 
-    "head_coach": "__hc",
-    "head_coach_opponent": "__opp__hc"
+    "unit": "__unit",
 }
+LEGACY_ROLE_SUFFIXES = {
+    "offensive_coordinator": "__oc",
+    "defensive_coordinator": "__dc",
+    "head_coach": "__hc",
+    "head_coach_opponent": "__opp__hc",
+}
+
+# Stats where a HIGHER value is WORSE for the unit (giveaways and penalties).
+# Used to orient the pooled unit block so that positive always means "good unit".
+UNIT_NEGATIVE_STAT_TOKENS = ("TO", "Int", "Pen")
+
+
+def unit_stat_sign(stat: str) -> float:
+    """+1.0 if a higher value of ``stat`` is good for the unit, -1.0 if bad.
+
+    Turnovers (TO, TO%), interceptions thrown (Int Passing) and penalties (Pen,
+    Yds Penalties) are negatively oriented; everything else is positive.
+    """
+    return -1.0 if any(tok in stat for tok in UNIT_NEGATIVE_STAT_TOKENS) else 1.0
 
 # Hiring team context features
 HIRING_TEAM_FEATURES = [
@@ -185,10 +214,13 @@ DATA_FILES = {
 }
 
 # Current analysis parameters
+# expected_feature_count: 2 (Coach Name, Year) + 41 (8 core + 33 unit) + 10
+# hiring-team + 1 (Avg 2Y Win Pct) + 1 (Coach Tenure Class) = 55.
+# (Was 154 under the legacy 4-block, 150-stat layout.)
 ANALYSIS_CONFIG = {
     "cutoff_year": 2022,
     "current_year": 2025,
-    "expected_feature_count": 154,
+    "expected_feature_count": 55,
     "hiring_context_years": [1, 2]  # Look back 1-2 years for team context
 }
 
@@ -209,59 +241,52 @@ EXCLUDED_HIRING_INSTANCES = [
 
 
 def get_all_feature_names() -> List[str]:
-    """Generate complete list of feature names in correct order matching Excel file"""
-    
+    """Complete feature-name list in canonical order (collapsed unit-block layout).
+
+    Core (8) + pooled unit block (33, ``__unit``) = 41 names. The single unit
+    block replaces all four legacy parallel blocks (OC ``__oc``, DC ``__dc``,
+    HC-team ``__hc``, HC-opp ``__opp__hc``); see ``unit_stat_sign`` and
+    create_data._load_league_data for the per-side orientation. The 10
+    hiring-team CONTEXT features are appended separately downstream
+    (get_output_column_names) since they describe the inherited team, not the
+    coach's own unit performance.
+    """
     # Core coaching experience features (Features 1-8)
     core_features = [
         "age",
-        "num_times_hc", 
+        "num_times_hc",
         "num_yr_col_pos",
         "num_yr_col_coor",
         "num_yr_col_hc",
         "num_yr_nfl_pos",
-        "num_yr_nfl_coor", 
+        "num_yr_nfl_coor",
         "num_yr_nfl_hc"
     ]
-    
-    # NFL OC team statistics (Features 9-41)
-    oc_features = []
-    for stat in BASE_TEAM_STATISTICS:
-        oc_features.append(f"{stat}__oc")
-    
-    # NFL DC opponent statistics (Features 42-74) 
-    dc_features = []
-    for stat in BASE_TEAM_STATISTICS:
-        dc_features.append(f"{stat}__dc")
-    
-    # NFL HC team statistics (Features 75-107)
-    hc_features = []
-    for stat in BASE_TEAM_STATISTICS:
-        hc_features.append(f"{stat}__hc")
-    
-    # NFL HC opponent statistics (Features 108-140)
-    hc_opp_features = []
-    for stat in BASE_TEAM_STATISTICS:
-        hc_opp_features.append(f"{stat}__opp__hc")
-    
-    # Combine all in exact Excel order
-    feature_names = core_features + oc_features + dc_features + hc_features + hc_opp_features
-    
-    return feature_names
+
+    # Pooled, orientation-corrected unit performance block (Features 9-41)
+    unit_features = [f"{stat}__unit" for stat in BASE_TEAM_STATISTICS]
+
+    return core_features + unit_features
 
 
 def get_feature_dict() -> Dict[str, Union[int, List]]:
-    """Create feature dictionary with appropriate default values"""
+    """Create feature dictionary with appropriate default values.
+
+    Core features accumulate as integer counters; the unit and HC-opponent
+    statistics accumulate as per-season lists (later reduced by ``_safe_mean``,
+    which pools all of a coach's role-seasons and drops missing-league seasons).
+    """
     feature_dict = {}
-    
+
     # Core features start as integers
     for feature in CORE_COACHING_FEATURES:
         feature_dict[feature] = 0
-    
-    # Team statistics features start as lists
+
+    # Pooled unit block + HC-opponent block start as lists
     for stat in BASE_TEAM_STATISTICS:
         for suffix in ROLE_SUFFIXES.values():
             feature_dict[f"{stat}{suffix}"] = []
-    
+
     return feature_dict
 
 
@@ -281,6 +306,51 @@ def get_output_column_names() -> List[str]:
 
     columns.extend(['Avg 2Y Win Pct', 'Coach Tenure Class'])
     return columns
+
+
+def standardize_team_abbreviation(team: str, year: Optional[int] = None) -> str:
+    """
+    Standardize a team abbreviation to a canonical PFR franchise key, resolving
+    historical relocations and abbreviations that meant different franchises in
+    different eras (BAL, HOU, STL).
+
+    Mirrors Coach_WAR/crawlers/utils/data_constants.py so the two projects
+    identify franchises identically. The returned key uniquely identifies the
+    franchise (e.g. Baltimore Colts and Indianapolis Colts both -> 'clt';
+    Baltimore Ravens -> 'rav'; Houston Oilers and Tennessee Titans -> 'oti').
+
+    Examples:
+        standardize_team_abbreviation('BAL', 1975) -> 'clt'  # Baltimore Colts
+        standardize_team_abbreviation('BAL', 2000) -> 'rav'  # Baltimore Ravens
+        standardize_team_abbreviation('HOU', 1990) -> 'oti'  # Houston Oilers
+        standardize_team_abbreviation('HOU', 2010) -> 'htx'  # Houston Texans
+    """
+    if not team or pd.isna(team):
+        return team
+
+    team = str(team).upper().strip()
+
+    # Year-based franchise changes take priority (shared abbreviation, two teams)
+    if year is not None:
+        if team == 'BAL':
+            return 'clt' if year <= 1983 else 'rav'  # Colts (->Indy) vs Ravens
+        elif team == 'HOU':
+            return 'oti' if year <= 1996 else 'htx'  # Oilers (->Tenn) vs Texans
+        elif team == 'STL':
+            return 'crd' if year <= 1987 else 'ram'  # Cardinals (->AZ) vs Rams
+
+    # Relocations/renames without era-based ambiguity
+    standard_mappings = {
+        'ARI': 'crd', 'IND': 'clt', 'LAC': 'sdg', 'LAR': 'ram', 'LVR': 'rai',
+        'LV': 'rai', 'OAK': 'rai', 'PHO': 'crd', 'TEN': 'oti', 'BOS': 'nwe',
+        'GB': 'gnb', 'KC': 'kan', 'NE': 'nwe', 'NO': 'nor', 'SF': 'sfo',
+        'TB': 'tam',
+    }
+    if team in standard_mappings:
+        return standard_mappings[team]
+
+    # Unmapped abbreviations (incl. PFR canon like 'rai','ram','sdg') -> lowercase
+    return team.lower()
 
 
 # Model file paths (relative to project root)

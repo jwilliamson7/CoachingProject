@@ -26,90 +26,45 @@ import matplotlib.pyplot as plt
 import matplotlib
 from sklearn.metrics import confusion_matrix
 
-from model import CoachTenureModel, stratified_coach_level_split
-from model.config import MODEL_CONFIG, MODEL_PATHS, FEATURE_CONFIG
+from model.pipeline import (
+    load_modeling_data, top_k_indices, best_k, leakage_free_split, fit_model, ordinal_model,
+)
 
 warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=UserWarning)
 
 
-def load_data():
-    """Load and prepare training data."""
-    data_path = os.path.join(project_root, MODEL_PATHS['data_file'])
-    df = pd.read_csv(data_path, index_col=0)
-    df = df[df[FEATURE_CONFIG['target_column']] != -1].copy()
-
-    X = df.iloc[:, FEATURE_CONFIG['feature_columns_start']:FEATURE_CONFIG['feature_columns_end']]
-    y = df[FEATURE_CONFIG['target_column']]
-    return df, X, y
-
-
-def get_shap_feature_ranking():
-    """Load cached SHAP values and return feature ranking by mean |SHAP|."""
-    cache_path = os.path.join(project_root, 'data', 'shap_values_cache.pkl')
-    with open(cache_path, 'rb') as f:
-        cache = pickle.load(f)
-    aggregated = cache['aggregated_shap']
-    mean_abs = np.abs(aggregated.values).mean(axis=0)
-    ranking = np.argsort(mean_abs)[::-1]
-    return ranking
-
-
-def subset_features(X, top_k):
-    """Subset X to top-K SHAP-ranked features."""
-    ranking = get_shap_feature_ranking()
-    selected = sorted(ranking[:top_k])
-    X_subset = X.iloc[:, selected]
-    return X_subset
-
-
 def main():
     n_seeds = 50
     n_classes = 3
-    top_k = 40
 
     print("Loading data...")
-    df, X, y = load_data()
-    print(f"Loaded {len(df)} instances with {X.shape[1]} features")
-
-    # Subset to top-40 SHAP features
-    X = subset_features(X, top_k)
-    print(f"Using top {top_k} SHAP-ranked features ({X.shape[1]} columns)")
+    df, X, y = load_modeling_data()
+    feat_idx = top_k_indices()
+    top_k = len(feat_idx)
+    print(f"Loaded {len(df)} instances; using top {top_k} SHAP-ranked features")
 
     # Accumulate confusion matrix counts across seeds
     cm_accumulated = np.zeros((n_classes, n_classes), dtype=float)
-    # Also track total test samples per true class for average counts
     total_test_per_class = np.zeros(n_classes, dtype=float)
 
     for seed in range(n_seeds):
-        # Split data
-        X_train, X_test, y_train, y_test, _ = stratified_coach_level_split(
-            df, X, y,
-            test_size=MODEL_CONFIG['test_size'],
-            random_state=seed,
-        )
-
-        # Train ordinal model
-        model = CoachTenureModel(
-            use_ordinal=True,
-            n_classes=n_classes,
-            random_state=seed,
-        )
-        model.fit(X_train, y_train, verbose=0)
-
-        # Predict
-        y_pred = model.predict(X_test)
+        # Shared leakage-free split (coach-level split, train-only imputation, top-K)
+        split = leakage_free_split(df, X, y, seed, feature_indices=feat_idx)
+        model = fit_model(split, ordinal_model, seed)
+        y_pred = model.predict(pd.DataFrame(split.X_test))
+        y_test = split.y_test
 
         # Build confusion matrix for this seed
-        cm = confusion_matrix(np.asarray(y_test), y_pred, labels=[0, 1, 2])
+        cm = confusion_matrix(y_test, y_pred, labels=[0, 1, 2])
         cm_accumulated += cm
 
         # Track class counts
         for cls in range(n_classes):
-            total_test_per_class[cls] += np.sum(np.asarray(y_test) == cls)
+            total_test_per_class[cls] += np.sum(y_test == cls)
 
         print(f"  Seed {seed:>2}/{n_seeds}: test_size={len(y_test)}, "
-              f"accuracy={np.mean(y_pred == np.asarray(y_test)):.3f}")
+              f"accuracy={np.mean(y_pred == y_test):.3f}")
 
     # Average counts per seed
     cm_avg_counts = cm_accumulated / n_seeds

@@ -121,42 +121,40 @@ def compute_shap_values(model: CoachTenureModel, X: np.ndarray,
     """
     shap_values_dict = {}
     ordinal_clf = model.model_
+    X = np.asarray(X)
 
     # Determine samples to explain
     if n_samples is None or n_samples >= X.shape[0]:
         X_explain = X
-        explain_idx = np.arange(X.shape[0])
     else:
         np.random.seed(42)  # For reproducibility
         explain_idx = np.random.choice(X.shape[0], n_samples, replace=False)
         X_explain = X[explain_idx]
 
-    # Background sample for KernelExplainer
-    np.random.seed(42)
-    n_bg = min(n_background, X.shape[0])
-    background_idx = np.random.choice(X.shape[0], n_bg, replace=False)
-    background = X[background_idx]
-
-    print(f"\nComputing SHAP values for {len(X_explain)} samples...")
+    # n_background retained for signature compatibility; TreeExplainer with the
+    # default tree_path_dependent perturbation does not require a background set.
+    print(f"\nComputing SHAP values (TreeExplainer, exact) for {len(X_explain)} samples...")
 
     for i, clf in enumerate(ordinal_clf.classifiers_):
         print(f"  Classifier {i} (P(Y > {i}))...", end=" ", flush=True)
 
-        # Create predict function for this classifier
-        def predict_proba(x, classifier=clf):
-            return classifier.predict_proba(x)[:, 1]
+        # Exact tree SHAP for the XGBoost binary classifier (margin/log-odds space).
+        # This is exact for gradient-boosted trees and orders of magnitude faster
+        # than the model-agnostic KernelExplainer, which makes the per-split
+        # (leakage-free) recomputation across 50 partitions tractable.
+        explainer = shap.TreeExplainer(clf)
+        shap_values_raw = np.asarray(explainer.shap_values(X_explain))
 
-        # Use KernelExplainer (model-agnostic, works with all XGBoost versions)
-        explainer = shap.KernelExplainer(predict_proba, background)
+        # Some SHAP/XGBoost versions return (n, n_features, n_outputs) for binary;
+        # collapse to the positive-class contribution.
+        if shap_values_raw.ndim == 3:
+            shap_values_raw = shap_values_raw[..., -1]
 
-        # Compute SHAP values
-        shap_values_raw = explainer.shap_values(X_explain, nsamples=100)
-
-        # Ensure base_values is an array
-        if np.isscalar(explainer.expected_value):
-            base_values = np.full(shap_values_raw.shape[0], explainer.expected_value)
+        ev = explainer.expected_value
+        if np.isscalar(ev):
+            base_values = np.full(shap_values_raw.shape[0], ev)
         else:
-            base_values = explainer.expected_value
+            base_values = np.full(shap_values_raw.shape[0], np.asarray(ev).ravel()[-1])
 
         shap_values = shap.Explanation(
             values=shap_values_raw,

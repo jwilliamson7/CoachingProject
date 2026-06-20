@@ -1,0 +1,77 @@
+Using top-20 SHAP-ranked features (Ordinal model)
+Training population: 373 known-tenure hires; recent hires (class -1): 21
+Filtered to 21 hires from 2022 onwards
+Training final model on the known-tenure population...
+
+*** DATA LEAKAGE PREVENTION ***
+7 recent hires also appear in training (prior stints):
+  - Dan Quinn (prior stints: [2015])
+  - Jim Harbaugh (prior stints: [2011])
+  - Mike Vrabel (prior stints: [2018])
+  - Pete Carroll (prior stints: [1994, 1997, 2010])
+  - Raheem Morris (prior stints: [2009])
+  - Sean Payton (prior stints: [2006])
+  - Todd Bowles (prior stints: [2015])
+These are predicted with a model retrained (and imputer re-fit) without their data.
+
+Retraining on 364 instances (excluding prior-stint coaches)...
+
+=====================================================================================
+NFL HEAD COACH TENURE PREDICTIONS
+=====================================================================================
+Model: Ordinal XGBoost Classifier
+Predictions for 21 recent coaching hires
+(*) = Predicted with model retrained to exclude coach's prior HC data
+=====================================================================================
+Coach Name             Year  Prediction     Probability Distribution       Confidence
+-------------------------------------------------------------------------------------
+  Brian Daboll         2022  0 (1-2 years)  [0.395, 0.223, 0.382]          LOW  (39.5%)
+  Kevin O'Connell      2022  2 (5+ years)   [0.043, 0.091, 0.866]          HIGH (86.6%)
+  Mike McDaniel        2022  2 (5+ years)   [0.276, 0.195, 0.529]          MED  (52.9%)
+* Todd Bowles          2022  1 (3-4 years)  [0.341, 0.471, 0.187]          LOW  (47.1%)
+  Jonathan Gannon      2023  2 (5+ years)   [0.090, 0.246, 0.664]          MED  (66.4%)
+* Sean Payton          2023  1 (3-4 years)  [0.170, 0.580, 0.250]          MED  (58.0%)
+  Shane Steichen       2023  1 (3-4 years)  [0.192, 0.623, 0.185]          MED  (62.3%)
+  DeMeco Ryans         2023  1 (3-4 years)  [0.236, 0.537, 0.227]          MED  (53.7%)
+  Mike Macdonald       2024  1 (3-4 years)  [0.132, 0.574, 0.294]          MED  (57.4%)
+* Jim Harbaugh         2024  2 (5+ years)   [0.175, 0.393, 0.431]          LOW  (43.1%)
+* Dan Quinn            2024  1 (3-4 years)  [0.251, 0.408, 0.341]          LOW  (40.8%)
+  Brian Callahan       2024  2 (5+ years)   [0.388, 0.129, 0.483]          LOW  (48.3%)
+* Raheem Morris        2024  0 (1-2 years)  [0.623, 0.193, 0.184]          MED  (62.3%)
+  Dave Canales         2024  1 (3-4 years)  [0.256, 0.479, 0.265]          LOW  (47.9%)
+  Ben Johnson          2025  1 (3-4 years)  [0.260, 0.561, 0.178]          MED  (56.1%)
+  Aaron Glenn          2025  2 (5+ years)   [0.332, 0.323, 0.346]          LOW  (34.6%)
+* Mike Vrabel          2025  2 (5+ years)   [0.113, 0.265, 0.622]          MED  (62.2%)
+  Liam Coen            2025  0 (1-2 years)  [0.439, 0.372, 0.188]          LOW  (43.9%)
+  Kellen Moore         2025  1 (3-4 years)  [0.197, 0.573, 0.230]          MED  (57.3%)
+  Brian Schottenheimer 2025  0 (1-2 years)  [0.693, 0.245, 0.062]          MED  (69.3%)
+* Pete Carroll         2025  2 (5+ years)   [0.229, 0.237, 0.535]          MED  (53.5%)
+
+--------------------------------------------------------------------------------
+SUMMARY STATISTICS
+--------------------------------------------------------------------------------
+
+Prediction Confidence:
+  Average confidence: 54.4%
+  Confidence range: 34.6% - 86.6%
+
+Predicted Tenure Distribution:
+  Class 0 (1-2 years): 4 coaches (19.0%)
+  Class 1 (3-4 years): 9 coaches (42.9%)
+  Class 2 (5+ years): 8 coaches (38.1%)
+
+Prediction Confidence Distribution:
+  HIGH: 1 coaches
+  MED: 12 coaches
+  LOW: 8 coaches
+
+================================================================================
+INTERPRETATION GUIDE:
+Class 0 (1-2 years): Short tenure - likely to be replaced within 2 seasons
+Class 1 (3-4 years): Medium tenure - moderate job security
+Class 2 (5+ years):  Long tenure - likely to have extended tenure
+================================================================================
+
+Predictions saved to C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\recent_hire_predictions.csv
+
+Prediction complete!

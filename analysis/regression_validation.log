@@ -1,0 +1,21 @@
+Regression on 373 instances (continuous tenure reconstructed)
+Using top-20 SHAP features and tuned params (reg:squarederror)
+
+======================================================================
+REGRESSION (continuous tenure) -- leakage-free, 50 seeds
+======================================================================
+  R^2            -0.064 [-0.102, -0.026]
+  MAE (years)    2.508 [2.441, 2.574]
+  Pearson r      0.192 [0.163, 0.221]
+  Spearman rho   0.241 [0.213, 0.270]
+
+======================================================================
+ORDINAL METRICS: regression+discretize vs the ordinal classifier
+======================================================================
+metric               regression->bin     ordinal clf
+QWK                0.196 [0.171,0.220]           0.221
+MAE                0.669 [0.651,0.686]           0.718
+Adj.Acc            0.910 [0.902,0.919]           0.864
+Macro F1           0.368 [0.353,0.383]           0.417
+
+Saved C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\regression_results.pkl

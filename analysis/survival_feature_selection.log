@@ -1,0 +1,35 @@
+Survival feature ranking via XGB-AFT TreeSHAP: top-10 indices = [np.int64(132), np.int64(123), np.int64(0), np.int64(156), np.int64(108), np.int64(39), np.int64(33), np.int64(93), np.int64(101), np.int64(21)]
+Overlap of survival top-20 with classifier top-20: 11/20
+
+    K   XGB-AFT C-idx   Cox C-idx
+---------------------------------
+    5           0.579       0.619
+   10           0.584       0.606
+   15           0.588       0.624
+   20           0.587       0.627
+   30           0.602       0.620
+   40           0.605       0.625
+   60           0.593       0.620
+   80           0.591       0.618
+  120           0.588       0.615
+  171           0.569       0.605
+
+Best K -> XGB-AFT: 40 (C-idx 0.605); Cox: 20 (C-idx 0.627)
+
+Evaluating on survival-selected features (50 splits)...
+
+==========================================================================================
+FEATURE SET COMPARISON (classifier top-20  vs  survival-selected)
+==========================================================================================
+model                                         QWK  MacroF1  AdjAcc   AUROC   C-idx
+------------------------------------------------------------------------------------------
+Ordinal classifier              0.221 [0.193,0.249]    0.417   0.864   0.604       -
+Cox (clf top-20)                0.254 [0.227,0.281]    0.399   0.940   0.620   0.629
+Cox (surv top-20)               0.218 [0.194,0.242]    0.379   0.937   0.611   0.621
+XGB-AFT (clf top-20)            0.221 [0.195,0.247]    0.374   0.940   0.602   0.605
+XGB-AFT (surv top-40)           0.197 [0.169,0.225]    0.376   0.931   0.597   0.601
+Weibull AFT (clf top-20)        0.241 [0.215,0.266]    0.392   0.912   0.617   0.623
+Weibull AFT (surv top-20)       0.211 [0.187,0.235]    0.380   0.903   0.611   0.617
+------------------------------------------------------------------------------------------
+
+Saved C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\survival_feature_selection.pkl

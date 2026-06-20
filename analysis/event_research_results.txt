@@ -1,0 +1,80 @@
+rid|label|confidence|reason|source|needs_user
+0|censor|high|Sid Gillman retired on top after 1974 (7-7, NFL Coach of the Year); hand-picked successor Bum Phillips|Wikipedia|no
+1|censor|high|Paul Brown retired voluntarily on top after 1975 (11-3); named own successor, stayed on as GM/owner|Wikipedia/Bengals.com|no
+2|event|high|John Ralston resigned under pressure after 1976 (9-5) following player revolt; stripped of GM title before resigning|Wikipedia|no
+3|event|high|Monte Clark fired by 49ers Apr 1977 over personnel-authority dispute with GM Joe Thomas; sat out 1977 before Detroit|Wikipedia|no
+4|event|high|Chuck Knox pre-emptively jumped to Buffalo Jan 1978 to avoid being fired by owner Rosenbloom after Mud Bowl loss|Wikipedia/ESPN|no
+5|event|high|Don Coryell forced out after 1977 (7-7) following falling out with owner Bill Bidwill; dismissed Feb 1978|Wikipedia|no
+6|event|high|George Allen fired by Redskins Jan 1978 despite 9-5; contract/budget dispute with Edward Bennett Williams|Washington Post/Wikipedia|no
+7|censor|high|Jack Pardee voluntarily resigned from Bears after 1977; rejected GM Finks offer to stay, chose Redskins job|Washington Post|no
+8|censor|high|Chuck Fairbanks voluntarily left Patriots after 1978 (11-4) for Univ. of Colorado; Patriots sued to block move|Wikipedia/Boston Globe|no
+9|censor|high|John Madden retired on top after 1978 (9-7) due to ulcer/burnout while successful and wanted|Wikipedia|no
+10|event|low|Larry Wilson INTERIM caretaker: took over Cardinals (2-1) after Bud Wilkinson fired Week 13 1979; returned to front office|Wikipedia|yes
+11|event|high|Bum Phillips fired by Oilers owner Bud Adams Dec 31 1980 despite 11-5 (expected extension); Saints job came after|UPI/Wikipedia|no
+12|event|high|Red Miller fired by new Broncos owner spring 1981 after 8-8 missed playoffs|Wikipedia|no
+13|event|high|Leeman Bennett fired by Falcons Jan 1983 after strike-shortened 5-4; said he was surprised|UPI/Wikipedia|no
+14|event|low|Mike McCormack INTERIM caretaker: took over Seahawks (4-3) after Patera fired in 1982 strike season; returned to GM role|Wikipedia|yes
+15|event|medium|Walt Michaels forced/pressured resignation Feb 1983; ownership gave a package and told him to resign|UPI/Wikipedia|no
+16|event|high|Bart Starr fired by Packers Dec 19 1983 day after 8-8 missed playoffs; said he was shocked|UPI/Wikipedia|no
+17|event|high|Ron Meyer fired midway through 1984 by Patriots after firing his DC; replaced by Raymond Berry|Wikipedia|no
+18|event|low|Fred Bruney INTERIM single game: coached final game of 1985 (1-0) after Marion Campbell let go; never permanent hire|Wikipedia|yes
+19|event|high|John Mackovic fired by Chiefs days after 1986 despite playoffs, following a player revolt to owner Lamar Hunt|Wikipedia|no
+20|censor|high|Bill Walsh retired Jan 1989 days after winning Super Bowl XXIII due to burnout while wanted; voluntary on top|UPI/ESPN|no
+21|event|high|Marty Schottenheimer forced resignation Browns Dec 1988 after Modell ultimatum to hire an OC/strip role; KC hired after|Wikipedia|no
+22|event|high|Jerry Glanville fired by Oilers Jan 1990 after season-ending losing skid; Atlanta hired him a week later|Wikipedia|no
+23|censor|high|Bill Parcells resigned from Giants May 1991 after Super Bowl XXV citing health; voluntary while wanted, took 2 years off|Washington Post|no
+24|event|high|Buddy Ryan fired by Eagles Jan 1991 after third straight first-round playoff exit|Washington Post|no
+25|censor|medium|Jerry Burns announced own retirement Dec 1991 at age 64 after 8-8; self-initiated, no pressure, beloved departure|Wikipedia/obits|no
+26|event|high|Dan Reeves fired by Broncos owner Bowlen Dec 1992 amid Elway feud after 8-8|UPI|no
+27|censor|high|Joe Gibbs retired March 1993 for health/family; voluntary, owner unaware it was coming, team wanted him|Washington Post|no
+28|event|high|Bruce Coslet fired by Jets Jan 1994 (never a winning season); GM cited philosophy disagreement|Seattle Times|no
+29|event|medium|Jimmy Johnson and Cowboys mutually parted March 1994 after power struggle with Jerry Jones; effectively forced out|ESPN|no
+30|event|high|Art Shell fired by Raiders owner Al Davis after 1994 (9-7) missed playoffs; Davis later regretted it|ESPN/Wikipedia|no
+31|event|medium|Don Shula resigned after 1995 amid heavy fan/media pressure with Jimmy Johnson waiting; team moved on, hired Johnson days later|Baltimore Sun|no
+32|event|medium|Ted Marchibroda left Colts Feb 1996 after team rejected his 2-yr extension demand (offered 1) and promoted a replacement; Ravens 6 days later|Baltimore Sun|yes
+33|censor|high|Bill Parcells resigned from Patriots after 1996 Super Bowl run in personnel-control dispute to take Jets job; Kraft wanted him|SI/ESPN|no
+34|censor|high|Bobby Ross voluntarily left Chargers after 1996 for Lions HC job with more control/money; Chargers wanted to retain him|Wikipedia/CBS|no
+35|event|high|George Seifert forced out after 1996; 49ers offered no extension, gave ultimatum to accept demotion behind named successor Mariucci|Washington Post|no
+36|event|high|Dennis Erickson fired by Seahawks Dec 1998 after fourth straight non-playoff season (8-8); one of five fired that day|CBS/Wikipedia|no
+37|censor|high|Mike Holmgren voluntarily resigned from Packers after 1998 to take Seahawks HC+GM job for total control; Packers wanted him|Packers.com/ESPN|no
+38|censor|high|Bill Parcells retired as Jets HC after 1999 on his own terms, moving to football ops with Belichick set to succeed; not performance-driven|ESPN/CBS|no
+39|event|high|Chan Gailey fired by Cowboys Jan 2000 after two playoff seasons; Jerry Jones cited scheme fit and later called it a regret|CBS/ESPN|no
+40|censor|high|Dick Vermeil retired on top after winning Super Bowl XXXIV with 1999 Rams (13-3); walked away voluntarily while wanted|Wikipedia/ESPN|no
+41|censor|high|Jimmy Johnson voluntarily retired after 1999 Dolphins season; burnout, time with family, team would have kept him|CBS/ESPN|no
+42|event|high|Pete Carroll fired by Patriots Jan 2000 after 8-8 collapse; Kraft replaced him with Belichick|ESPN/Patriots.com|no
+43|event|high|Ray Rhodes fired by Packers GM Ron Wolf Jan 2000 after lone 8-8 season missing playoffs|SI/Wikipedia|no
+44|censor|high|Al Groh voluntarily resigned Jets after 2000 (9-7) to take Virginia (alma mater) college HC job|UPI/ESPN|no
+45|censor|medium|Bobby Ross voluntarily resigned mid-2000 citing burnout, player effort, and leg blood clots; owner praised decision, team viable|Washington Post|no
+46|event|low|Gary Moeller INTERIM caretaker: took over Week 11 2000 (4-3) after Ross quit; never permanent hire, not retained by new pres Millen|Wikipedia|yes
+47|event|high|Wade Phillips fired by Bills owner Ralph Wilson after 2000 (8-8) for refusing to fire his special teams coach|CBS/ESPN|no
+48|event|medium|Jon Gruden traded away by Raiders to Tampa Bay Feb 2002 (for picks and cash); Raiders moved on, Gruden never wanted to leave|NBC Sports Bay Area|no
+49|event|high|Marty Schottenheimer fired by Dan Snyder after lone 2001 Washington season (8-8) in power struggle; Spurrier hired|ESPN/Washington Post|no
+50|event|high|Tony Dungy fired by Buccaneers Jan 2002 after repeated playoff failures; Colts hired him after, but fired first|ESPN/Wikipedia|no
+51|event|high|Steve Mariucci fired by 49ers Jan 2003 after losing power struggle with GM/owner; Lions hired him after, but fired first|Washington Post|no
+52|censor|high|Dick Vermeil voluntarily retired after 2005 (10-6), walked away on top still wanted (one more year chants)|Wikipedia/Arrowhead Pride|no
+53|event|high|Mike Tice fired by Vikings Jan 1 2006; owner Zygi Wilf declined to renew right after 9-7 finale|ESPN/NFL.com|no
+54|censor|high|Bill Cowher voluntarily stepped down/retired Jan 2007 after 15 seasons, still wanted (won SB XL the prior year)|Pro Football HOF|no
+55|censor|high|Bill Parcells voluntarily retired from coaching Jan 2007 after 4 Dallas seasons; his own choice, Jones wanted him back|ESPN|no
+56|event|high|Marty Schottenheimer fired by Chargers Feb 2007 despite NFL-best 14-2, over GM A.J. Smith dysfunction|ESPN|no
+57|censor|high|Joe Gibbs resigned Jan 2008 for family/non-football reasons (grandson's leukemia); voluntary departure|Washington Post|no
+58|event|high|Eric Mangini fired by Jets Dec 2008 after 1-4 collapse; Browns hired him after, but fired first|NFL.com|no
+59|event|high|Jon Gruden fired by Buccaneers Jan 2009 after winless December and playoff miss|Britannica/Wikipedia|no
+60|event|high|Mike Shanahan fired by owner Bowlen Dec 2008 after late collapse (8-8) missed playoffs 3rd straight, ending 14-yr tenure|ESPN/Wikipedia|no
+61|censor|high|Tony Dungy retired voluntarily Jan 2009 on top after 12-4 playoff season to be with family; hand-picked successor Caldwell|ESPN|no
+62|event|high|Tom Cable not retained: Al Davis declined his contract option Jan 2011 despite 8-8 (first non-losing season in years)|ESPN/Raiders.com|no
+63|event|high|Hue Jackson fired Jan 2012 by new GM Reggie McKenzie after one 8-8 season; personnel-control clash|NFL.com|no
+64|event|high|Lovie Smith fired Dec 2012 after 10-6 missed playoffs (collapsed from 7-1); GM Phil Emery decision|ESPN/NFL.com|no
+65|censor|high|Doug Marrone voluntarily exercised opt-out Dec 2014 leaving a 9-7 team; asked for extension then chose to walk|NFL.com/ESPN|no
+66|event|high|Jim Harbaugh mutual parting Dec 2014 after down 8-8 amid management feud; effectively pushed out (Michigan came after)|ESPN/SI|no
+67|event|high|John Fox forced out/parted ways Jan 2015 by Elway after 12-4 ended in divisional loss; Chicago hired him after|ESPN/SI|no
+68|censor|high|Gary Kubiak retired Jan 2017 for health reasons (migraine condition/seizures, ambulance during season); non-football|ESPN/NFL.com|no
+69|censor|high|Bruce Arians retired Jan 2018 (Cardinals) citing family after 42-yr career; left as franchise winningest coach by choice|CBS/Yahoo|no
+70|event|high|Jim Caldwell fired by Lions Jan 2018 after 9-7; GM Bob Quinn wanted a new voice, cited record vs good teams|ESPN/NFL.com|no
+71|event|high|Mike Mularkey fired/parted by Titans Jan 2018 days after winning a wild-card game; ownership saw different paths|CBS Sports|no
+72|event|high|Jason Garrett fired (parted ways) by Cowboys Jan 2020 after 8-8 missed playoffs; replaced by McCarthy|NFL.com|no
+73|event|high|Brian Flores fired by Dolphins Jan 2022 after 9-8 despite back-to-back winning seasons; Flores then sued NFL|NFL.com/CNN|no
+74|censor|high|Bruce Arians voluntarily stepped down March 2022 (Bucs) while successful (SB winner), hand-picked successor Bowles, moved to front office|NFL.com/ESPN|no
+75|event|high|Jon Gruden forced resignation from Raiders Oct 2021 mid-season amid email scandal; not voluntary-while-viable|CNN/SI|no
+76|event|high|Duplicate of rid 75 (Jon Gruden Oct 2021 forced resignation amid email scandal); spurious 2020 hire row in data|CNN/SI|yes
+77|censor|high|Sean Payton voluntarily retired/stepped away Jan 2022 (Saints) after 9-8, wanting time off; team would have kept him (un-retired 2023)|NFL.com/PFF|no
+78|event|medium|Pete Carroll out as Seahawks coach Jan 2024 after 9-8; he wanted to return but ownership forced him into an advisor role|ESPN/Seattle Times|no

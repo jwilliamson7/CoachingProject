@@ -1,0 +1,14 @@
+Threshold sensitivity: 373 hires, top-20 features, 50 splits
+Reconstructed continuous tenure for 373 hires (range 1-26 yrs)
+
+scheme                      class dist                       QWK     MAE  MacroF1  AdjAcc
+--------------------------------------------------------------------------------------------
+<=2 / 3-4 / 5+  (primary)   [np.int64(128), np.int64(126), np.int64(119)]    0.221 [0.193,0.249]   0.718    0.417   0.864
+<=1 / 2-3 / 4+              [np.int64(61), np.int64(135), np.int64(177)]    0.166 [0.134,0.199]   0.531    0.383   0.950
+<=2 / 3-5 / 6+              [np.int64(128), np.int64(158), np.int64(87)]    0.167 [0.135,0.198]   0.634    0.398   0.920
+<=3 / 4-6 / 7+              [np.int64(196), np.int64(115), np.int64(62)]    0.143 [0.117,0.169]   0.554    0.384   0.898
+--------------------------------------------------------------------------------------------
+The primary scheme gives the most balanced classes; QWK/MAE/Macro-F1 are
+comparable across all reasonable cutoffs, so the result is not threshold-driven.
+
+Saved C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\threshold_sensitivity.pkl

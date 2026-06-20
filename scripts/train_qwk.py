@@ -32,8 +32,8 @@ sys.path.insert(0, project_root)
 
 import numpy as np
 import pandas as pd
-from sklearn.impute import SimpleImputer
 
+from scripts.data.matrix_factorization_imputation import SVDImputer
 from model import (
     CoachTenureModel,
     stratified_coach_level_split,
@@ -51,9 +51,9 @@ from model.config import MODEL_CONFIG, MODEL_PATHS, FEATURE_CONFIG
 
 
 def load_data(data_path: str = None) -> pd.DataFrame:
-    """Load the training data."""
+    """Load the RAW training data (imputation is fit per train split downstream)."""
     if data_path is None:
-        data_path = os.path.join(project_root, MODEL_PATHS['data_file'])
+        data_path = os.path.join(project_root, MODEL_PATHS['raw_data_file'])
 
     print(f"Loading data from {data_path}...")
     df = pd.read_csv(data_path, index_col=0)
@@ -122,10 +122,11 @@ def train_with_qwk_tuning(
     print(f"Test set: {len(X_test)} instances")
     print(f"No coach overlap between train/test: {len(set(df.loc[X_train.index, 'Coach Name']) & set(test_coaches)) == 0}")
 
-    # Impute missing values
-    imputer = SimpleImputer(strategy='mean')
-    X_train_imputed = imputer.fit_transform(X_train)
-    X_test_imputed = imputer.transform(X_test)
+    # Impute missing values: SVD imputer fit on the training partition only,
+    # then applied to the held-out test partition (no leakage across the split).
+    imputer = SVDImputer().fit(np.asarray(X_train))
+    X_train_imputed = imputer.transform(np.asarray(X_train))
+    X_test_imputed = imputer.transform(np.asarray(X_test))
 
     # Generate coach-level CV splits for tuning
     df_train = df.loc[X_train.index]
@@ -195,10 +196,10 @@ def compare_metrics_experiment(
         random_state=MODEL_CONFIG['random_state']
     )
 
-    # Impute
-    imputer = SimpleImputer(strategy='mean')
-    X_train_imputed = imputer.fit_transform(X_train)
-    X_test_imputed = imputer.transform(X_test)
+    # Impute: SVD imputer fit on train only, applied to test
+    imputer = SVDImputer().fit(np.asarray(X_train))
+    X_train_imputed = imputer.transform(np.asarray(X_train))
+    X_test_imputed = imputer.transform(np.asarray(X_test))
 
     # Get CV splits
     df_train = df.loc[X_train.index]

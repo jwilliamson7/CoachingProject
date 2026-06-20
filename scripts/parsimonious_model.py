@@ -35,18 +35,25 @@ from matplotlib.ticker import MaxNLocator
 
 from model import (
     CoachTenureModel,
-    stratified_coach_level_split,
     ordinal_metrics,
 )
 from model.config import MODEL_CONFIG, MODEL_PATHS, FEATURE_CONFIG, ORDINAL_CONFIG
+from model.pipeline import leakage_free_split, fit_model, ordinal_model
+from scripts.data.matrix_factorization_imputation import SVDImputer
 
 warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=UserWarning)
 
 
 def load_data():
-    """Load and prepare training data."""
-    data_path = os.path.join(project_root, MODEL_PATHS['data_file'])
+    """Load and prepare RAW training data (features retain missing values).
+
+    Imputation is deliberately NOT applied here. It is fit on each split's
+    training partition inside train_and_evaluate_single_seed so that no
+    held-out information leaks into the imputation, and so the prediction
+    target never enters the factorization.
+    """
+    data_path = os.path.join(project_root, MODEL_PATHS['raw_data_file'])
     df = pd.read_csv(data_path, index_col=0)
     df = df[df[FEATURE_CONFIG['target_column']] != -1].copy()
 
@@ -55,12 +62,31 @@ def load_data():
     return df, X, y
 
 
-def get_shap_feature_ranking():
-    """Load precomputed SHAP values and rank features by mean |SHAP|."""
+def readable_feature_names():
+    """Readable names for ALL features in the current modeling dataset: the 150
+    original feature names plus any appended engineered columns (cf_/rf_), so name
+    lists match the data width (prevents IndexError when the data has >150 cols)."""
+    from scripts.shap_analysis import get_feature_names
+    base = get_feature_names()
+    _, X, _ = load_data()
+    if X.shape[1] > len(base):
+        return base + list(X.columns[len(base):])
+    return base[:X.shape[1]]
+
+
+def get_shap_feature_ranking(force_recompute=False):
+    """Load (or compute) the leakage-free global SHAP feature ranking.
+
+    The ranking is a feature-selection filter computed once on the full
+    development sample: features are imputed with a feature-only SVD imputer,
+    an ordinal model is trained, and mean |SHAP| (exact TreeExplainer) is
+    aggregated across the two Frank-Hall binary classifiers. All downstream
+    *performance* estimates impute within each split's training partition only.
+    """
     cache_path = os.path.join(project_root, 'data', 'shap_values_cache.pkl')
 
-    if os.path.exists(cache_path):
-        print(f"Loading cached SHAP values from {cache_path}...")
+    if os.path.exists(cache_path) and not force_recompute:
+        print(f"Loading cached SHAP ranking from {cache_path}...")
         with open(cache_path, 'rb') as f:
             cache = pickle.load(f)
         aggregated = cache['aggregated_shap']
@@ -68,33 +94,39 @@ def get_shap_feature_ranking():
         ranking = np.argsort(mean_abs)[::-1]
         return ranking, mean_abs
     else:
-        print("No cached SHAP values found. Computing from model...")
+        print("Computing leakage-free SHAP ranking from raw data...")
         return compute_shap_ranking()
 
 
 def compute_shap_ranking():
-    """Compute SHAP ranking from scratch."""
+    """Compute the global SHAP ranking leakage-free from raw data.
+
+    Feature-only SVD imputation (no target column) is fit on the full known
+    sample, an ordinal model is trained, and exact tree SHAP is aggregated.
+    """
     from scripts.shap_analysis import (
-        load_data_and_model, compute_shap_values,
-        compute_aggregated_shap, get_feature_names,
+        compute_shap_values, compute_aggregated_shap, get_feature_names,
     )
 
-    model, df, X, y = load_data_and_model()
-    feature_names = get_feature_names()
-    shap_dict = compute_shap_values(model, X, feature_names, n_background=100)
+    df, X, y = load_data()  # raw features with NaN
+    imputer = SVDImputer().fit(X.values)
+    X_imp = imputer.transform(X.values)
+
+    model = CoachTenureModel(use_ordinal=True, n_classes=3, random_state=42)
+    model.fit(pd.DataFrame(X_imp), y, verbose=0)
+
+    feature_names = get_feature_names() + list(X.columns[len(get_feature_names()):])
+    shap_dict = compute_shap_values(model, X_imp, feature_names)
     aggregated = compute_aggregated_shap(shap_dict, feature_names)
 
     mean_abs = np.abs(aggregated.values).mean(axis=0)
     ranking = np.argsort(mean_abs)[::-1]
 
-    # Cache for future use
+    # Cache for reuse by parsimony, SHAP-validation, and bootstrap scripts
     cache_path = os.path.join(project_root, 'data', 'shap_values_cache.pkl')
-    print(f"Saving SHAP cache to {cache_path}...")
+    print(f"Saving leakage-free SHAP cache to {cache_path}...")
     with open(cache_path, 'wb') as f:
-        pickle.dump({
-            'shap_values_dict': shap_dict,
-            'aggregated_shap': aggregated,
-        }, f)
+        pickle.dump({'aggregated_shap': aggregated}, f)
 
     return ranking, mean_abs
 
@@ -117,29 +149,18 @@ def compute_metrics_from_arrays(y_true, y_pred, y_proba=None):
 def train_and_evaluate_single_seed(
     df, X, y, feature_indices, random_state=42
 ):
-    """Train a model on a subset of features for a single seed and return metrics."""
-    X_train, X_test, y_train, y_test, _ = stratified_coach_level_split(
-        df, X, y,
-        test_size=MODEL_CONFIG['test_size'],
-        random_state=random_state,
-    )
+    """Train a model on a subset of features for a single seed and return metrics.
 
-    X_train_sub = np.asarray(X_train)[:, feature_indices]
-    X_test_sub = np.asarray(X_test)[:, feature_indices]
-    y_train_arr = np.asarray(y_train)
-    y_test_arr = np.asarray(y_test)
+    The leakage-free split (coach-level split, train-only SVD imputation, top-K
+    selection) and the model fit are the shared pipeline primitives.
+    """
+    split = leakage_free_split(df, X, y, random_state, feature_indices=feature_indices)
+    model = fit_model(split, ordinal_model, random_state)
 
-    model = CoachTenureModel(
-        use_ordinal=True,
-        n_classes=3,
-        random_state=random_state,
-    )
-    model.fit(pd.DataFrame(X_train_sub), pd.Series(y_train_arr), verbose=0)
+    y_pred = model.predict(pd.DataFrame(split.X_test))
+    y_proba = model.predict_proba(pd.DataFrame(split.X_test))
 
-    y_pred = model.predict(pd.DataFrame(X_test_sub))
-    y_proba = model.predict_proba(pd.DataFrame(X_test_sub))
-
-    return compute_metrics_from_arrays(y_test_arr, y_pred, y_proba)
+    return compute_metrics_from_arrays(split.y_test, y_pred, y_proba)
 
 
 def run_parsimony_analysis(
@@ -308,8 +329,7 @@ def generate_results_table(all_results, feature_ranking, shap_values):
     print(r"\end{table}")
 
     # Feature list for top-K models
-    from scripts.shap_analysis import get_feature_names
-    feature_names = get_feature_names()
+    feature_names = readable_feature_names()
 
     for k in [10, 20]:
         if k in feature_counts:
@@ -376,8 +396,7 @@ def main():
     feature_ranking, shap_values = get_shap_feature_ranking()
 
     print(f"\nTop 10 features by SHAP importance:")
-    from scripts.shap_analysis import get_feature_names
-    feature_names = get_feature_names()
+    feature_names = readable_feature_names()
     for i in range(10):
         idx = feature_ranking[i]
         print(f"  {i+1:>2}. {feature_names[idx]:<45} |SHAP| = {shap_values[idx]:.4f}")
