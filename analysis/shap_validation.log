@@ -1,0 +1,351 @@
+Computing SHAP values across 50 seeds for top-20 features (of 171); leakage-free per-split imputation
+Category breakdown: {'HC Opp Stats': np.int64(5), 'HC Team Stats': np.int64(5), 'OC Stats': np.int64(3), 'DC Stats': np.int64(3), 'Rank/Recency': np.int64(2), 'Core Experience': np.int64(1), 'Career Path': np.int64(1)}
+
+
+Computing SHAP values (TreeExplainer, exact) for 75 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed  0/50: total_SHAP=2.5840, Def/Off=0.742
+
+Computing SHAP values (TreeExplainer, exact) for 75 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed  1/50: total_SHAP=2.4894, Def/Off=0.793
+
+Computing SHAP values (TreeExplainer, exact) for 74 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed  2/50: total_SHAP=2.8221, Def/Off=0.743
+
+Computing SHAP values (TreeExplainer, exact) for 75 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed  3/50: total_SHAP=2.5408, Def/Off=0.643
+
+Computing SHAP values (TreeExplainer, exact) for 75 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed  4/50: total_SHAP=2.5780, Def/Off=1.328
+
+Computing SHAP values (TreeExplainer, exact) for 74 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed  5/50: total_SHAP=2.3537, Def/Off=1.143
+
+Computing SHAP values (TreeExplainer, exact) for 77 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed  6/50: total_SHAP=2.3758, Def/Off=1.588
+
+Computing SHAP values (TreeExplainer, exact) for 73 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed  7/50: total_SHAP=2.5291, Def/Off=0.782
+
+Computing SHAP values (TreeExplainer, exact) for 74 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed  8/50: total_SHAP=2.4567, Def/Off=1.092
+
+Computing SHAP values (TreeExplainer, exact) for 76 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed  9/50: total_SHAP=2.7006, Def/Off=1.181
+
+Computing SHAP values (TreeExplainer, exact) for 74 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 10/50: total_SHAP=2.3778, Def/Off=0.911
+
+Computing SHAP values (TreeExplainer, exact) for 73 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 11/50: total_SHAP=2.6900, Def/Off=1.418
+
+Computing SHAP values (TreeExplainer, exact) for 74 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 12/50: total_SHAP=2.5354, Def/Off=1.056
+
+Computing SHAP values (TreeExplainer, exact) for 75 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 13/50: total_SHAP=2.3688, Def/Off=0.717
+
+Computing SHAP values (TreeExplainer, exact) for 73 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 14/50: total_SHAP=2.4679, Def/Off=0.880
+
+Computing SHAP values (TreeExplainer, exact) for 74 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 15/50: total_SHAP=2.3387, Def/Off=1.250
+
+Computing SHAP values (TreeExplainer, exact) for 73 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 16/50: total_SHAP=2.4622, Def/Off=0.874
+
+Computing SHAP values (TreeExplainer, exact) for 73 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 17/50: total_SHAP=2.5455, Def/Off=1.161
+
+Computing SHAP values (TreeExplainer, exact) for 74 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 18/50: total_SHAP=2.2994, Def/Off=1.304
+
+Computing SHAP values (TreeExplainer, exact) for 73 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 19/50: total_SHAP=2.4697, Def/Off=0.647
+
+Computing SHAP values (TreeExplainer, exact) for 73 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 20/50: total_SHAP=2.5769, Def/Off=0.652
+
+Computing SHAP values (TreeExplainer, exact) for 74 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 21/50: total_SHAP=2.3257, Def/Off=0.814
+
+Computing SHAP values (TreeExplainer, exact) for 74 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 22/50: total_SHAP=2.6401, Def/Off=1.406
+
+Computing SHAP values (TreeExplainer, exact) for 74 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 23/50: total_SHAP=2.5820, Def/Off=1.036
+
+Computing SHAP values (TreeExplainer, exact) for 73 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 24/50: total_SHAP=2.4153, Def/Off=1.106
+
+Computing SHAP values (TreeExplainer, exact) for 76 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 25/50: total_SHAP=2.4977, Def/Off=1.048
+
+Computing SHAP values (TreeExplainer, exact) for 74 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 26/50: total_SHAP=2.6545, Def/Off=1.012
+
+Computing SHAP values (TreeExplainer, exact) for 74 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 27/50: total_SHAP=2.6782, Def/Off=1.168
+
+Computing SHAP values (TreeExplainer, exact) for 77 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 28/50: total_SHAP=2.4996, Def/Off=1.746
+
+Computing SHAP values (TreeExplainer, exact) for 74 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 29/50: total_SHAP=2.5480, Def/Off=0.986
+
+Computing SHAP values (TreeExplainer, exact) for 74 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 30/50: total_SHAP=2.5283, Def/Off=1.370
+
+Computing SHAP values (TreeExplainer, exact) for 75 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 31/50: total_SHAP=2.5295, Def/Off=1.099
+
+Computing SHAP values (TreeExplainer, exact) for 75 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 32/50: total_SHAP=2.3807, Def/Off=1.071
+
+Computing SHAP values (TreeExplainer, exact) for 76 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 33/50: total_SHAP=2.2536, Def/Off=0.836
+
+Computing SHAP values (TreeExplainer, exact) for 73 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 34/50: total_SHAP=2.5124, Def/Off=1.098
+
+Computing SHAP values (TreeExplainer, exact) for 76 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 35/50: total_SHAP=2.6000, Def/Off=0.941
+
+Computing SHAP values (TreeExplainer, exact) for 73 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 36/50: total_SHAP=2.5012, Def/Off=1.401
+
+Computing SHAP values (TreeExplainer, exact) for 74 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 37/50: total_SHAP=2.5338, Def/Off=0.919
+
+Computing SHAP values (TreeExplainer, exact) for 76 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 38/50: total_SHAP=2.4697, Def/Off=1.136
+
+Computing SHAP values (TreeExplainer, exact) for 74 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 39/50: total_SHAP=2.5232, Def/Off=1.101
+
+Computing SHAP values (TreeExplainer, exact) for 74 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 40/50: total_SHAP=2.5563, Def/Off=1.079
+
+Computing SHAP values (TreeExplainer, exact) for 74 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 41/50: total_SHAP=2.3806, Def/Off=1.137
+
+Computing SHAP values (TreeExplainer, exact) for 73 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 42/50: total_SHAP=2.7012, Def/Off=1.026
+
+Computing SHAP values (TreeExplainer, exact) for 74 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 43/50: total_SHAP=2.1282, Def/Off=1.168
+
+Computing SHAP values (TreeExplainer, exact) for 74 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 44/50: total_SHAP=2.5239, Def/Off=1.638
+
+Computing SHAP values (TreeExplainer, exact) for 75 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 45/50: total_SHAP=2.3613, Def/Off=0.872
+
+Computing SHAP values (TreeExplainer, exact) for 76 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 46/50: total_SHAP=2.4627, Def/Off=1.121
+
+Computing SHAP values (TreeExplainer, exact) for 76 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 47/50: total_SHAP=2.5615, Def/Off=1.589
+
+Computing SHAP values (TreeExplainer, exact) for 73 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 48/50: total_SHAP=2.3654, Def/Off=0.940
+
+Computing SHAP values (TreeExplainer, exact) for 73 samples...
+  Classifier 0 (P(Y > 0))... done
+  Classifier 1 (P(Y > 1))... done
+Aggregating SHAP values across classifiers...
+  Seed 49/50: total_SHAP=2.3388, Def/Off=1.119
+
+======================================================================
+RESULTS (50 valid seeds out of 50)
+======================================================================
+
+Per-feature normalized importance (top 20):
+Rank  Feature                           Imp   CI_lo   CI_hi
+------------------------------------------------------------
+1     1stD Rushing (HC Opp)          0.105  [0.098, 0.113]
+2     age                            0.096  [0.090, 0.102]
+3     4DAtt (HC Opp)                 0.066  [0.058, 0.074]
+4     TO% (OC)                       0.064  [0.059, 0.070]
+5     TO% (HC)                       0.058  [0.051, 0.066]
+6     NY/A Passing (HC)              0.056  [0.050, 0.061]
+7     Yds Penalties (HC)             0.053  [0.046, 0.060]
+8     rf_final_winpct_pctl           0.046  [0.040, 0.052]
+9     rf_avg_winpct_pctl             0.046  [0.042, 0.050]
+10    1stPy (HC)                     0.044  [0.039, 0.049]
+11    Yds Average Drive (HC Opp)     0.043  [0.037, 0.049]
+12    TO% (HC Opp)                   0.043  [0.038, 0.048]
+13    Yds Rushing (OC)               0.041  [0.034, 0.049]
+14    Cmp Passing (DC)               0.041  [0.037, 0.046]
+15    RZAtt (OC)                     0.036  [0.032, 0.041]
+16    4D% (DC)                       0.035  [0.031, 0.040]
+17    Att Passing (HC Opp)           0.032  [0.027, 0.038]
+18    TO% (DC)                       0.032  [0.028, 0.036]
+19    cf_internal_hire               0.032  [0.027, 0.037]
+20    4D% (HC)                       0.028  [0.024, 0.031]
+
+Category importance (unnormalized mean |SHAP|):
+Category                        # Feat    Total      Avg
+------------------------------------------------------------
+HC Team Stats                        5   0.5946   0.1189
+HC Opp Stats                         5   0.7222   0.1444
+DC Stats                             3   0.2715   0.0905
+OC Stats                             3   0.3550   0.1183
+Core Experience                      1   0.2400   0.2400
+Career Path                          1   0.0795   0.0795
+Rank/Recency                         2   0.2294   0.1147
+HC Stats (combined)                 10   1.3168   0.1317
+
+Defensive/Offensive SHAP Ratio:
+  Mean: 1.0778
+  Std:  0.2606
+  95% CI: [1.0037, 1.1519]
+  Rounded: 1.08, CI [1.00, 1.15]
+
+Saved to C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\shap_validation_data.pkl

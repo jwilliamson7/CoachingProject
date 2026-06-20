@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 import numpy as np
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.decomposition import TruncatedSVD
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
@@ -13,6 +14,103 @@ warnings.filterwarnings('ignore')
 # Add project root to path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
+
+
+class SVDImputer(BaseEstimator, TransformerMixin):
+    """Leakage-free iterative truncated-SVD imputer with fit/transform separation.
+
+    The low-rank factorization and the mean-initialization values are learned
+    from the training partition only (``fit``), then applied unchanged to any
+    matrix (``transform``). This removes two leaks present in the original
+    full-matrix imputation:
+
+      1. Train/test leakage -- the SVD basis previously saw held-out rows
+         because imputation was run once on the whole 656-row matrix before
+         splitting.
+      2. Target leakage -- the original routine factorized every numeric
+         column, which included ``Coach Tenure Class`` (the prediction target)
+         and ``Avg 2Y Win Pct``. This imputer should be fit on feature columns
+         only, so outcome information never enters the reconstruction.
+
+    Parameters mirror the original ``matrix_factorization_imputation`` routine
+    (50 components, mean initialization, iterative SVD to convergence) so that a
+    full-sample fit reproduces the previous behaviour up to the removal of the
+    leaked columns.
+    """
+
+    def __init__(self, n_components=50, max_iter=50, tol=1e-6, random_state=42):
+        self.n_components = n_components
+        self.max_iter = max_iter
+        self.tol = tol
+        self.random_state = random_state
+
+    def fit(self, X, y=None):
+        X = np.asarray(X, dtype=float)
+        n_samples, n_features = X.shape
+        rank = min(self.n_components, n_samples, n_features - 1)
+        self.n_components_ = rank
+
+        missing = np.isnan(X)
+        # Column means from observed (training) entries; 0 for all-missing cols
+        col_means = np.nanmean(X, axis=0)
+        col_means = np.where(np.isnan(col_means), 0.0, col_means)
+        self.col_means_ = col_means
+
+        current = X.copy()
+        if missing.any():
+            current[missing] = np.take(col_means, np.where(missing)[1])
+
+        prev = None
+        svd = None
+        for _ in range(self.max_iter):
+            svd = TruncatedSVD(n_components=rank, random_state=self.random_state)
+            reduced = svd.fit_transform(current)
+            recon = svd.inverse_transform(reduced)
+            new = current.copy()
+            if missing.any():
+                new[missing] = recon[missing]
+            if prev is not None and missing.any():
+                diff = np.mean(np.abs(new[missing] - prev[missing]))
+                if diff < self.tol:
+                    current = new
+                    break
+            prev = new.copy()
+            current = new
+            if not missing.any():
+                break
+
+        self.components_ = svd.components_  # (rank, n_features), learned on train
+        self.explained_variance_ratio_sum_ = float(svd.explained_variance_ratio_.sum())
+        self.train_imputed_ = current
+        return self
+
+    def transform(self, X):
+        X = np.asarray(X, dtype=float)
+        missing = np.isnan(X)
+        current = X.copy()
+        if not missing.any():
+            return current
+        current[missing] = np.take(self.col_means_, np.where(missing)[1])
+
+        comp = self.components_  # fixed training basis (no refit on new data)
+        prev = None
+        for _ in range(self.max_iter):
+            recon = (current @ comp.T) @ comp
+            new = current.copy()
+            new[missing] = recon[missing]
+            if prev is not None:
+                diff = np.mean(np.abs(new[missing] - prev[missing]))
+                if diff < self.tol:
+                    current = new
+                    break
+            prev = new.copy()
+            current = new
+        return current
+
+    def fit_transform(self, X):
+        self.fit(X)
+        return self.transform(X)
+
 
 def matrix_factorization_imputation(data, n_components=50, max_iter=200, random_state=42):
     """

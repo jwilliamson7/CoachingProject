@@ -1,0 +1,80 @@
+rid,coach,hire_year,last_year,duration,final_record,final_winpct,age_at_exit,notes,coached_after,hc_elsewhere_next,hc_elsewhere_after,exit_type
+0,Sid Gillman,1973,1974,2,7-7,0.5,63.0,,1,0,0,nonlosing_left?
+1,Paul Brown,1970,1975,6,11-3,0.786,67.0,,0,0,0,nonlosing_left?
+2,John Ralston,1972,1976,5,9-5,0.643,49.0,,1,0,0,nonlosing_left?
+3,Monte Clark,1976,1976,1,8-6,0.571,39.0,,1,0,1,nonlosing_left?
+4,Chuck Knox,1973,1977,5,10-4,0.714,45.0,,1,1,1,moved_team?
+5,Don Coryell,1973,1977,5,7-7,0.5,53.0,,1,1,1,moved_team?
+6,George Allen,1971,1977,7,9-5,0.643,59.0,,0,0,0,nonlosing_left?
+7,Jack Pardee,1975,1977,3,9-5,0.643,41.0,,1,1,1,moved_team?
+8,Chuck Fairbanks,1973,1978,6,11-4,0.733,45.0,,1,0,0,nonlosing_left?
+9,John Madden,1970,1978,9,9-7,0.563,42.0,,0,0,0,nonlosing_left?
+10,Larry Wilson,1979,1979,1,2-1,0.667,41.0,,0,0,0,nonlosing_left?
+11,Bum Phillips,1975,1980,6,11-5,0.688,57.0,,1,1,1,moved_team?
+12,Red Miller,1977,1980,4,8-8,0.5,53.0,,1,0,0,nonlosing_left?
+13,Leeman Bennett,1977,1982,6,5-4,0.556,44.0,,1,0,1,nonlosing_left?
+14,Mike McCormack,1982,1982,1,4-3,0.571,52.0,,0,0,0,nonlosing_left?
+15,Walt Michaels,1977,1982,6,6-3,0.667,53.0,,1,0,0,nonlosing_left?
+16,Bart Starr,1975,1983,9,8-8,0.5,49.0,,0,0,0,nonlosing_left?
+17,Ron Meyer,1982,1984,3,5-3,0.625,43.0,,1,0,1,nonlosing_left?
+18,Fred Bruney,1985,1985,1,1-0,1.0,54.0,,1,0,0,nonlosing_left?
+19,John Mackovic,1983,1986,4,10-6,0.625,43.0,,1,0,0,nonlosing_left?
+20,Bill Walsh,1979,1988,10,10-6,0.625,57.0,Super Bowl Champions,1,0,0,nonlosing_left?
+21,Marty Schottenheimer,1985,1988,4,10-6,0.625,45.0,,1,1,1,moved_team?
+22,Jerry Glanville,1986,1989,4,9-7,0.563,48.0,,1,1,1,moved_team?
+23,Bill Parcells,1983,1990,8,13-3,0.813,49.0,Super Bowl Champions,1,0,1,nonlosing_left?
+24,Buddy Ryan,1986,1990,5,10-6,0.625,59.0,,1,0,1,nonlosing_left?
+25,Jerry Burns,1986,1991,6,8-8,0.5,64.0,,0,0,0,nonlosing_left?
+26,Dan Reeves,1981,1992,12,8-8,0.5,48.0,,1,1,1,moved_team?
+27,Joe Gibbs,1981,1992,12,9-7,0.563,52.0,,1,0,0,nonlosing_left?
+28,Bruce Coslet,1990,1993,4,8-8,0.5,47.0,,1,0,1,nonlosing_left?
+29,Jimmy Johnson,1989,1993,5,12-4,0.75,50.0,Super Bowl Champions,1,0,1,nonlosing_left?
+30,Art Shell,1989,1994,6,9-7,0.563,48.0,,1,0,0,nonlosing_left?
+31,Don Shula,1970,1995,26,9-7,0.563,65.0,,0,0,0,nonlosing_left?
+32,Ted Marchibroda,1992,1995,4,9-7,0.563,64.0,,1,1,1,moved_team?
+33,Bill Parcells,1993,1996,4,11-5,0.688,55.0,AFC Champions,1,1,1,moved_team?
+34,Bobby Ross,1992,1996,5,8-8,0.5,61.0,,1,1,1,moved_team?
+35,George Seifert,1989,1996,8,12-4,0.75,56.0,,1,0,1,nonlosing_left?
+36,Dennis Erickson,1995,1998,4,8-8,0.5,51.0,,1,0,1,nonlosing_left?
+37,Mike Holmgren,1992,1998,7,11-5,0.688,50.0,,1,1,1,moved_team?
+38,Bill Parcells,1997,1999,3,8-8,0.5,58.0,,1,0,1,nonlosing_left?
+39,Chan Gailey,1998,1999,2,8-8,0.5,47.0,,1,0,1,nonlosing_left?
+40,Dick Vermeil,1997,1999,3,13-3,0.813,63.0,Super Bowl Champions,1,0,1,nonlosing_left?
+41,Jimmy Johnson,1996,1999,4,9-7,0.563,56.0,,0,0,0,nonlosing_left?
+42,Pete Carroll,1997,1999,3,8-8,0.5,48.0,,1,0,1,nonlosing_left?
+43,Ray Rhodes,1999,1999,1,8-8,0.5,49.0,,1,0,0,nonlosing_left?
+44,Al Groh,2000,2000,1,9-7,0.563,56.0,,1,0,0,nonlosing_left?
+45,Bobby Ross,1997,2000,4,5-4,0.556,65.0,Resigned after week 10,1,0,0,resigned_notes
+46,Gary Moeller,2000,2000,1,4-3,0.571,59.0,Coach starting week 11,1,0,0,nonlosing_left?
+47,Wade Phillips,1998,2000,3,8-8,0.5,53.0,,1,0,1,nonlosing_left?
+48,Jon Gruden,1998,2001,4,10-6,0.625,38.0,,1,1,1,moved_team?
+49,Marty Schottenheimer,2001,2001,1,8-8,0.5,58.0,,1,1,1,moved_team?
+50,Tony Dungy,1996,2001,6,9-7,0.563,46.0,,1,1,1,moved_team?
+51,Steve Mariucci,1997,2002,6,10-6,0.625,47.0,,1,1,1,moved_team?
+52,Dick Vermeil,2001,2005,5,10-6,0.625,69.0,,0,0,0,nonlosing_left?
+53,Mike Tice,2002,2005,4,9-7,0.563,46.0,,1,0,0,nonlosing_left?
+54,Bill Cowher,1992,2006,15,8-8,0.5,49.0,,0,0,0,nonlosing_left?
+55,Bill Parcells,2003,2006,4,9-7,0.563,65.0,,0,0,0,nonlosing_left?
+56,Marty Schottenheimer,2002,2006,5,14-2,0.875,63.0,,1,0,0,nonlosing_left?
+57,Joe Gibbs,2004,2007,4,9-7,0.563,67.0,,0,0,0,nonlosing_left?
+58,Eric Mangini,2006,2008,3,9-7,0.563,37.0,,1,1,1,moved_team?
+59,Jon Gruden,2002,2008,7,9-7,0.563,45.0,,1,0,1,nonlosing_left?
+60,Mike Shanahan,1995,2008,14,8-8,0.5,56.0,,1,0,1,nonlosing_left?
+61,Tony Dungy,2002,2008,7,12-4,0.75,53.0,,0,0,0,nonlosing_left?
+62,Tom Cable,2009,2010,2,8-8,0.5,46.0,,1,0,0,nonlosing_left?
+63,Hue Jackson,2011,2011,1,8-8,0.5,46.0,,1,0,1,nonlosing_left?
+64,Lovie Smith,2004,2012,9,10-6,0.625,54.0,,1,0,1,nonlosing_left?
+65,Doug Marrone,2013,2014,2,9-7,0.563,50.0,,1,0,1,nonlosing_left?
+66,Jim Harbaugh,2011,2014,4,8-8,0.5,51.0,,1,0,1,nonlosing_left?
+67,John Fox,2011,2014,4,12-4,0.75,59.0,,1,1,1,moved_team?
+68,Gary Kubiak,2015,2016,2,9-7,0.563,55.0,,1,0,0,nonlosing_left?
+69,Bruce Arians,2013,2017,5,8-8,0.5,65.0,,1,0,1,nonlosing_left?
+70,Jim Caldwell,2014,2017,4,9-7,0.563,62.0,,1,0,0,nonlosing_left?
+71,Mike Mularkey,2016,2017,2,9-7,0.563,56.0,,1,0,0,nonlosing_left?
+72,Jason Garrett,2010,2019,10,8-8,0.5,53.0,,1,0,0,nonlosing_left?
+73,Brian Flores,2019,2021,3,9-8,0.529,40.0,,1,0,0,nonlosing_left?
+74,Bruce Arians,2019,2021,3,13-4,0.765,69.0,,0,0,0,nonlosing_left?
+75,Jon Gruden,2018,2021,4,3-2,0.6,58.0,Resigned after Week 5,0,0,0,resigned_notes
+76,Jon Gruden,2020,2021,2,3-2,0.6,58.0,Resigned after Week 5,0,0,0,resigned_notes
+77,Sean Payton,2006,2021,16,9-8,0.529,58.0,,1,0,1,nonlosing_left?
+78,Pete Carroll,2010,2023,14,9-8,0.529,72.0,,1,0,1,nonlosing_left?

@@ -148,12 +148,19 @@ class CoachTenureModel:
         self : CoachTenureModel
             Fitted model.
         """
-        X = np.asarray(X)
+        X = np.asarray(X, dtype=float)
         y = np.asarray(y)
 
-        # Impute missing values
-        self.imputer_ = SimpleImputer(strategy='mean')
-        X_imputed = self.imputer_.fit_transform(X)
+        # Impute missing values with a leakage-free SVD imputer fit on THIS
+        # training set only (then applied to test data in predict). If the
+        # caller already imputed (no missing values remain), skip it.
+        if np.isnan(X).any():
+            from scripts.data.matrix_factorization_imputation import SVDImputer
+            self.imputer_ = SVDImputer().fit(X)
+            X_imputed = self.imputer_.transform(X)
+        else:
+            self.imputer_ = None
+            X_imputed = X
 
         if tune_hyperparameters:
             self._fit_with_tuning(X_imputed, y, n_iter, cv_splits, verbose)
@@ -273,8 +280,8 @@ class CoachTenureModel:
             Predicted class labels.
         """
         self._check_is_fitted()
-        X = np.asarray(X)
-        X_imputed = self.imputer_.transform(X)
+        X = np.asarray(X, dtype=float)
+        X_imputed = self.imputer_.transform(X) if self.imputer_ is not None else X
         return self.model_.predict(X_imputed)
 
     def predict_proba(self, X: Union[np.ndarray, pd.DataFrame]) -> np.ndarray:
@@ -292,8 +299,8 @@ class CoachTenureModel:
             Class probabilities.
         """
         self._check_is_fitted()
-        X = np.asarray(X)
-        X_imputed = self.imputer_.transform(X)
+        X = np.asarray(X, dtype=float)
+        X_imputed = self.imputer_.transform(X) if self.imputer_ is not None else X
         return self.model_.predict_proba(X_imputed)
 
     def evaluate(

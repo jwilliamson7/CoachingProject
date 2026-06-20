@@ -22,7 +22,8 @@ from data_constants import (
     get_all_feature_names,
     get_feature_dict,
     get_hiring_team_stat_dict,
-    get_output_column_names
+    get_output_column_names,
+    unit_stat_sign,
 )
 
 
@@ -145,37 +146,37 @@ class CoachingDataProcessor:
         team_row = team_df[team_df['Team Abbreviation'] == team_abbrev]
         opponent_row = opponent_df[opponent_df['Team Abbreviation'] == team_abbrev]
         
-        # Process data based on role
+        # Process data based on role -- pool every "your-unit" role-season-SIDE into
+        # the single oriented __unit block (positive = good unit). All four legacy
+        # parallel blocks are merged here:
+        #   OC season -> +sign * team offense
+        #   HC season -> +sign * team offense  AND  -sign * opponent allowed (defense)
+        #   DC season -> -sign * opponent offense allowed  (low allowed = good defense)
+        # An HC season therefore contributes BOTH sides; OC offense only; DC defense
+        # only. _safe_mean later averages across all pooled role-season-sides,
+        # dropping any whose league value is missing (the exact season-weighted pool).
+        def _add_offense(row):
+            for col in row.columns:
+                if col != 'Team Abbreviation':
+                    key = f"{col}__unit"
+                    if key in feature_dict:
+                        feature_dict[key].append(unit_stat_sign(col) * row[col].values[0])
+
+        def _add_defense(row):
+            for col in row.columns:
+                if col != 'Team Abbreviation':
+                    key = f"{col}__unit"
+                    if key in feature_dict:
+                        feature_dict[key].append(-unit_stat_sign(col) * row[col].values[0])
+
         if role == "HC":
-            # Head coach gets both team and opponent stats
-            for col in team_row.columns:
-                if col != 'Team Abbreviation':
-                    feature_key = f"{col}__hc"
-                    if feature_key in feature_dict:
-                        feature_dict[feature_key].append(team_row[col].values[0])
-            
-            for col in opponent_row.columns:
-                if col != 'Team Abbreviation':
-                    feature_key = f"{col}__opp__hc"
-                    if feature_key in feature_dict:
-                        feature_dict[feature_key].append(opponent_row[col].values[0])
-        
+            _add_offense(team_row)       # team's offense under the HC
+            _add_defense(opponent_row)   # team's defense under the HC (points allowed)
         elif role == "OC":
-            # Offensive coordinator gets team offensive stats
-            for col in team_row.columns:
-                if col != 'Team Abbreviation':
-                    feature_key = f"{col}__oc"
-                    if feature_key in feature_dict:
-                        feature_dict[feature_key].append(team_row[col].values[0])
-        
+            _add_offense(team_row)
         elif role == "DC":
-            # Defensive coordinator gets opponent offensive stats (team's defensive performance)
-            for col in opponent_row.columns:
-                if col != 'Team Abbreviation':
-                    feature_key = f"{col}__dc"
-                    if feature_key in feature_dict:
-                        feature_dict[feature_key].append(opponent_row[col].values[0])
-        
+            _add_defense(opponent_row)
+
         return team_index
     
     def _get_hiring_team_context(self, franchise: str, hire_year: int) -> List[float]:

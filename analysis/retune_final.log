@@ -1,0 +1,77 @@
+Loading data from C:\Users\jonwi\Documents\Projects\CoachingProject\data/master_data_extended.csv...
+Loaded 373 instances with known tenure classifications
+
+Dataset summary:
+  Total instances: 373
+  Features: 171
+  Class distribution:
+    Class 0: 134 (35.9%)
+    Class 1: 123 (33.0%)
+    Class 2: 116 (31.1%)
+
+============================================================
+Training ORDINAL model with QWK-based tuning
+============================================================
+Train set: 300 instances
+Test set: 73 instances
+No coach overlap between train/test: True
+
+Using 5-fold coach-level CV for hyperparameter tuning
+Optimization metric: Quadratic Weighted Kappa (QWK)
+
+============================================================
+Hold-out Test Set Performance
+============================================================
+============================================================
+              NFL Coach Tenure Model (Ordinal)              
+============================================================
+
+ORDINAL METRICS
+----------------------------------------
+Mean Absolute Error (MAE):  0.8082
+Quadratic Weighted Kappa:   0.0619
+Adjacent Accuracy (+-1):    0.8356
+Exact Accuracy:             0.3562
+Macro F1 Score:             0.3493
+AUROC (macro):              0.5104
+
+PER-CLASS METRICS
+----------------------------------------
+Class                 Precision     Recall         F1    Support
+Class 0 (1-2 yrs)         0.333      0.381      0.356         21
+Class 1 (3-4 yrs)         0.353      0.480      0.407         25
+Class 2 (5+ yrs)          0.400      0.222      0.286         27
+
+CONFUSION MATRIX
+----------------------------------------
+             Predicted
+              0      1      2
+Actual 0:      8      8      5
+Actual 1:      9     12      4
+Actual 2:      7     14      6
+============================================================
+Model saved to C:\Users\jonwi\Documents\Projects\CoachingProject\data/models/coach_tenure_ordinal_qwk_model.pkl
+
+============================================================
+TRAINING SUMMARY
+============================================================
+Optimization metric: Quadratic Weighted Kappa (QWK)
+Best CV QWK score: (see above)
+Test set QWK: 0.0619
+Test set MAE: 0.8082
+Test set Adjacent Accuracy: 0.8356
+
+Best hyperparameters:
+  colsample_bytree: 0.8
+  gamma: 0
+  learning_rate: 0.35
+  max_depth: 2
+  min_child_weight: 1
+  n_estimators: 50
+  reg_alpha: 0
+  reg_lambda: 0.1
+  subsample: 0.8
+
+Model saved to: C:\Users\jonwi\Documents\Projects\CoachingProject\data/models/coach_tenure_ordinal_qwk_model.pkl
+
+Training complete!
