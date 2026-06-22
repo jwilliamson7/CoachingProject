@@ -35,7 +35,7 @@ from scripts.shap_analysis import compute_shap_values, compute_aggregated_shap
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
 
-EXT = os.path.join(project_root, "data", "master_data_extended.csv")
+EXT = os.path.join(project_root, "data", "master_data.csv")
 N_SEEDS = 50
 COUNTS = [5, 10, 20, 30, 40, 50, 60, 80, 100, 130, 150]
 METRICS = ["qwk", "mae", "macro_f1", "adjacent_accuracy", "exact_accuracy"]
