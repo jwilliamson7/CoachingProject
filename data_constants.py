@@ -233,10 +233,16 @@ FIRED_COACHES = [
     "Jerod Mayo"
 ]
 
-# Coach-year hiring instances to exclude from final dataset
-# Format: (coach_name, hire_year) tuples
+# Coach-year hiring instances to exclude from the final dataset.
+# Format: (coach_name, hire_year) tuples.
 EXCLUDED_HIRING_INSTANCES = [
-    ("Sean Payton", 2013)  # Interim/temporary hire that should not be included in analysis
+    # Sean Payton was SUSPENDED for the entire 2012 season (still the Saints' head
+    # coach of record, but that season is absent from the PFR ranks table). The
+    # ranks gap makes his 2013 return look like a brand-new hire to the stint
+    # detector, so we exclude that phantom 2013 instance. His real, continuous
+    # 2006-2021 Saints stint is captured by the 2006 instance (tenure recomputed
+    # relocation/gap-aware), and his 2023 Denver hire is a separate instance.
+    ("Sean Payton", 2013),
 ]
 
 

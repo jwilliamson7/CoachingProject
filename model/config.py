@@ -139,13 +139,14 @@ MODEL_PATHS: Dict[str, str] = {
     # The path is kept only so any unported legacy script fails loudly rather
     # than silently reading stale/leaked data.
     'data_file': 'data/svd_imputed_master_data.csv',
-    # Canonical modeling input (Jun 2026): modern-era (1970+) raw features with the
-    # Tier 1+2 engineered career-path/rank features appended (150 + 21 = 171),
-    # un-imputed (imputation is fit per train split). Built by
-    # scripts/data/engineer_career_features.py. The original all-era 150-feature
-    # raw file remains at data/master_data.csv.
-    'raw_data_file': 'data/master_data_extended.csv',
-    'raw_data_file_original': 'data/master_data.csv',
+    # Single canonical modeling input (Jun 2026): the modern-era (1970+) hiring
+    # instances with population hygiene + relocation/partial-season-corrected tenure
+    # labels and the engineered career-path/rank/org/roster/team-quality features
+    # appended (94 modeled feature columns), un-imputed (imputation is fit per train
+    # split). Built in ONE pass by scripts/data/create_data.py
+    # (CoachingDataProcessor -> engineer_career_features.build_modeling_dataset);
+    # there is no separate base/_extended file anymore.
+    'raw_data_file': 'data/master_data.csv',
     'models_dir': 'data/models',
     'default_model_output': 'data/models/coach_tenure_model.pkl',
     'ordinal_model_output': 'data/models/coach_tenure_ordinal_model.pkl',

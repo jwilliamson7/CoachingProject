@@ -41,6 +41,7 @@ from lifelines.utils import concordance_index
 from model.pipeline import load_modeling_data, leakage_free_split
 from scripts.survival_analysis import global_max_season, build_survival_targets, tci
 from scripts.survival_models import cox_builder, eval_model, N_SEEDS
+from scripts.survival_methods import drop_redundant_features
 
 warnings.filterwarnings("ignore")
 
@@ -48,7 +49,7 @@ warnings.filterwarnings("ignore")
 # meant to be optimized; the point is the floor. (The full model row uses its own
 # CV-tuned penalizer, loaded from the canonical-validate artifact.)
 BASELINE_COX = {"penalizer": 0.1, "l1_ratio": 0.0}
-CANON_PKL = os.path.join(project_root, "analysis", "survival_canonical_validate.pkl")
+DEF_PKL = os.path.join(project_root, "analysis", "survival_definitive.pkl")
 
 
 def km_null_cindex(df, X, y, dur, evt):
@@ -69,7 +70,9 @@ def cox_cindex(df, X, y, dur, evt, idx, params=BASELINE_COX):
 
 
 def main():
-    df, X, y = load_modeling_data()
+    # known_only=False to match survival_definitive: the still-active coaches are
+    # right-censored observations, not dropped (see survival_definitive.py).
+    df, X, y = load_modeling_data(known_only=False)
     boundary = global_max_season()
     dur, evt = build_survival_targets(df, boundary)
     keep = dur.index
@@ -94,12 +97,18 @@ def main():
     resume = sorted(core + cf + rf)                      # who the coach is
     # unit = the coach's prior on-field performance
 
-    # ---- full CV-selected model (recomputed on same seeds) ----
-    with open(CANON_PKL, "rb") as f:
-        canon = pickle.load(f)
-    full_feats = canon.get("top") or canon.get("selected")
-    full_params = canon.get("cox_params", BASELINE_COX)
-    full_idx = [pos[c] for c in full_feats]
+    # ---- full selected model: use the SAME stable set + params as the headline
+    # (survival_definitive.pkl) so the ablation's full row equals the bake-off ----
+    with open(DEF_PKL, "rb") as f:
+        defn = pickle.load(f)
+    full_feats = defn["stable"]
+    full_params = defn.get("cox_params", BASELINE_COX)
+    # The full row must equal survival_definitive's headline exactly, so it uses
+    # the SAME redundancy-pruned matrix the selection + hazard model used (the
+    # construct ablations above intentionally stay on the full feature set).
+    Xp = drop_redundant_features(X)
+    posp = {c: i for i, c in enumerate(Xp.columns)}
+    full_idx = [posp[c] for c in full_feats]
 
     rows = []  # (label, scores)
     rows.append(("KM null (no covariates)", km_null_cindex(df, X, y, dur, evt)))
@@ -121,7 +130,7 @@ def main():
     rows.append((f"Coach unit performance ({len(unit)})",
                  cox_cindex(df, X, y, dur, evt, unit)))
     rows.append((f"FULL CV-selected ({len(full_idx)})",
-                 cox_cindex(df, X, y, dur, evt, full_idx, full_params)))
+                 cox_cindex(df, Xp, y, dur, evt, full_idx, full_params)))
 
     print("=" * 64)
     print(f"{'baseline':<34}{'C-index':>10}{'95% CI':>20}")

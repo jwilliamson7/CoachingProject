@@ -61,7 +61,7 @@ def fig_stability(d, top=18):
     ax.axvline(thr, ls="--", color=REF, alpha=0.8,
                label=f"stable threshold = {thr:g}")
     ax.set_xlim(0, 1)
-    ax.set_xlabel("Selection frequency (200 coach-level subsamples)")
+    ax.set_xlabel("Selection frequency (2000 coach-level subsamples)")
     ax.set_title("Cox-native stability selection")
     ax.legend(loc="lower right", frameon=False)
     _save(fig, "survival_stability.png")
@@ -111,7 +111,7 @@ def fig_calibration(d):
 
 
 def fig_cif():
-    df, X, y = load_modeling_data()
+    df, X, y = load_modeling_data(known_only=False)
     boundary = global_max_season()
     dur, cause = build_competing_targets(df, boundary)
     keep = dur.index
