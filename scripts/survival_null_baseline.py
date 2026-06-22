@@ -39,7 +39,8 @@ import numpy as np
 from lifelines.utils import concordance_index
 
 from model.pipeline import load_modeling_data, leakage_free_split
-from scripts.survival_analysis import global_max_season, build_survival_targets, tci
+from model.config import MODEL_CONFIG
+from scripts.survival_analysis import global_max_season, build_survival_targets, nb_tci
 from scripts.survival_models import cox_builder, eval_model, N_SEEDS
 from scripts.survival_methods import drop_redundant_features
 
@@ -132,12 +133,13 @@ def main():
     rows.append((f"FULL CV-selected ({len(full_idx)})",
                  cox_cindex(df, Xp, y, dur, evt, full_idx, full_params)))
 
+    tf = MODEL_CONFIG["test_size"]
     print("=" * 64)
-    print(f"{'baseline':<34}{'C-index':>10}{'95% CI':>20}")
+    print(f"{'baseline':<34}{'C-index':>10}{'NB 95% CI':>20}")
     print("-" * 64)
     summary = {}
     for label, sc in rows:
-        m, lo, hi = tci(sc)
+        m, lo, hi = nb_tci(sc, tf)
         summary[label] = {"mean": m, "lo": lo, "hi": hi, "raw": np.asarray(sc)}
         print(f"{label:<34}{m:>10.3f}   [{lo:.3f}, {hi:.3f}]")
     print("=" * 64)

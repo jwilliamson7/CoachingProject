@@ -82,6 +82,11 @@ DROP_REDUNDANT_FEATURES = [
     "Yds__unit", "NY/A Passing__unit", "Int Passing__unit", "1stD Rushing__unit",
     "Yds Penalties__unit", "Pts Average Drive__unit", "PF (Points For)__unit",
     "cf_pre_side_def", "hire_starter_age", "hire_roster_age",
+    # Removed for a proportional-hazards violation: when selected it was the sole
+    # Grambsch-Therneau PH failure (p<0.001) while contributing nothing (HR p=0.88);
+    # a null covariate whose PH "violation" is residual noise. Its sibling
+    # rf_final_unit_pctl (unit quality, not team record) stays in the pool.
+    "rf_final_winpct_pctl",
 ]
 
 from data_constants import get_all_feature_names as _gafn, HIRING_TEAM_FEATURES as _htf
@@ -380,6 +385,41 @@ def stability_selection(df, X, dur, evt, xgb_params=None, K=15, n_boot=100,
         for i in rank[:K]:
             counts[i] += 1
     return pd.Series(counts / n_boot, index=cols).sort_values(ascending=False)
+
+
+def stability_selection_multi(df, X, dur, evt, Ks=(10, 15, 20), xgb_params=None,
+                              n_boot=100, subsample=0.5, seed=0, importance_fn=None):
+    """Stability selection recording top-K membership for SEVERAL K from the SAME
+    subsamples in ONE bootstrap pass.
+
+    Identical procedure to stability_selection (coach-level subsampling, per-sample
+    re-imputation + re-ranking), but each subsample's full rank is scored against
+    every K in ``Ks`` at once. This makes the K-sensitivity apples-to-apples (same
+    draws) and costs one pass instead of len(Ks) passes. Returns {K: freq_series}.
+    """
+    from scripts.data.matrix_factorization_imputation import SVDImputer
+    if importance_fn is None:
+        from scripts.survival_feature_selection import survival_importance
+        def importance_fn(Z, T, E):
+            return survival_importance(Z, T, E, xgb_params)
+
+    rng = np.random.default_rng(seed)
+    coaches = df["Coach Name"].unique()
+    cols = list(X.columns)
+    counts = {K: np.zeros(len(cols)) for K in Ks}
+    Tv = dur.values.astype(float)
+    Ev = evt.values.astype(int)
+    n_take = max(1, int(len(coaches) * subsample))
+    for _ in range(n_boot):
+        samp = rng.choice(coaches, size=n_take, replace=False)
+        mask = df["Coach Name"].isin(samp).values
+        Ximp = SVDImputer().fit(X.values[mask]).transform(X.values[mask])
+        rank, _ = importance_fn(Ximp, Tv[mask], Ev[mask])
+        for K in Ks:
+            for i in rank[:K]:
+                counts[K][i] += 1
+    return {K: pd.Series(counts[K] / n_boot, index=cols).sort_values(ascending=False)
+            for K in Ks}
 
 
 # --------------------------------------------------------------------------- #
