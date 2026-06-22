@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 """
-Definitive firing-survival analysis (JQAS) on the final 94-feature canonical +
-enriched dataset. Supersedes every old 4-block survival_*.pkl. Produces the
-numbers and curves the paper reports, with the full reviewer-grade methods stack:
+Definitive firing-survival analysis (JQAS) on the canonical + enriched dataset
+(94 features, pruned to a non-redundant pool of ~74 for selection and inference;
+see survival_methods.drop_redundant_features). Supersedes every old 4-block
+survival_*.pkl. Produces the numbers and curves the paper reports, with the full
+reviewer-grade methods stack:
 
   - FULLY COX-NATIVE pipeline: feature ranking, stability selection, prediction,
     and hazard-ratio interpretation all use the Cox model class, so there is no
@@ -19,7 +21,7 @@ numbers and curves the paper reports, with the full reviewer-grade methods stack
   - KM median tenure + log-rank era test.
   - The null/naive baseline table (loaded from survival_null_baseline.pkl).
 
-Iterates at N_SEEDS (50) + STAB_BOOTS (200): the locked camera-ready settings.
+Iterates at N_SEEDS (50) + STAB_BOOTS (2000): the locked camera-ready settings.
 
 Usage:
     python scripts/survival_definitive.py
@@ -39,7 +41,7 @@ from lifelines import KaplanMeierFitter
 from lifelines.statistics import logrank_test
 
 from model.pipeline import load_modeling_data
-from scripts.survival_analysis import global_max_season, build_survival_targets, tci
+from scripts.survival_analysis import global_max_season, build_survival_targets, nb_tci
 from scripts.survival_models import (
     cox_builder, weibull_builder, lognormal_builder, loglogistic_builder,
     xgbaft_builder, N_SEEDS,
@@ -52,18 +54,23 @@ from scripts.data.matrix_factorization_imputation import SVDImputer
 from data_constants import get_all_feature_names, HIRING_TEAM_FEATURES
 from scripts.survival_methods import (
     build_competing_targets, firing_event, aalen_johansen_cif, cox_hazard_ratios,
-    ph_test, survival_eval, cox_calibration, stability_selection, cox_importance,
+    ph_test, survival_eval, cox_calibration, stability_selection_multi, cox_importance,
     drop_redundant_features, FIRED, VOLUNTARY,
 )
 
 warnings.filterwarnings("ignore")
 
-STAB_K = 15          # top-K per subsample for stability selection
-STAB_BOOTS = 2000    # coach-level subsamples (camera-ready). 2000 (vs 200) drives
-                     # the Monte-Carlo SE of each selection frequency down to ~0.011,
-                     # so features near the 0.5 retention line (e.g. age at hire) are
-                     # placed reliably rather than by subsampling noise.
-STAB_THR = 0.5       # selection-frequency threshold for the stable set
+STAB_K = 10          # top-K (q) per subsample. Primary value; STAB_K_GRID below
+                     # records the K-sensitivity from the same subsamples so the
+                     # choice is shown to be immaterial. With p~74, K=10 and
+                     # STAB_THR=0.6 give a valid Meinshausen-Buhlmann error bound
+                     # E[V] <= (1/(2*thr-1)) * K^2/p ~= 6.8 (undefined at thr=0.5).
+STAB_K_GRID = (10, 15, 20)  # K-sensitivity grid (one bootstrap pass, shared draws)
+STAB_BOOTS = 2000    # coach-level subsamples (camera-ready). 2000 drives the
+                     # Monte-Carlo SE of each selection frequency down to ~0.011,
+                     # so features near the 0.6 retention line are placed reliably
+                     # rather than by subsampling noise.
+STAB_THR = 0.6       # selection-frequency threshold (Meinshausen-Buhlmann floor)
 BRIER_GRID = np.array([1., 2., 3., 4., 5., 6., 7., 8., 10.])
 CANON_PKL = os.path.join(project_root, "analysis", "survival_canonical_validate.pkl")
 AFT_P = {"penalizer": 0.01}
@@ -130,14 +137,21 @@ def main():
           f"K-curve {{{', '.join(f'{k}:{v:.3f}' for k,v in kcurve.items())}}}\n")
 
     # ---- 2. Cox-native stability selection -> tight stable core ----
-    print(f"Stability selection: {STAB_BOOTS} coach-level subsamples, top-{STAB_K}...")
-    freq = stability_selection(df, X, dur, evt, K=STAB_K, n_boot=STAB_BOOTS,
-                               subsample=0.5, seed=0, importance_fn=cox_importance)
+    # One bootstrap pass scores top-K membership for every K in STAB_K_GRID, so the
+    # K choice is shown to be immaterial (apples-to-apples, shared subsamples).
+    print(f"Stability selection: {STAB_BOOTS} coach-level subsamples, "
+          f"top-K K in {STAB_K_GRID} (primary K={STAB_K}, threshold {STAB_THR})...")
+    freq_multi = stability_selection_multi(df, X, dur, evt, Ks=STAB_K_GRID,
+                                           n_boot=STAB_BOOTS, subsample=0.5, seed=0,
+                                           importance_fn=cox_importance)
+    freq = freq_multi[STAB_K]
     stable = list(freq[freq >= STAB_THR].index)
-    if len(stable) < 3:                       # degenerate-run floor only
+    floored = len(stable) < 3
+    if floored:                               # degenerate-run floor only
         stable = list(freq.head(5).index)
     stable_idx = [cols.index(c) for c in stable]
-    print(f"stable set ({len(stable)} feats, freq>= {STAB_THR}):")
+    print(f"stable set ({len(stable)} feats, freq>= {STAB_THR}, K={STAB_K}"
+          f"{', FLOORED to top-5' if floored else ''}):")
     for c in stable:
         print(f"  {nm(c):<28} {c:<14} {freq[c]:.2f}")
     print(f"  freq>=0.6: {int((freq>=0.6).sum())} | >=0.7: {int((freq>=0.7).sum())}")
@@ -155,7 +169,16 @@ def main():
                 print(f"      {nm(a)} ~ {nm(b)}: r={r:.2f}")
         else:
             print("  collinearity guard: no stable-set pair |r|>0.7 (clean)")
-    print("  selection frequencies (top 20):")
+    # K-sensitivity table: every feature that clears the threshold at ANY K, with
+    # its frequency at each K (a star marks membership in the primary-K stable set).
+    sens = sorted({c for K in STAB_K_GRID for c in freq_multi[K][freq_multi[K] >= STAB_THR].index},
+                  key=lambda c: -freq_multi[STAB_K].get(c, 0.0))
+    print(f"  K-sensitivity (freq at K in {STAB_K_GRID}, threshold {STAB_THR}):")
+    for c in sens:
+        cells = "  ".join(f"K{K}={freq_multi[K][c]:.2f}" for K in STAB_K_GRID)
+        star = "*" if freq[c] >= STAB_THR else " "
+        print(f"    {star} {nm(c):<26} {cells}")
+    print("  selection frequencies (top 20, primary K):")
     for c, v in freq.head(20).items():
         print(f"    {nm(c):<28} {v:.2f}")
     print()
@@ -163,12 +186,13 @@ def main():
     # ---- 3. paired NB: stable set vs CV-argmax set (Cox) ----
     ev_stable = survival_eval(cox_builder, cox_p, df, X, y, durb, evt, stable_idx, N_SEEDS)
     ev_topk = survival_eval(cox_builder, cox_p, df, X, y, durb, evt, topk_idx, N_SEEDS)
+    tf = MODEL_CONFIG["test_size"]
     d_ch = np.array(ev_stable["harrell"]) - np.array(ev_topk["harrell"])
-    m, t, p = nadeau_bengio_ttest(d_ch, MODEL_CONFIG["test_size"])
+    m, t, p = nadeau_bengio_ttest(d_ch, tf)
     print(f"NB stable(K={len(stable)}) - CV-argmax(K={cv_k}) Cox Harrell: "
           f"delta={m:+.4f} t={t:+.3f} p={p:.3g}  "
-          f"(stable {tci(ev_stable['harrell'])[0]:.3f} vs "
-          f"topk {tci(ev_topk['harrell'])[0]:.3f})\n")
+          f"(stable {nb_tci(ev_stable['harrell'], tf)[0]:.3f} vs "
+          f"topk {nb_tci(ev_topk['harrell'], tf)[0]:.3f})\n")
 
     # ---- 4. model bake-off on the stable set (Harrell + Uno) ----
     builders = [("Cox", cox_builder, cox_p),
@@ -177,12 +201,12 @@ def main():
                 ("LogLogistic AFT", loglogistic_builder, AFT_P),
                 ("XGB-AFT", xgbaft_builder, xgb_p)]
     bakeoff = {}
-    print("Model bake-off on the stable set:")
+    print("Model bake-off on the stable set (Nadeau-Bengio 95% CI):")
     print(f"  {'model':<18}{'Harrell C':>20}{'Uno C':>20}")
     for name, b, p_ in builders:
         ev = ev_stable if name == "Cox" else survival_eval(
             b, p_, df, X, y, durb, evt, stable_idx, N_SEEDS)
-        h, u = tci(ev["harrell"]), tci(ev["uno"])
+        h, u = nb_tci(ev["harrell"], tf), nb_tci(ev["uno"], tf)
         bakeoff[name] = {"harrell": h, "uno": u,
                          "harrell_raw": np.array(ev["harrell"]),
                          "uno_raw": np.array(ev["uno"])}
@@ -192,8 +216,8 @@ def main():
     # ---- 5. calibration (Cox) ----
     ibs, bs_curve = cox_calibration(df, X, y, durb, evt, stable_idx, cox_p,
                                     BRIER_GRID, N_SEEDS)
-    ibs_ci = tci(ibs)
-    print(f"\nCalibration (Cox): integrated Brier {ibs_ci[0]:.4f} "
+    ibs_ci = nb_tci(ibs, tf)
+    print(f"\nCalibration (Cox, Nadeau-Bengio 95% CI): integrated Brier {ibs_ci[0]:.4f} "
           f"[{ibs_ci[1]:.4f},{ibs_ci[2]:.4f}]  (0.25 = uninformative)")
     print("  Brier by horizon:", dict(zip(BRIER_GRID.astype(int), np.round(bs_curve, 3))))
 
@@ -242,6 +266,7 @@ def main():
             "cox_params": cox_p, "xgb_params": xgb_p,
             "kcurve": kcurve, "cv_k": cv_k, "topk": [cols[i] for i in topk_idx],
             "stab_freq": freq, "stab_freq_named": freq.rename(index=nm),
+            "stab_freq_multi": freq_multi, "stab_k": STAB_K, "stab_k_grid": STAB_K_GRID,
             "stable": stable, "stable_named": [nm(c) for c in stable],
             "stab_thr": STAB_THR,
             "nb_stable_vs_topk": {"delta": m, "t": t, "p": p},

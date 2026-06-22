@@ -141,6 +141,22 @@ def tci(a):
     return m, m - h, m + h
 
 
+def nb_tci(a, test_frac):
+    """Nadeau-Bengio corrected 95% t-CI for a metric over J random subsamples.
+
+    The J train/test resamples share training data, so the naive tci understates
+    the interval. NB inflates the resampling variance by (1/J + test_frac/(1-test_frac))
+    (= 1/J + n_test/n_train); half-width = t(J-1) * sqrt(that) * sd. This is the
+    paper-reported CI convention and uses the SAME variance correction as
+    compare_ordinal_multiclass.nadeau_bengio_ttest (so CIs and significance tests agree).
+    """
+    a = np.asarray(a, float); a = a[~np.isnan(a)]
+    n = len(a); m = a.mean(); sd = a.std(ddof=1)
+    mult = np.sqrt(1.0 / n + test_frac / (1.0 - test_frac))
+    h = stats.t.ppf(0.975, n - 1) * mult * sd
+    return m, m - h, m + h
+
+
 def kaplan_meier_figure(dur, evt, df, boundary):
     """Overall KM curve + KM stratified by hire era (non-circular) with log-rank."""
     kmf = KaplanMeierFitter()

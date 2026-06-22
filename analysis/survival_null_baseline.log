@@ -1,21 +1,21 @@
-357 stints | 94 feats | fired=319 censored=38 | seeds=25
+371 stints | 94 feats | fired=312 censored=59 | seeds=50
 
 ================================================================
-baseline                             C-index              95% CI
+baseline                             C-index           NB 95% CI
 ----------------------------------------------------------------
 KM null (no covariates)                0.500   [0.500, 0.500]
-Coach age only                         0.561   [0.542, 0.580]
-Internal hire only                     0.562   [0.552, 0.573]
-Inherited team SRS only                0.496   [0.480, 0.512]
-Inherited defensive SRS only           0.519   [0.503, 0.535]
-Roster turnover only                   0.533   [0.519, 0.548]
-Inherited situation (30)               0.517   [0.498, 0.536]
-Coach resume (31)                      0.574   [0.557, 0.591]
-Coach unit performance (33)            0.523   [0.509, 0.537]
-FULL CV-selected (8)                   0.600   [0.579, 0.620]
+Coach age only                         0.560   [0.515, 0.604]
+Internal hire only                     0.564   [0.532, 0.596]
+Inherited team SRS only                0.504   [0.464, 0.543]
+Inherited defensive SRS only           0.530   [0.495, 0.565]
+Roster turnover only                   0.516   [0.460, 0.572]
+Inherited situation (30)               0.494   [0.448, 0.539]
+Coach resume (31)                      0.577   [0.533, 0.620]
+Coach unit performance (33)            0.526   [0.480, 0.573]
+FULL CV-selected (5)                   0.602   [0.560, 0.645]
 ================================================================
 
-Full-model selected features: ['cf_internal_hire', 'tq_dsrs', 'Feature 19', 'hire_starter_exp', 'Feature 1', 'cf_nfl_share', 'Feature 41', 'hire_roster_turnover']
+Full-model selected features: ['cf_internal_hire', 'Feature 1', 'Feature 6', 'tq_dsrs', 'Feature 11']
 Full-model Cox params: {'penalizer': 0.5, 'l1_ratio': 0.25}
 
 Saved C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\survival_null_baseline.pkl
