@@ -53,6 +53,60 @@ CENSORED, FIRED, VOLUNTARY = 0, 1, 2
 
 
 # --------------------------------------------------------------------------- #
+# Redundant-feature prune (collinearity / double-measurement removal)
+# --------------------------------------------------------------------------- #
+# The canonical feature set measures a few constructs twice, which produced a
+# multicollinearity/suppression problem in the multivariable hazard model:
+#   (1) the hiring team's pre-hire quality is captured BOTH as raw box scores
+#       (hiring_team_* points/yards) AND as schedule-adjusted SRS (tq_*). The SRS
+#       version is preferred -- it adjusts for strength of schedule -- so the raw
+#       scoring/yardage duplicates are dropped.
+#   (2) tq_srs = tq_osrs + tq_dsrs and tq_mov = tq_srs - tq_sos are EXACT linear
+#       identities (R^2=1.0), so keeping all six tq_ columns is perfect collinearity;
+#       the non-redundant basis is {tq_osrs, tq_dsrs, tq_sos, tq_srs_traj}.
+#   (3) same-construct near-duplicates elsewhere (|r|>=0.85): penalties vs penalty
+#       yards, rushing yards vs rushing first downs, etc. -- one representative each.
+# This prune feeds FEATURE SELECTION and the FINAL HAZARD MODEL only; the
+# construct-level ablations in survival_null_baseline keep the full block (a
+# construct's predictive ceiling legitimately uses all of its measurements).
+# Pairs that LOOK correlated but are conceptually distinct are intentionally KEPT:
+#   num_times_hc vs num_yr_nfl_hc (count of stints vs accumulated HC years),
+#   rf_final_unit_pctl vs rf_final_winpct_pctl (unit quality vs team success).
+DROP_REDUNDANT_FEATURES = [
+    # Tier 1 -- inherited-team double measurement + SRS linear identities
+    "tq_srs", "tq_mov",
+    "hiring_team_win_pct", "hiring_team_points_scored", "hiring_team_points_allowed",
+    "hiring_team_yards_offense", "hiring_team_yards_allowed",
+    "hiring_team_yards_per_play", "hiring_team_yards_per_play_allowed",
+    # Tier 2 -- same-construct near-duplicates (keep one representative each)
+    "Yds__unit", "NY/A Passing__unit", "Int Passing__unit", "1stD Rushing__unit",
+    "Yds Penalties__unit", "Pts Average Drive__unit", "PF (Points For)__unit",
+    "cf_pre_side_def", "hire_starter_age", "hire_roster_age",
+]
+
+from data_constants import get_all_feature_names as _gafn, HIRING_TEAM_FEATURES as _htf
+# friendly name -> positional 'Feature N' label (base features only; engineered
+# features such as tq_/cf_/hire_ carry their real column label already).
+_FRIENDLY_TO_COL = {n: f"Feature {i+1}" for i, n in enumerate(list(_gafn()) + list(_htf))}
+
+
+def drop_redundant_features(X):
+    """Return X without the columns in DROP_REDUNDANT_FEATURES.
+
+    Names resolve by friendly label: engineered features carry their real column
+    name; base features are positional 'Feature N' placeholders mapped via the
+    canonical name list. Absent/unknown names are skipped silently.
+    """
+    cols = set(X.columns)
+    drop = []
+    for f in DROP_REDUNDANT_FEATURES:
+        c = f if f in cols else _FRIENDLY_TO_COL.get(f)
+        if c in cols:
+            drop.append(c)
+    return X.drop(columns=drop)
+
+
+# --------------------------------------------------------------------------- #
 # Competing-risks event coding
 # --------------------------------------------------------------------------- #
 def build_competing_targets(df, boundary):
@@ -344,7 +398,7 @@ def main():
     print(f"boundary={boundary} | n={len(dur)} | "
           f"fired={counts.get(FIRED,0)} active-censored={counts.get(CENSORED,0)} "
           f"voluntary={counts.get(VOLUNTARY,0)}")
-    assert counts.get(FIRED) == 319 and counts.get(CENSORED) == 11 \
+    assert counts.get(FIRED) == 312 and counts.get(CENSORED) == 11 \
         and counts.get(VOLUNTARY) == 27, "competing-risk split drifted!"
 
     # CIF: firing vs voluntary

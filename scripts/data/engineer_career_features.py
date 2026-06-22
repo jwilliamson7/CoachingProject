@@ -35,19 +35,21 @@ import numpy as np
 import pandas as pd
 
 COACHES_DIR = project_root / "Coaches"
-RAW_DATA = project_root / "data" / "master_data.csv"
-OUT_DATA = project_root / "data" / "master_data_extended.csv"
+# Single canonical modeling dataset, written by scripts/data/create_data.py (which
+# builds the base instances then calls build_modeling_dataset()). There is no longer
+# a separate raw/_extended split -- one file, one build path.
+MASTER_DATA = project_root / "data" / "master_data.csv"
 # Tier 6 inherited-roster/talent source (another project; team-year keyed, 1970-2024)
 COACH_WAR_COMBINED = Path(
     r"C:\Users\jonwi\Documents\Projects\Coach_WAR\data\final\combined_final_dataset.csv"
 )
 
-EXCLUDED_ROLE_KEYWORDS = [
-    "Consultant", "Scout", "Analyst", "Athletic Director", "Advisor", "Intern",
-    "Sports Science", "Quality Control", "Emeritus", "Freshman ", "/Freshman",
-    "Recruiting", "Reserve", "earnings", "Strength and Conditioning",
-    "Strength & Conditioning", "Video", "Senior Assistant",
-]
+# Single source of truth for role exclusions: the same list create_data uses (via
+# data_constants). Previously this module kept its OWN copy that had drifted (it was
+# missing "Passing Game Coordinator", "Pass Gm. Coord." and "Associate Head Coach"),
+# so the base-builder and the feature-engineer disagreed on 28 role-seasons. Import,
+# don't duplicate, so the two classifiers can never drift again.
+from data_constants import EXCLUDED_ROLE_KEYWORDS
 
 OFF_KW = ["offensive", "quarterback", "running back", "wide receiver", "tight end",
           "o-line", "passing game", "pass game"]
@@ -173,6 +175,34 @@ def _slope(values):
     return float(np.polyfit(x, np.asarray(v, float), 1)[0])
 
 
+def _dedupe_history(df):
+    """Collapse PFR sub-role duplicate rows so the whole module sees one season as
+    one row -- matching create_data._dedupe_career_rows. PFR sometimes lists a
+    single season as two rows with different role text (e.g. 'Defensive
+    Coordinator' and 'Defensive Coordinator/Linebackers'); without this, row-count
+    features such as cf_nfl_share double-count those seasons. Keep one row per
+    (Year, level-class, role-class); same-year role CHANGES (different role-class)
+    and non-coaching rows are preserved. reconstruct_tenure is set-based and so is
+    unaffected -- this only de-duplicates, never drops a distinct season.
+    """
+    if df is None or df.empty:
+        return df
+    def lvl_tag(l):
+        return "nfl" if is_nfl(l) else ("col" if "College" in str(l) else "oth")
+    seen, keep = set(), []
+    for idx, r in df.iterrows():
+        role = classify_role(r.get("Role", ""))
+        if role == "NONE":
+            keep.append(idx)
+            continue
+        key = (int(r["Year"]), lvl_tag(r.get("Level")), role)
+        if key in seen:
+            continue
+        seen.add(key)
+        keep.append(idx)
+    return df.loc[keep]
+
+
 def load_history(coach):
     p = COACHES_DIR / coach / "all_coaching_history.csv"
     if not p.exists():
@@ -182,7 +212,7 @@ def load_history(coach):
         df["Year"] = pd.to_numeric(df["Year"], errors="coerce")
         df = df.dropna(subset=["Year"])
         df["Year"] = df["Year"].astype(int)
-        return df
+        return _dedupe_history(df)
     except Exception:
         return None
 
@@ -479,17 +509,25 @@ def classify_exit(coach, hire_year, boundary, retire_age=DEFAULT_RETIRE_AGE):
 # interim->permanent hires to their first season-opening year. Reuses the
 # Coach_WAR project's solved multi-coach-season resolution (Primary_Coach per
 # team-year) rather than re-deriving it (see memory reference-coachwar-primary-coach).
-# NOTE: re-anchored rows shift hire year by +1 season; their NEW (tier1/tier2)
-# features are recomputed as-of the anchored year, but the inherited original
-# feature columns from master_data remain as-of the pre-anchor year (one season
-# stale, the interim half-season at the same franchise). A minor, documented
-# limitation affecting only the re-anchored hires.
+#
+# As of the single-builder consolidation, create_data._process_coach_career applies
+# this hygiene AT THE SOURCE (via _classify_hire): interim-only caretakers are never
+# emitted, and an interim->permanent promotion is built directly at the season-opening
+# year with the interim partial HC season FOLDED INTO prior experience (its unit
+# performance + the HC-year count + age/context as-of the anchored year). So there is
+# no longer any one-season feature staleness. clean_population below now runs only as a
+# VERIFICATION GUARD on the already-clean data -- it reuses the same classify_hire_
+# instance logic and is expected to report "dropped 0, re-anchored 0".
 # ----------------------------------------------------------------------------
 COACH_WAR_HC_TABLE = Path(
     r"C:\Users\jonwi\Documents\Projects\Coach_WAR\data\processed\coaching"
     r"\team_year_head_coaches.csv")
-# Spurious duplicate hire instances (same real stint recorded twice in master_data)
-DUPLICATE_HIRE_INSTANCES = [("Jon Gruden", 2020)]
+# Spurious duplicate hire instances (same real stint recorded twice in master_data).
+# Now empty: the upstream stint detector (create_data._process_coach_career) resolves
+# franchise identity with the year-aware canonical key plus the head-coaching employer
+# name, so relocations/renames and same-year demotion-then-rehire fragments no longer
+# create a duplicate instance to remove here. Kept as a guard hook only.
+DUPLICATE_HIRE_INSTANCES = []
 
 
 def _primary_coach_index():
@@ -764,11 +802,24 @@ def team_quality_features(hist, hire_year):
     return f
 
 
-def main():
-    df = pd.read_csv(RAW_DATA, index_col=0)
+def build_modeling_dataset(df, verbose=True):
+    """Build the final modeling dataset from the all-era base hiring-instance table.
+
+    This is the single source of the canonical `data/master_data.csv`: it takes the
+    raw all-era hiring instances (produced in-memory by create_data's
+    CoachingDataProcessor), restricts to the modern era (1970+), applies population
+    hygiene (drops mid-season interim caretakers, re-anchors interim->permanent
+    hires), corrects the tenure labels relocation/partial-season-aware, and appends
+    the engineered career-path / rank / org / roster / team-quality features.
+
+    Returns the final DataFrame. The previous two-file split (master_data.csv base +
+    master_data_extended.csv final) is gone: create_data.main() calls this and writes
+    the single result. Kept as an importable function so the build has ONE code path.
+    """
     n_all = len(df)
     df = df[df["Year"] >= MIN_HIRE_YEAR].copy()
-    print(f"Loaded {n_all} instances; kept {len(df)} from {MIN_HIRE_YEAR}+ (modern era)")
+    if verbose:
+        print(f"Loaded {n_all} instances; kept {len(df)} from {MIN_HIRE_YEAR}+ (modern era)")
 
     # Population hygiene: remove mid-season interim caretakers + duplicate hire
     # instances and re-anchor interim->permanent hires to their season-opening
@@ -834,10 +885,13 @@ def main():
     target_cols = ["Avg 2Y Win Pct", "Coach Tenure Class"]
     feat_cols = [c for c in df.columns if c not in target_cols]
     ext = pd.concat([df[feat_cols], new_df, df[target_cols]], axis=1)
-    ext.to_csv(OUT_DATA)
-    print(f"Wrote {OUT_DATA} with shape {ext.shape}")
+    if verbose:
+        _report_feature_coverage(ext, new_df)
+    return ext
 
-    # ---- Validation / quick diagnostics ----
+
+def _report_feature_coverage(ext, new_df):
+    """Coverage/correlation diagnostics + spot checks printed during a build."""
     known = ext[ext["Coach Tenure Class"] != -1]
     y = known["Coach Tenure Class"]
     print("\nNew-feature coverage and correlation with tenure class (known instances):")
@@ -848,7 +902,6 @@ def main():
         corr = v.corr(y) if v.notna().sum() > 10 else np.nan
         print(f"{c:<28} {cov:>7.0f}% {corr:>9.3f}")
 
-    # spot checks
     for name, yr in [('Andy Reid', 1999), ('Jeff Fisher', 1995)]:
         idx = ext[(ext['Coach Name'] == name) & (ext['Year'] == yr)]
         if len(idx):
@@ -861,4 +914,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # The single dataset builder is scripts/data/create_data.py, which constructs
+    # the base instances and calls build_modeling_dataset(). This module is the
+    # shared feature/tenure/hygiene library imported by the survival scripts;
+    # running it directly just delegates to that one canonical builder.
+    from scripts.data.create_data import main as build_master_data
+    build_master_data()

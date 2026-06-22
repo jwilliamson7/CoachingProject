@@ -53,13 +53,16 @@ from data_constants import get_all_feature_names, HIRING_TEAM_FEATURES
 from scripts.survival_methods import (
     build_competing_targets, firing_event, aalen_johansen_cif, cox_hazard_ratios,
     ph_test, survival_eval, cox_calibration, stability_selection, cox_importance,
-    FIRED, VOLUNTARY,
+    drop_redundant_features, FIRED, VOLUNTARY,
 )
 
 warnings.filterwarnings("ignore")
 
 STAB_K = 15          # top-K per subsample for stability selection
-STAB_BOOTS = 200     # coach-level subsamples (camera-ready)
+STAB_BOOTS = 2000    # coach-level subsamples (camera-ready). 2000 (vs 200) drives
+                     # the Monte-Carlo SE of each selection frequency down to ~0.011,
+                     # so features near the 0.5 retention line (e.g. age at hire) are
+                     # placed reliably rather than by subsampling noise.
 STAB_THR = 0.5       # selection-frequency threshold for the stable set
 BRIER_GRID = np.array([1., 2., 3., 4., 5., 6., 7., 8., 10.])
 CANON_PKL = os.path.join(project_root, "analysis", "survival_canonical_validate.pkl")
@@ -80,12 +83,25 @@ def nm(c):
 
 
 def main():
-    df, X, y = load_modeling_data()
+    # known_only=False: include the still-active coaches (tenure class -1). The
+    # classification framing had to drop them (an ongoing tenure has no class);
+    # survival analysis uses them correctly as right-censored observations, which
+    # is the whole point of the framework. They code as cause=0 (active) and bring
+    # the sample to the full set of currently-employed head coaches.
+    df, X, y = load_modeling_data(known_only=False)
     boundary = global_max_season()
     dur, cause = build_competing_targets(df, boundary)
     keep = dur.index
     df, X, y = df.loc[keep], X.loc[keep], y.loc[keep]
     dur, cause = dur.loc[keep], cause.loc[keep]
+    # Collapse collinear / double-measured features before selection + inference
+    # (raw hiring-team box scores duplicated by schedule-adjusted SRS; the
+    # tq_srs/tq_mov linear identities; same-construct near-duplicates). See
+    # survival_methods.DROP_REDUNDANT_FEATURES. Construct ablations keep the full set.
+    n_before = X.shape[1]
+    X = drop_redundant_features(X)
+    print(f"redundancy prune: {n_before} -> {X.shape[1]} feats "
+          f"({n_before - X.shape[1]} dropped)\n")
     durb, evtb = build_survival_targets(df, boundary)  # binary firing target
     durb, evt = durb.loc[keep], pd.Series(firing_event(cause), index=keep)
     cols = list(X.columns)
@@ -125,6 +141,20 @@ def main():
     for c in stable:
         print(f"  {nm(c):<28} {c:<14} {freq[c]:.2f}")
     print(f"  freq>=0.6: {int((freq>=0.6).sum())} | >=0.7: {int((freq>=0.7).sum())}")
+    # post-selection collinearity guard: redundant measurements are pruned upstream,
+    # but flag any residual stable-set pair with |r|>0.7 so a suppression artifact
+    # (two collinear survivors with unstable joint coefficients) cannot slip through.
+    if len(stable_idx) > 1:
+        cstab = pd.DataFrame(Ximp_full[:, stable_idx], columns=stable).corr().abs().values
+        hot = [(stable[i], stable[j], cstab[i, j])
+               for i in range(len(stable)) for j in range(i + 1, len(stable))
+               if cstab[i, j] > 0.7]
+        if hot:
+            print("  WARNING stable-set collinearity |r|>0.7:")
+            for a, b, r in hot:
+                print(f"      {nm(a)} ~ {nm(b)}: r={r:.2f}")
+        else:
+            print("  collinearity guard: no stable-set pair |r|>0.7 (clean)")
     print("  selection frequencies (top 20):")
     for c, v in freq.head(20).items():
         print(f"    {nm(c):<28} {v:.2f}")

@@ -70,11 +70,13 @@ def stratified_coach_level_split(
         coach_class = coach_instances.iloc[:, -1].mode()[0]
         coach_classes[coach] = coach_class
 
-    # Separate coaches by class
-    coaches_by_class = {0: [], 1: [], 2: []}
+    # Separate coaches by class (class-agnostic: supports any integer labels,
+    # e.g. the -1 "still active" survival stratum. Reproduces the old 0/1/2
+    # behavior exactly when only those classes are present.)
+    classes = sorted(set(coach_classes.values()))
+    coaches_by_class = {c: [] for c in classes}
     for coach, cls in coach_classes.items():
-        if cls in coaches_by_class:
-            coaches_by_class[cls].append(coach)
+        coaches_by_class[cls].append(coach)
 
     # Shuffle coaches within each class
     for cls in coaches_by_class:
@@ -89,7 +91,7 @@ def stratified_coach_level_split(
 
     # Select test coaches from each class
     test_coaches = []
-    for cls in [0, 1, 2]:
+    for cls in classes:
         current_test_instances = 0
         for coach in coaches_by_class.get(cls, []):
             coach_count = len(df[df['Coach Name'] == coach])
@@ -288,13 +290,14 @@ class CoachLevelStratifiedKFold(BaseCrossValidator):
             values, counts = np.unique(coach_labels, return_counts=True)
             coach_classes[coach] = values[np.argmax(counts)]
 
-        # Separate coaches by class
-        n_classes = len(np.unique(y))
-        coaches_by_class = {i: [] for i in range(n_classes)}
+        # Separate coaches by class (class-agnostic: any integer labels, incl.
+        # the -1 still-active survival stratum; identical to the old behavior
+        # when classes are exactly 0..n-1)
+        classes = sorted(np.unique(y).tolist())
+        coaches_by_class = {c: [] for c in classes}
 
         for coach, cls in coach_classes.items():
-            if cls in coaches_by_class:
-                coaches_by_class[cls].append(coach)
+            coaches_by_class[cls].append(coach)
 
         # Shuffle coaches within each class
         for cls in coaches_by_class:
@@ -305,7 +308,7 @@ class CoachLevelStratifiedKFold(BaseCrossValidator):
             test_coaches = []
 
             # Select test coaches from each class for this fold
-            for cls in range(n_classes):
+            for cls in classes:
                 coaches_in_class = coaches_by_class.get(cls, [])
                 if len(coaches_in_class) == 0:
                     continue

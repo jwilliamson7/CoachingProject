@@ -67,7 +67,6 @@ Mike McCormack,1973,3,1975,4-10,0.286,45.0,,0,1,deterministic,event,1,high,losin
 John Ralston,1972,5,1976,9-5,0.643,49.0,,0,0,research,event,1,high,John Ralston resigned under pressure after 1976 (9-5) following player revolt; stripped of GM title before resigning,Wikipedia
 Monte Clark,1976,1,1976,8-6,0.571,39.0,,0,1,research,event,1,high,Monte Clark fired by 49ers Apr 1977 over personnel-authority dispute with GM Joe Thomas; sat out 1977 before Detroit,Wikipedia
 Bill Arnsparger,1974,3,1976,0-7,0.0,50.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
-Bill Arnsparger,1976,1,1976,0-7,0.0,50.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
 Lou Holtz,1976,1,1976,3-10,0.231,39.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
 Lou Saban,1972,5,1976,2-3,0.4,55.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
 Marion Campbell,1975,2,1976,1-4,0.2,47.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
@@ -108,7 +107,6 @@ Ed Biles,1981,3,1983,0-6,0.0,52.0,,0,0,deterministic,event,1,high,losing_finale,
 Forrest Gregg,1980,4,1983,7-9,0.438,50.0,,1,1,deterministic,event,1,high,losing_finale,record/Notes
 Ron Meyer,1982,3,1984,5-3,0.625,43.0,,0,1,research,event,1,high,Ron Meyer fired midway through 1984 by Patriots after firing his DC; replaced by Raymond Berry,Wikipedia
 Frank Kush,1982,3,1984,4-11,0.267,55.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
-Frank Kush,1984,1,1984,4-11,0.267,55.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
 John McKay,1976,9,1984,6-10,0.375,61.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
 Les Steckel,1984,1,1984,3-13,0.188,38.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
 Monte Clark,1978,7,1984,4-11-1,0.281,47.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
@@ -127,14 +125,12 @@ Leeman Bennett,1985,2,1986,2-14,0.125,48.0,,0,0,deterministic,event,1,high,losin
 Rod Dowhower,1985,2,1986,0-13,0.0,43.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
 Forrest Gregg,1984,4,1987,5-9-1,0.367,54.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
 Tom Flores,1979,9,1987,5-10,0.333,50.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
-Tom Flores,1982,6,1987,5-10,0.333,50.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
 Marty Schottenheimer,1985,4,1988,10-6,0.625,45.0,,1,1,research,event,1,high,Marty Schottenheimer forced resignation Browns Dec 1988 after Modell ultimatum to hire an OC/strip role; KC hired after,Wikipedia
 Al Saunders,1987,2,1988,6-10,0.375,41.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
 Darryl Rogers,1985,4,1988,2-9,0.182,54.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
 Frank Gansz,1987,2,1988,4-11-1,0.281,50.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
 Jerry Glanville,1986,4,1989,9-7,0.563,48.0,,1,1,research,event,1,high,Jerry Glanville fired by Oilers Jan 1990 after season-ending losing skid; Atlanta hired him a week later,Wikipedia
 Gene Stallings,1986,4,1989,5-6,0.455,54.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
-Gene Stallings,1988,2,1989,5-6,0.455,54.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
 Joe Walton,1983,7,1989,4-12,0.25,54.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
 Marion Campbell,1987,3,1989,3-9,0.25,60.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
 Mike Shanahan,1988,2,1989,1-3,0.25,37.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
@@ -254,7 +250,6 @@ Tom Cable,2009,2,2010,8-8,0.5,46.0,,0,0,research,event,1,high,Tom Cable not reta
 Brad Childress,2006,5,2010,3-7,0.3,54.0,Fired after Week 11,0,0,deterministic,event,1,high,fired_notes,record/Notes
 Eric Mangini,2009,2,2010,5-11,0.313,39.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
 Jeff Fisher,1995,16,2010,6-10,0.375,52.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
-Jeff Fisher,1997,14,2010,6-10,0.375,52.0,,0,1,deterministic,event,1,high,losing_finale,record/Notes
 John Fox,2002,9,2010,2-14,0.125,55.0,,1,1,deterministic,event,1,high,losing_finale,record/Notes
 Josh McDaniels,2009,2,2010,3-9,0.25,34.0,Fired after Week 13,0,1,deterministic,event,1,high,fired_notes,record/Notes
 Mike Singletary,2009,2,2010,5-10,0.333,52.0,Fired after Week 16,0,0,deterministic,event,1,high,fired_notes,record/Notes
@@ -298,7 +293,6 @@ Tom Coughlin,2004,12,2015,6-10,0.375,69.0,,0,0,deterministic,event,1,high,losing
 Chip Kelly,2016,1,2016,2-14,0.125,53.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
 Gus Bradley,2013,4,2016,2-12,0.143,50.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
 Jeff Fisher,2012,5,2016,4-9,0.308,58.0,Fired after Week 14,0,0,deterministic,event,1,high,fired_notes,record/Notes
-Jeff Fisher,2016,1,2016,4-9,0.308,58.0,Fired after Week 14,0,0,deterministic,event,1,high,fired_notes,record/Notes
 Mike McCoy,2013,4,2016,5-11,0.313,44.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
 Rex Ryan,2015,2,2016,7-8,0.467,54.0,Fired after Week 16,0,0,deterministic,event,1,high,fired_notes,record/Notes
 Jim Caldwell,2014,4,2017,9-7,0.563,62.0,,0,0,research,event,1,high,"Jim Caldwell fired by Lions Jan 2018 after 9-7; GM Bob Quinn wanted a new voice, cited record vs good teams",ESPN/NFL.com
@@ -310,7 +304,6 @@ John Fox,2015,3,2017,5-11,0.313,62.0,,0,0,deterministic,event,1,high,losing_fina
 Adam Gase,2016,3,2018,7-9,0.438,40.0,,1,1,deterministic,event,1,high,losing_finale,record/Notes
 Dirk Koetter,2016,3,2018,5-11,0.313,59.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
 Hue Jackson,2016,3,2018,2-5-1,0.313,53.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
-Hue Jackson,2018,1,2018,2-5-1,0.313,53.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
 Marvin Lewis,2003,16,2018,6-10,0.375,60.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
 Mike McCarthy,2006,13,2018,4-7-1,0.375,55.0,Fired after Week 13,0,1,deterministic,event,1,high,fired_notes,record/Notes
 Steve Wilks,2018,1,2018,3-13,0.188,49.0,,0,0,deterministic,event,1,high,losing_finale,record/Notes
