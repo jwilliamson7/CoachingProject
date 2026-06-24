@@ -49,7 +49,7 @@
 %\affil[1]{\protect\raggedright
 %Des Moines, Iowa, e-mail: jon@williamsonconsultinggroup.com}
 
-\abstract{Each NFL off-season brings a wave of head coaching changes, and a coach's tenure is the clearest public measure of whether the hire worked. Yet whether a hire will end in firing is poorly understood the moment the contract is signed. Prior work has largely modeled the in-season firing decision from results posted during the tenure, leaving open how much is foreseeable on hiring day. We recast the problem as a firing-aware survival analysis. Across 371 head coaching stints (1970--2025), we model the time from hire to firing, treating voluntary departures as a competing risk and active coaches as censored, using only pre-hire information. A cause-specific Cox proportional-hazards model, benchmarked against parametric and gradient-boosted alternatives and fit on features chosen by Cox-native stability selection, proves only modestly predictive: a Harrell concordance of 0.602 (95\% CI [0.560, 0.645]) and an integrated Brier score of 0.176. The one robust signal is not the coach's credentials but the structure of the hire: internal promotions face a higher firing hazard than external hires (HR 1.52), with weaker effects from age at hire and prior-unit yards-per-play efficiency. The broad performance record that hiring processes scrutinize, points, yards, and turnovers, forecasts dismissal no better than chance.}
+\abstract{Head coach turnover in the National Football League is frequent, and a coach's tenure is the clearest available measure of whether a hire succeeded. Yet whether a hire will end in firing is poorly understood when the coaching contract is signed. Prior work has largely modeled the in-season firing decision from in-tenure results, leaving open how much is foreseeable at the time of hire. We recast the problem as a firing-aware survival analysis. Across 371 head coaching stints in the modern era (1970--2025), we model the time from hire to firing, treating voluntary departures as a competing risk and active coaches as censored, from pre-hire information. A cause-specific Cox model, benchmarked against parametric and gradient-boosted alternatives and fit on Cox-native stability-selected features, proves modestly predictive, with a Harrell concordance of 0.602 (95\% CI [0.560, 0.645]) and an integrated Brier score of 0.176 (95\% CI [0.160, 0.191]). The one robust signal is structural: internal promotions face a higher firing hazard than external hires (HR 1.52, 95\% CI [1.15, 2.02]), with weaker effects from age at hire and prior-unit yards-per-play efficiency. The broad on-field record hiring searches examine, points, yards, and turnovers against league average, forecasts dismissal no better than chance.}
 
 \keywords{survival analysis, head coach, National Football League, Cox proportional hazards, competing risks}
 
@@ -57,11 +57,11 @@
 
 \section{Introduction}
 
-Hiring a head coach is one of the most consequential personnel decisions an NFL franchise makes, and the record shows how often it is undone. Of the 371 stints we study in the modern era (1970 onward), 84\% ended in an involuntary parting, and the median coach survived only four seasons before being fired. Teams pour weeks of interviews, scheme presentations, and background checks into the choice, sometimes enlisting outside search consultants \citep{perez2025, brandt2026}, yet reversals are common enough to raise a basic question: at the moment a coach is hired, before a single game has been played, how foreseeable is the eventual firing from the information the team actually has in hand?
+Hiring a head coach is one of the most consequential decisions an NFL franchise makes, and history shows how often it is undone. Of the 371 stints we study in the modern era (1970--2025), 84\% ended in an involuntary parting, and the median coach survived only four seasons before being fired, churn that opens roughly a quarter of the league's head-coaching jobs in a typical off-season. Teams pour weeks of interviews, scheme presentations, and background checks into the choice, sometimes enlisting outside search consultants \citep{perez2025, brandt2026}, yet hires end in dismissal often enough to raise a basic question: at the moment a coach is hired, before a single game has been played, how foreseeable is the eventual outcome, whether and when the hire ends in firing, from the information the team actually has in hand?
 
-Research on NFL coaching turnover consistently finds that dismissal is driven by a coach's performance in the job \citep{allen2012, salaga2020, foreman2019, farnell2021}. As we detail in Section~\ref{sec:litreview}, however, these studies share a structural approach: they explain dismissal using covariates realized \emph{during} the tenure, such as team-season win percentage, player fines and penalties, or performance relative to expectations. These models answer a retrospective question, what about a tenure, once it has unfolded, is associated with firing, and their recurring answer, that losing leads to firing, offers little to a team deciding whom to hire.
+Research on NFL coaching turnover consistently finds that dismissal is driven by a coach's performance in the job \citep{allen2012, salaga2020, foreman2019, farnell2021}. As we detail in Section~\ref{sec:litreview}, however, these studies share a structural approach: they explain dismissal using covariates realized \emph{during} the tenure, such as team-season win percentage, player fines and penalties, or performance relative to expectations. These models answer a retrospective question: once a tenure has unfolded, what about it is associated with firing? Their recurring answer is that losing leads to firing, and that offers little to a team deciding whom to hire.
 
-The prospective version of this question is harder: using only what can be observed when the contract is signed, how much of an eventual firing is already foreseeable? If pre-hire signal is strong, dismissals reflect foreseeable mismatches that sharper evaluation could reduce. If it is weak, the outcome is determined largely by events that unfold only after the contract is signed. The answer bears both on how franchises allocate their evaluation effort and on the broader debate over whether coaching changes accomplish what teams intend \citep{bryson2024}.
+The prospective version of this question is harder: using only what can be observed when the coaching contract is signed, how much of an eventual firing is already foreseeable? If pre-hire signal is strong, dismissals reflect foreseeable mismatches that sharper evaluation could reduce. If it is weak, the outcome is determined largely by events that unfold only after the contract is signed. The answer bears both on how franchises allocate their evaluation effort and on the broader debate over whether coaching changes accomplish what teams intend \citep{bryson2024}.
 
 We frame NFL head coach dismissal as a pre-hire, firing-aware, competing-risks forecasting problem, separating the foreseeable component of the outcome from the larger part realized only after the hire. We then use that framing to ask how much of an eventual dismissal is written into the information available on hiring day, and where any foreseeable signal resides.
 
@@ -70,20 +70,22 @@ We frame NFL head coach dismissal as a pre-hire, firing-aware, competing-risks f
 
 \subsection{Determinants of NFL head coach dismissal}
 
-The economics of NFL coaching turnover has received sustained attention, and its consistent message is that dismissal is driven by performance. \citet{allen2012} estimate probit models of turnover over 1979--2006 and exploit the early-1990s introduction of the salary cap and free agency as a natural experiment, finding that both the probability of dismissal and the weight placed on talent and on-field results increased once the cap made measurable performance more decisive. \citet{salaga2020} apply survival methods to 208 head coach employment spells from 1985 to 2018, but model dismissal from on-field performance accumulated \emph{during} the tenure; they conclude that firing is driven largely by raw, and to a lesser degree relative, in-season results rather than by anything known at the time of hire. \citet{foreman2019} fit a hazard model to 505 team-seasons (2000--2015) and show that player deviance, measured through fines, penalties, and off-field legal incidents, raises the dismissal hazard. \citet{farnell2021} examine the full coaching hierarchy and find that young, experienced, well-performing coordinators tend to be promoted, while older and poorly performing coaches tend to be fired, with race playing little role in either decision.
+The economics of NFL coaching turnover has received sustained attention, and its consistent message is that dismissal is driven by performance. \citet{allen2012} estimate probit models of turnover over 1979--2006 and exploit the early-1990s introduction of the salary cap and free agency as a natural experiment, finding that both the probability of dismissal and the weight placed on talent and on-field results increased once the cap made measurable performance more decisive. \citet{salaga2020} apply survival methods to 208 head coach employment spells from 1985 to 2018, but model dismissal from on-field performance accumulated \emph{during} the tenure; they conclude that firing is driven largely by raw, and to a lesser degree relative, in-season results, and leave pre-hire information untested. \citet{foreman2019} fit a hazard model to 505 team-seasons (2000--2015) and show that player deviance, measured through fines, penalties, and off-field legal incidents, raises the dismissal hazard. \citet{farnell2021} examine the full coaching hierarchy and find that young, experienced, well-performing coordinators tend to be promoted, while older and poorly performing coaches tend to be fired, with race playing little role in either decision.
 
 What unites these studies is that every covariate is realized \emph{during} the tenure, so they characterize which in-season outcomes accompany a firing rather than what, if anything, foreshadows it at the time of hire.
 
 \subsection{Survival modeling of managerial tenure and the case for Cox}
 \label{sec:litcox}
 
-A coaching spell is naturally a time-to-event outcome: it has a start, an end that is either observed (a departure) or not yet observed (an ongoing tenure), and a duration whose distribution is the quantity of interest. Survival analysis is the standard framework for such data for several reasons. It models the full time-to-event distribution, the hazard of firing at each point in a tenure, rather than collapsing the outcome to whether a coach was fired or to an average tenure length; it accommodates right-censoring, the coaches still employed at the end of the study window, so those incomplete spells inform the fit instead of being discarded as a regression on observed tenure would require; and it expresses covariate effects as shifts in the timing of the event, not merely its occurrence. The framework has been used across sports management. \citet{gilfix2020} study Major League Soccer manager longevity and find that performance relative to predecessors, league context, and age at hire all affect tenure duration. \citet{salaga2020} fit Cox survival models to 208 NFL coaching spells over 1985--2018, but, as in the dismissal studies above, their covariates are realized during the tenure (raw and relative on-field performance) rather than fixed at hire.
+A coaching spell is naturally a time-to-event outcome: it has a start, an end that is either observed (a departure) or not yet observed (an ongoing tenure), and a duration whose distribution is the quantity of interest. Survival analysis is the standard framework for such data for several reasons. It models the full time-to-event distribution, the hazard of firing at each point in a tenure, rather than collapsing the outcome to whether a coach was fired or to an average tenure length; it accommodates right-censoring, the coaches still employed at the end of the study window, so those incomplete spells inform the fit instead of being discarded as a regression on observed tenure would require; and it expresses covariate effects as shifts in the timing of the event, not merely its occurrence.
 
-Within survival analysis, the Cox proportional-hazards model \citep{cox1972} is among the most widely used time-to-event models across the empirical sciences, and we adopt it as our primary model. It is semi-parametric, leaving the baseline hazard (the shape of firing risk over the course of a tenure) unspecified, which avoids committing in advance to a parametric clock for when coaches are fired; its coefficients exponentiate into interpretable hazard ratios, which suits a study whose substantive interest is in \emph{which} factors foreshadow firing; and it is the established choice in the cognate sports-management literature \citep{salaga2020, gilfix2020}, keeping our results comparable to prior work. Whether this interpretability costs any accuracy is an empirical question we take up in Section~\ref{sec:models}.
+The framework has been used across sports management. \citet{gilfix2020} study Major League Soccer manager longevity and find that performance relative to predecessors, league context, and age at hire all affect tenure duration. \citet{salaga2020} fit Cox survival models to 208 NFL coaching spells over 1985--2018, but their covariates are realized during the tenure (raw and relative on-field performance) rather than fixed at hire.
+
+Within survival analysis, the Cox proportional-hazards model \citep{cox1972} is among the most widely used time-to-event models across the empirical sciences, and we adopt it as our primary model. It is semi-parametric, leaving the baseline hazard (the shape of firing risk over the course of a tenure) unspecified, which avoids committing in advance to a parametric clock for when coaches are fired; its coefficients exponentiate into interpretable hazard ratios, which suits a study whose substantive interest is in \emph{which} factors foreshadow firing; and it is the established choice in the cognate sports-management literature \citep{salaga2020, gilfix2020}, keeping our results comparable to prior work. Whether this interpretability costs any accuracy is an empirical question we address in Section~\ref{sec:models}.
 
 \subsection{Prediction from pre-hire information}
 
-Methodologically, our framing is closest to work that forecasts sports outcomes from information available before the outcome is realized. \citet{wolfson2011} forecast NFL quarterback career success from pre-draft observables and find that much of the variation in future performance is driven by factors not observable in advance, a forecasting problem structurally similar to the one we pose. \citet{roach2016} relates early-career team performance to prior head coaching experience and other pre-hire predictors and finds no positive association. Other NFL machine-learning work predicts within-game or within-season outcomes \citep{lock2014, david2011}, a different problem from forecasting at the time of hire.
+Methodologically, our framing is closest to work that forecasts sports outcomes from information available before the outcome is realized. \citet{wolfson2011} forecast NFL quarterback career success from pre-draft observables and find that much of the variation in future performance is driven by factors not observable in advance, a forecasting problem structurally similar to the one we pose. \citet{roach2016} relates early-career team performance to prior head coaching experience and other pre-hire predictors and finds no positive association.
 
 \section{Methods}
 
@@ -91,14 +93,14 @@ We predict the time from hire to firing for NFL head coaches using only informat
 
 \subsection{Population and outcome}
 
-The analysis covers 371 non-interim head coaching stints held by 264 distinct coaches who were hired between 1970 and 2025; 86 coaches account for more than one stint, and four (Bill Parcells, Pete Carroll, Chuck Knox, and Marty Schottenheimer) appear four times each. Because survival analysis treats an ongoing tenure as a right-censored observation rather than a missing outcome, we retain every coach still employed at the data boundary, including recent hires whose tenures have not yet concluded. Mid-season interim appointments that did not convert into a non-interim role are excluded, and interim appointments later retained on a non-interim basis are anchored to the season in which that tenure began. The duration of a stint is the number of seasons the coach held the position. As a check that dismissal is a meaningful outcome rather than noise, Appendix~\ref{app:winrate} relates tenure length to regular-season winning percentage, which rises across short, medium, and long stints (Kruskal--Wallis $p < 10^{-30}$).
+The analysis covers 371 non-interim head coaching stints held by 264 distinct coaches who were hired between 1970 and 2025; 86 coaches account for more than one stint. Mid-season interim appointments that did not convert into a non-interim role are excluded, and interim appointments later retained on a non-interim basis are anchored to the season in which that tenure began. The duration of a stint is the number of seasons the coach held the position. As a check that dismissal is a meaningful outcome rather than noise, Appendix~\ref{app:winrate} relates tenure length to regular-season winning percentage, which rises across short, medium, and long stints (Kruskal--Wallis $p < 0.001$).
 
 \subsubsection{Competing-risks event coding}
 \label{sec:coding}
 
 We distinguish three terminal states for each stint, summarized in Table~\ref{tab:events}. The event of interest is \emph{involuntary non-retention}: a firing, a forced resignation, a face-saving ``mutual'' parting, or a performance-driven non-renewal. The two complementary states are a \emph{voluntary-while-viable} departure, which we treat as a competing event, and a tenure still ongoing at the data boundary, which is administratively censored.
 
-Classifying departures is difficult because the labels organizations attach to a coaching change are unreliable. A fired coach is routinely described as having ``stepped down,'' and a ``mutual parting'' is frequently a dismissal in all but name. We therefore adopt a conservative, asymmetric protocol. Involuntary non-retention is the \emph{default}: a stint is coded as a firing unless we found positive, documented evidence that the coach left on his own terms while still employable. A departure is coded as voluntary, and hence censored, only when it falls into one of three pre-specified categories, each established from contemporaneous reporting:
+Classifying departures is difficult because the labels organizations attach to a coaching change are unreliable: a fired coach is routinely described as having ``stepped down,'' and a ``mutual parting'' can be a dismissal in all but name. We therefore default to firing, coding a stint as involuntary non-retention unless we found positive, documented evidence that the coach left on his own terms while still employable. A departure is coded as voluntary, and hence censored, only when contemporaneous reporting placed it in one of three pre-specified categories:
 \begin{quote}
 \begin{enumerate}
 \item[(A)] the coach left to take another head coaching position while still wanted by the incumbent team;
@@ -106,7 +108,7 @@ Classifying departures is difficult because the labels organizations attach to a
 \item[(C)] the coach departed for documented health, family, or other non-football reasons.
 \end{enumerate}
 \end{quote}
-Each of the 27 voluntary departures was researched and adjudicated individually, recording a one-line justification, a confidence level, and a source; the full classification, with category and justification, is given in Appendix~\ref{app:nonfiring}. The remaining 32 non-firings are coaches still active at the data boundary (the 2025 season). The default-to-firing rule is deliberately conservative against cosmetic exit language: where reporting was ambiguous, we coded the exit as a firing rather than credit an unverified voluntary narrative.
+A losing record in the coach's final season is itself disqualifying: such a stint is coded as a firing however the parting was described, and every one of the 27 voluntary departures we credit had a final-season record at or above .500. Each was adjudicated individually, with a one-line justification, a confidence level, and a source recorded in Appendix~\ref{app:nonfiring}. The remaining 32 non-firings are coaches still active at the 2025 data boundary.
 
 \begin{table}[!ht]
 \caption{Competing-risks coding of the 371 head coaching stints. The firing hazard treats voluntary departures and active coaches as censored; the cumulative incidence function (Section~\ref{sec:cif}) treats voluntary departure as a competing event.}
@@ -129,27 +131,29 @@ The two quantities we estimate call for voluntary exits to be handled in two dif
 
 \subsection{Pre-hire features}
 
-The analysis uses 74 pre-hire features for each hire, all fixed at the time of hire and organized into eight families on two tiers: the coach being hired and the situation he inherits (Table~\ref{tab:feature_categories}). They are constructed so that each underlying construct enters once: where several measures capture the same construct, for instance a team rating and the components that sum to it, a single representative is kept (Section~\ref{sec:selection}). The description that follows, and the formal definitions in Appendix~\ref{app:features}, concern this feature set.
+The analysis draws on 74 candidate pre-hire features for each hire, all fixed at the time of hire and organized into eight families on two tiers: the coach being hired and the situation he inherits (Table~\ref{tab:feature_categories}). From these candidates the model selects a smaller set by stability selection (Section~\ref{sec:selection}). The description that follows, and the formal definitions in Appendix~\ref{app:features}, concern this candidate set.
 
 \begin{table}[!ht]
-\caption{The 74 pre-hire features on two tiers: attributes of the coach being hired, and attributes of the situation he inherits. All values are measured at or before the hire date; Appendix~\ref{app:features} defines every feature.}
+\caption{The 74 candidate pre-hire features on two tiers: attributes of the coach being hired, and attributes of the situation he inherits. ``\#'' is the number of features each family contributes to the candidate set; the prior-unit family is detailed in Appendix~\ref{app:unitstats}. All values are measured at or before the hire date; Appendix~\ref{app:features} defines every feature.}
 \label{tab:feature_categories}
 \small
-\begin{tabular}{ll}
+\begin{tabular}{l c l}
 \toprule
-Family & Description \\
+Family & \# & Description \\
 \midrule
-\multicolumn{2}{@{}l}{\emph{The coach (who is hired)}}\\
-Core experience & Age at hire, prior HC stints, years by coaching level and role \\
-Career structure & Employer history, role and side exposure, internal-hire indicator \\
-Prior unit performance & Pooled, orientation-signed unit statistics from prior roles (App.~\ref{app:unitstats}) \\
-Recent form & Percentile and trajectory of the coach's recent unit and team performance \\
+\multicolumn{3}{@{}l}{\emph{The coach (who is hired)}}\\
+Core experience & 8 & Age at hire, prior HC stints, years by coaching level and role \\
+Career structure & 16 & Employer history, role and side exposure, internal-hire indicator \\
+Prior unit performance & 26 & Pooled, orientation-signed unit statistics from prior roles (App.~\ref{app:unitstats}) \\
+Recent form & 5 & Percentile and trajectory of the coach's recent unit and team performance \\
 \addlinespace
-\multicolumn{2}{@{}l}{\emph{The situation (what is inherited)}}\\
-Hiring-team results & Recent record, scoring, yards, turnovers, and playoff appearances \\
-Inherited team quality & Team rating (SRS) components and schedule strength \\
-Inherited roster & Roster and starter value, age, experience, retention, draft capital \\
-Organizational instability & Predecessor tenure, distinct HCs in the prior decade \\
+\multicolumn{3}{@{}l}{\emph{The situation (what is inherited)}}\\
+Hiring-team results & 3 & Turnovers and playoff appearances over the prior two seasons \\
+Inherited team quality & 4 & Team rating (SRS) components and schedule strength \\
+Inherited roster & 10 & Roster and starter value, age, experience, retention, draft capital \\
+Organizational instability & 2 & Predecessor tenure, distinct HCs in the prior decade \\
+\midrule
+Total & 74 & \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -158,7 +162,7 @@ Several inherited-quality features use the Simple Rating System (SRS), reported 
 
 \subsubsection{Pooled unit representation}
 
-A coach accumulates performance statistics in several prior roles (offensive coordinator, defensive coordinator, head coach). Rather than maintain four parallel statistical blocks (one per role and side), which leaves most cells empty for any individual coach, we pool a coach's prior role-seasons into a single oriented \emph{unit} block of 33 statistics (itemized in Appendix~\ref{app:unitstats}). Each season the coach worked is mapped to the side of the ball that role controlled, and the contribution is signed so that larger values are always better: an offensive coordinator's season contributes its team's offensive output; a defensive coordinator's season contributes the suppression of the opposing offense; a head coach's season contributes both. Turnovers and penalties are sign-flipped so that fewer is better. Per-season values are normalized relative to that season's league distribution,
+A coach accumulates on-field statistics in several prior roles, as an offensive coordinator, a defensive coordinator, or a head coach, and each role speaks to a different side of the ball. The natural way to record this would be a separate statistical block for each role and side: an offensive block filled only by a coach's offensive-coordinator seasons, a defensive block filled only by his defensive-coordinator seasons, and so on. But almost no coach has held every role, so for any individual most of those blocks would stand empty, a career defensive coach having no offensive-coordinator statistics and a first-time coordinator no head-coaching ones. Rather than carry these mostly empty parallel blocks, we pool a coach's prior role-seasons into a single oriented \emph{unit} block of 33 statistics (itemized in Appendix~\ref{app:unitstats}). Each season the coach worked is mapped to the side of the ball that role controlled, and the contribution is signed so that larger values are always better: an offensive coordinator's season contributes its team's offensive output; a defensive coordinator's season contributes the suppression of the opposing offense; a head coach's season contributes both. Turnovers and penalties are sign-flipped so that fewer is better. Per-season values are normalized relative to that season's league distribution,
 \begin{equation}
 z_{i,s,t} = \frac{x_{i,s,t} - \mu_{s,t}}{\sigma_{s,t}},
 \label{eq:zscore}
@@ -167,7 +171,7 @@ where $x_{i,s,t}$ is statistic $s$ for coach $i$'s relevant unit in season $t$ a
 
 \subsubsection{Missing data}
 
-The pooled unit representation just described removes the structural emptiness that a role-by-role layout would otherwise create: a coach's qualifying role-seasons all feed one oriented block, rather than leaving parallel offensive, defensive, and head coaching blocks empty for a coach who never held one of those roles. Where the relevant information is itself a binary career fact, such as whether a coach ever served as an NFL coordinator on a given side, it is encoded directly as an indicator, so that ``never held the role'' is represented as information rather than as a value to be guessed. The missingness that remains is not scattered at random but concentrated in the advanced efficiency and drive statistics the league only began recording in the 1990s, so it falls almost entirely on coaches whose qualifying seasons predate those measures; it is imputed by truncated singular value decomposition, approximating the feature matrix by a low-rank factorization $\mathbf{X} \approx \mathbf{U}\boldsymbol{\Sigma}\mathbf{V}^\top$ re-fit within each resample on training data alone (Section~\ref{sec:eval}).
+The feature design already removes one kind of missingness. Because the pooled unit block collapses all of a coach's roles into one oriented block, a coach who never held a given role produces no empty cells; and binary career facts, such as whether a coach ever served as an NFL coordinator on a given side, are encoded directly as indicators, so that ``never held the role'' is recorded as information rather than left as a value to guess. The missingness that remains is concentrated in the advanced efficiency and drive statistics the league only began recording in the 1990s, and so falls almost entirely on coaches whose qualifying seasons predate those measures. We impute it by truncated singular value decomposition, approximating the feature matrix by a low-rank factorization $\mathbf{X} \approx \mathbf{U}\boldsymbol{\Sigma}\mathbf{V}^\top$ re-fit within each resample on training data alone (Section~\ref{sec:eval}).
 
 \subsection{Survival models}
 \label{sec:models}
@@ -177,30 +181,26 @@ Our primary model is the Cox proportional-hazards model \citep{cox1972}, which s
 \lambda_i(t \mid \mathbf{x}_i) = \lambda_0(t)\,\exp(\mathbf{x}_i^\top \boldsymbol{\beta}),
 \label{eq:cox}
 \end{equation}
-leaving the baseline hazard $\lambda_0(t)$ unspecified. For predictive evaluation the model is fit with elastic-net regularization, whose penalty strength and $\ell_1$ mixing are chosen by coach-level cross-validated concordance over a grid (penalizer $0.5$ and $\ell_1$ ratio $0.25$ at the optimum; Appendix~\ref{app:hyperparameters}); regularization stabilizes estimation when features are correlated. For the reported inference (Section~\ref{sec:hazard}) we refit without penalization, as detailed there.
+leaving the baseline hazard $\lambda_0(t)$ unspecified. For predictive evaluation the model is fit with elastic-net regularization, whose penalty strength and $\ell_1$ mixing are chosen by coach-level cross-validated concordance over a grid (penalizer $0.5$ and $\ell_1$ ratio $0.25$ at the optimum; Appendix~\ref{app:hyperparameters}). For the reported inference (Section~\ref{sec:hazard}) we refit without penalization, as detailed there.
 
 To verify that the proportional-hazards form does not sacrifice predictive performance, we benchmark Cox against a family of accelerated-failure-time (AFT) models (Weibull, log-normal, and log-logistic) and against a gradient-boosted survival model, XGBoost with the \texttt{survival:aft} objective \citep{chen2016}. The AFT and boosted models serve only as a robustness check on the choice of primary model; all interpretation is drawn from the Cox fit.
 
-\subsection{Feature pruning and Cox-native stability selection}
+\subsection{Cox-native stability selection}
 \label{sec:selection}
 
-Several features measure the same construct more than once: the hiring team's pre-hire quality appears both as raw box-score aggregates and as the schedule-adjusted Simple Rating System, and the SRS total is by construction the sum of its offensive and defensive parts. Within each group of features whose pairwise correlation exceeds a high threshold we keep a single representative, preferring the schedule-adjusted measure over its raw counterpart and the SRS components over their total, which leaves the 74 features used for selection and inference. The block-level ablations of Section~\ref{sec:performance}, which gauge whole feature families rather than individual predictors, pool every statistic in a family, including the correlated measures the single-representative rule sets aside for per-feature selection.
-
-From this pool we select features by stability selection \citep{meinshausen2010} driven by a Cox-native importance criterion, so that selection, prediction, and interpretation all rest on the same model class and there is no cross-model importance disagreement to adjudicate. On each of $B = 2000$ subsamples drawn at the \emph{coach} level (half the coaches, sampled without replacement so no coach is split across the partition), we re-impute the features, fit a ridge Cox model, and rank features by the magnitude of their standardized coefficients. Writing $\hat{S}^{(b)}$ for the $q = 10$ highest-ranked features on subsample $b$, the selection frequency of feature $k$ is
+From the 74 candidate features we select a robust subset by stability selection \citep{meinshausen2010} driven by a Cox-native importance criterion, so that selection, prediction, and interpretation all rest on the same model class and there is no cross-model importance disagreement to adjudicate. On each of $B = 2000$ subsamples drawn at the \emph{coach} level (half the coaches, sampled without replacement so no coach is split across the partition), we re-impute the features, fit a ridge Cox model, and rank features by the magnitude of their standardized coefficients. Writing $\hat{S}^{(b)}$ for the $q = 10$ highest-ranked features on subsample $b$, the selection frequency of feature $k$ is
 \begin{equation}
 \hat{\Pi}_k = \frac{1}{B}\sum_{b=1}^{B} \mathbf{1}\!\left\{k \in \hat{S}^{(b)}\right\},
 \label{eq:stability}
 \end{equation}
-and we treat a feature as robustly selected when $\hat{\Pi}_k \geq \pi$ at threshold $\pi = 0.6$. A single-covariate model would leave the internal-hire hazard ratio exposed to confounding by correlated pre-hire factors and would yield no adjusted estimate for the next-strongest effects. We therefore carry the five highest-frequency features into the reported hazard and prediction models, so that the leading effect is estimated with adjustment and the four features just below the threshold, each of which clears it at slightly larger shortlist lengths (Table~\ref{tab:stability}), can be inspected rather than assumed away. We retain the formal stable set as the one feature that clears the threshold at the primary shortlist length $q = 10$, which preserves the error-control guarantee, and report each feature's selection frequency alongside its estimate.
+and we treat a feature as robustly selected when $\hat{\Pi}_k \geq \pi$ at threshold $\pi = 0.6$. Because a single-covariate model would leave the leading hazard ratio exposed to confounding by correlated pre-hire factors and would yield no adjusted estimate for the next-strongest effects, the reported hazard and prediction models adjust the leading effect for the features just below the threshold rather than fitting it alone; how many features that involves is determined by the selection results (Section~\ref{sec:selection_results}), and we report each feature's selection frequency alongside its estimate.
 
 For stability selection the expected number of falsely selected features is bounded by $\mathbb{E}[V] \leq q^2 / \{(2\pi - 1)\,p\}$ \citep{meinshausen2010}, with $p = 74$ the size of the feature pool; the bound is finite only for $\pi > \tfrac{1}{2}$ and tightens as $q$ shrinks. We therefore set $\pi = 0.6$, the lower end of the $[0.6, 0.9]$ range \citet{meinshausen2010} recommend, and keep $q$ small. Because $q$ is otherwise a modeling convention, we record the selection profile at $q \in \{10, 15, 20\}$ from the identical subsamples and report it in Section~\ref{sec:selection_results}, so the conclusions can be read against the choice. As an external check on the stable set, we also rank the 74 features by their Cox importance and choose how many to retain by maximizing coach-level cross-validated concordance; Section~\ref{sec:selection_results} compares that cross-validated set against the stable set.
 
 \subsection{Evaluation}
 \label{sec:eval}
 
-\subsubsection{Leakage-free resampling}
-
-All predictive metrics are averaged over 50 independent train/test splits. Each split is performed at the coach level: every stint belonging to a given coach is assigned entirely to either training or test, so that a coach hired more than once (for example, a coordinator later rehired elsewhere) cannot appear on both sides. Within each split, SVD imputation is fit on the training partition and applied to the test partition, feature selection is recomputed, and the model is trained, so that no step has access to test-set information.
+We evaluate the models by repeated leakage-free resampling. All predictive metrics are averaged over 50 independent train/test splits. Each split is performed at the coach level: every stint belonging to a given coach is assigned entirely to either training or test, so that a coach hired more than once (for example, a coordinator later rehired elsewhere) cannot appear on both sides. Within each split, SVD imputation is fit on the training partition and applied to the test partition, feature selection is recomputed, and the model is trained, so that no step has access to test-set information.
 
 \subsubsection{Discrimination and calibration}
 
@@ -229,7 +229,7 @@ Across the 371 stints, the Kaplan--Meier median firing-free tenure is four seaso
 \subsection{Competing-risks incidence}
 \label{sec:cif}
 
-Figure~\ref{fig:cif} shows the cumulative incidence of firing and of voluntary departure. Firing accounts for nearly all terminations at every horizon: by the end of the second season the cumulative firing incidence is 0.22 (95\% CI [0.18, 0.27]), against 0.01 ([0.00, 0.02]) for voluntary departure; by season four it is 0.55 ([0.50, 0.60]) against 0.03 ([0.01, 0.05]); and by season eight it is 0.81 ([0.76, 0.85]) against 0.06 ([0.04, 0.09]).
+Figure~\ref{fig:cif} shows the cumulative incidence of firing and of voluntary departure. Firing accounts for nearly all terminations at every horizon: by the end of the second season the cumulative firing incidence is 0.29 (95\% CI [0.25, 0.34]), against 0.01 ([0.00, 0.02]) for voluntary departure; by season four it is 0.62 ([0.57, 0.67]) against 0.04 ([0.02, 0.06]); and by season eight it is 0.82 ([0.77, 0.86]) against 0.06 ([0.04, 0.09]).
 
 \begin{figure}[!ht]
 \centering
@@ -270,9 +270,9 @@ Inherited defensive SRS & 0.44 & 0.57 & \textbf{0.67} \\
 \subsection{Predictive performance}
 \label{sec:performance}
 
-Table~\ref{tab:bakeoff} reports discrimination for the Cox model and the four robustness benchmarks on the stable feature set. The Cox model attains a Harrell concordance of 0.602 (95\% CI [0.560, 0.645]) and a close Uno concordance of 0.631 (95\% CI [0.511, 0.751]); the agreement of the two point estimates indicates that censoring does not materially distort the concordance. Uno's interval is the wider of the two not because its estimate is uniformly noisier, in most resamples the two track closely, but because its inverse-probability weighting concentrates on the small number of latest firings near each test split's truncation horizon, so in a few small folds the reweighted pair set becomes unstable and inflates the resampling variance. No competing model separates itself from Cox: the parametric and gradient-boosted alternatives differ from it by at most about a hundredth of a concordance point, well within the resampling uncertainty. The proportional-hazards form therefore carries no predictive penalty that the resampling can detect, and we read the models as indistinguishable in discrimination at this resolution, which supports adopting the more interpretable Cox model as primary.
+Table~\ref{tab:bakeoff} reports discrimination for the Cox model and the four robustness benchmarks on the stable feature set. The Cox model attains a Harrell concordance of 0.602 (95\% CI [0.560, 0.645]) and a close Uno concordance of 0.631 (95\% CI [0.511, 0.751]); the agreement of the two point estimates indicates that censoring does not materially distort the concordance. Uno's interval is the wider of the two not because its estimate is uniformly noisier, in most resamples the two track closely, but because its inverse-probability weighting concentrates on the small number of latest firings near each test split's truncation horizon, so in a few small folds the reweighted pair set becomes unstable and inflates the resampling variance. No competing model separates itself from Cox: the parametric and gradient-boosted alternatives differ from it by no more than about 0.013 in concordance, well within the resampling uncertainty. The proportional-hazards form therefore carries no predictive penalty that the resampling can detect, and we read the models as indistinguishable in discrimination at this resolution, which supports adopting the more interpretable Cox model as primary.
 
-To locate where this discrimination comes from, we compared the full model against a covariate-free null and a series of single-block ablations under the same coach-level resampling protocol (Table~\ref{tab:ablation}). A model with no covariates scores 0.500 by construction. The entire 33-statistic unit-performance block, the football record that hiring processes scrutinize most heavily, does not separate from chance: its concordance is 0.526 (95\% CI [0.480, 0.573]), and the inherited-situation block scores 0.494 ([0.448, 0.539]). Both intervals include 0.500, so neither block is distinguishable from chance. The two structural variables that anchor the final model are individually far more informative: the internal-hire indicator alone reaches 0.564 (95\% CI [0.532, 0.596]) and age at hire alone 0.560 (95\% CI [0.515, 0.604]), both clearing the chance floor and each recovering roughly three-fifths of the distance from chance to the full model's 0.602. A single binary feature, whether the coach was promoted from within, thus discriminates firing better than all thirty-three prior-performance statistics combined. This ablation anticipates the hazard-ratio results below: what predictive signal exists is concentrated in the circumstances of the hire and in a narrow slice of the prior record, not in the statistical record taken as a block.
+To locate where this discrimination comes from, we compared the full model against a covariate-free null and a series of single-block ablations under the same coach-level resampling protocol (Table~\ref{tab:ablation}). A model with no covariates scores 0.500 by construction. The entire 33-statistic unit-performance block, the bulk of a coach's prior on-field record, does not separate from chance: its concordance is 0.526 (95\% CI [0.480, 0.573]), and the inherited-situation block scores 0.494 ([0.448, 0.539]). Both intervals include 0.500, so neither block is distinguishable from chance. The two structural variables that anchor the final model are individually far more informative: the internal-hire indicator alone reaches 0.564 (95\% CI [0.532, 0.596]) and age at hire alone 0.560 (95\% CI [0.515, 0.604]), both clearing the chance floor and each recovering roughly three-fifths of the distance from chance to the full model's 0.602 (95\% CI [0.560, 0.645]). A single binary feature, whether the coach was promoted from within, thus discriminates firing better than all thirty-three prior-performance statistics combined. This ablation anticipates the hazard-ratio results below: what predictive signal exists is concentrated in the circumstances of the hire and in a narrow slice of the prior record, not in the statistical record taken as a block.
 
 \begin{table}[!ht]
 \caption{Discrimination of single-block and null-model ablations, averaged over the same 50 leakage-free coach-level splits as Table~\ref{tab:bakeoff}. Each row reports a Cox model fit on the indicated feature set alone. The covariate-free null is 0.500 by construction; the full selected model matches the headline 0.602. Intervals use the same Nadeau--Bengio correction for resample overlap as Table~\ref{tab:bakeoff}.}
@@ -309,7 +309,7 @@ XGBoost-AFT & 0.608 [0.567, 0.648] & 0.634 [0.515, 0.753] \\
 \end{tabular}
 \end{table}
 
-A concordance near 0.60 carries real but modest signal: presented with two coaches, the model orders their firing times correctly about three in five times. Calibration tells a complementary story. Figure~\ref{fig:calibration} shows the inverse-probability-weighted Brier score by horizon; the integrated Brier score is 0.176 (95\% CI [0.160, 0.191]), comfortably below the 0.25 of an uninformative model. The Brier score is the mean squared error of the predicted survival probabilities, so 0 marks perfect prediction and 0.25 a model that hands every coach the same coin-flip probability; 0.176 is a 30\% reduction in squared error relative to that uninformative baseline (a Brier skill score of about 0.30), so the model's probabilities carry real information while remaining far from deterministic. The figure is read against the dashed 0.25 line: the vertical distance below it at each horizon is the model's probabilistic skill there. That skill is greatest in the first season, where almost no coach has yet been fired and survival is easy to anticipate, and at long horizons, where almost every coach has been; it nearly vanishes in the third and fourth seasons, where the error peaks near 0.25 and firing decisions are most contested and least determined by pre-hire information.
+A concordance near 0.60 carries real but modest signal: presented with two coaches, the model orders their firing times correctly about three in five times. Calibration tells a complementary story. Figure~\ref{fig:calibration} shows the inverse-probability-weighted Brier score by horizon; the integrated Brier score is 0.176 (95\% CI [0.160, 0.191]). Against the 0.25 expected of an uninformative model that assigns every coach the same survival probability (Section~\ref{sec:eval}), the integrated score of 0.176 is a Brier skill score of about 0.30: a roughly 30\% reduction in mean squared error over a no-information forecast, meaningful but far from precise. The figure is read against the dashed 0.25 line: the vertical distance below it at each horizon is the model's probabilistic skill there. That skill is greatest in the first season, where almost no coach has yet been fired and survival is all but certain, and at long horizons, where almost every coach has been; it nearly vanishes in the third and fourth seasons, where the error peaks near 0.25 and firing decisions are most contested and least determined by pre-hire information.
 
 \begin{figure}[!ht]
 \centering
@@ -347,19 +347,19 @@ Inherited defensive SRS & 1.024 & [0.992, 1.057] & 0.147 \\
 \label{fig:forest}
 \end{figure}
 
-Three predictors are distinguishable from a hazard ratio of one. The strongest, and the only feature robustly selected (Section~\ref{sec:selection_results}), is the internal-hire indicator: coaches promoted from within the hiring organization face a markedly higher firing hazard than external hires (HR 1.52, 95\% CI [1.15, 2.02], $p = 0.003$). Two further effects emerge in the multivariable fit. Firing risk rises modestly with age at hire, by about 2\% per year (HR 1.021, 95\% CI [1.003, 1.039], $p = 0.021$), echoing the pattern \citet{farnell2021} report for the broader coaching hierarchy. And coaches whose prior units were more efficient in yards per play face a lower hazard (HR 0.74, 95\% CI [0.61, 0.89], $p = 0.001$), the one slice of the on-field record that carries forward into firing risk, and it does so protectively. The remaining two features, years as an NFL position coach and the inherited defensive rating, have confidence intervals spanning a hazard ratio of one and so cannot be distinguished from no effect in these data. The internal-hire indicator also captures coaches elevated from interim to non-interim status.
+Three predictors are distinguishable from a hazard ratio of one. The only one robustly selected (Section~\ref{sec:selection_results}) is the internal-hire indicator: coaches promoted from within the hiring organization face a markedly higher firing hazard than external hires (HR 1.52, 95\% CI [1.15, 2.02], $p = 0.003$). Two further effects emerge in the multivariable fit. Firing risk rises modestly with age at hire, by about 2\% per year (HR 1.021, 95\% CI [1.003, 1.039], $p = 0.021$), echoing the pattern \citet{farnell2021} report for the broader coaching hierarchy. And coaches whose prior units were more efficient in yards per play face a lower hazard (HR 0.74, 95\% CI [0.61, 0.89], $p = 0.001$), the one slice of the on-field record that carries forward into firing risk, and it does so protectively. The remaining two features, years as an NFL position coach and the inherited defensive rating, have confidence intervals spanning a hazard ratio of one and so cannot be distinguished from no effect in these data. The internal-hire indicator also captures coaches elevated from interim to non-interim status.
 
-The broader pattern across the model is the more important result. Taken as a block, the pooled offensive and defensive unit statistics that make up the largest share of the feature set and that teams scrutinize most heavily discriminate firing at a level indistinguishable from chance (Section~\ref{sec:performance}); their predictive content collapses to a single dimension, yards-per-play efficiency, once the rest of the record is competed away. What foreseeable signal exists is concentrated in how the hire is structured, above all whether the coach is promoted from within rather than brought in from outside, with a thin protective contribution from prior-unit yards-per-play efficiency, rather than in the detailed statistical record.
+The broader pattern across the model is the more important result. Taken as a block, the pooled offensive and defensive unit statistics that make up the largest share of the feature set discriminate firing at a level indistinguishable from chance (Section~\ref{sec:performance}); their predictive content collapses to a single dimension, yards-per-play efficiency, once the rest of the record is competed away. The commonly cited efficiency measures, third-down conversion rate, red-zone scoring rate, total points, and takeaways among them, are nowhere among the leading selected features (Table~\ref{tab:stability}); of the entire 33-statistic block, only prior-unit yards-per-play efficiency carries forward into firing risk. What foreseeable signal exists is concentrated in how the hire is structured, above all whether the coach is promoted from within rather than brought in from outside, with a thin protective contribution from prior-unit yards-per-play efficiency, rather than in the detailed statistical record.
 
 \section{Discussion}
 
-The analysis yields a connected set of findings. The headline is a ceiling: even with the full pre-hire record in hand, only a modest part of firing is foreseeable. What foreseeable signal exists sits mainly in the structural circumstances of the hire, with a thin protective contribution from the yards-per-play efficiency of the coach's prior units, rather than in the broad on-field record. And dismissal, despite the noise inherent in it, proves a meaningful outcome to model. We develop these in turn, then draw out what they imply for hiring teams and the limits that bound the conclusions.
+The analysis yields a connected set of findings. The headline is a ceiling on predictability: even with the full pre-hire record in hand, only a modest part of firing is foreseeable at the time of hire. What foreseeable signal exists sits mainly in the structural circumstances of the hire, with a thin protective contribution from the yards-per-play efficiency of the coach's prior units, rather than in the broad on-field record. We develop these in turn, then draw out what they imply for hiring teams and the limits that bound the conclusions.
 
-\subsection{Dismissal is largely unforeseeable at hiring}
+\subsection{Dismissal is largely unforeseeable at the time of hire}
 
-The central finding concerns how foreseeable dismissal is in aggregate, more than any single coefficient. With every pre-hire feature available, a calibrated survival model forecasts firing with a concordance near 0.60 and an integrated Brier score of 0.176. This is genuine signal, but a modest one, and it implies that the bulk of what determines a coach's dismissal is not knowable when the contract is signed. The ceiling is a property of the outcome rather than the estimator: the benchmark AFT and gradient-boosted models agree to within sampling error, so it does not move with the choice of model. The interpretation parallels \citet{wolfson2011} on quarterback projection: much of the variation in future success is driven by factors that are simply not observable in advance.
+The central finding concerns how foreseeable dismissal is in aggregate. With every pre-hire feature available, a calibrated survival model forecasts firing with a concordance near 0.60 and an integrated Brier score of 0.176 (95\% CI [0.160, 0.191]). This is genuine signal, but a modest one, and it implies that the bulk of what determines a coach's dismissal is not knowable when the contract is signed. The ceiling is a property of the outcome rather than the estimator: the benchmark AFT and gradient-boosted models agree to within sampling error, so it does not move with the choice of model. The interpretation parallels \citet{wolfson2011} on quarterback projection: much of the variation in future success is driven by factors that are simply not observable in advance.
 
-This finding refines, rather than contradicts, the prior literature. \citet{allen2012}, \citet{salaga2020}, and \citet{foreman2019} all show that performance strongly drives dismissal, but they measure performance as it is realized during the tenure, and \citet{allen2012} in particular find that what matters is performance relative to expectations rather than raw results. Our pre-hire analysis speaks to the question those in-tenure studies leave open: the performance that drives firing is largely \emph{not} anticipated by the pre-hire record; teams are not failing to act on a signal they already hold, because most of what will determine the outcome is realized only once the coach is in the role and is not encoded in anything observable on hiring day.
+This finding refines the prior literature. \citet{allen2012}, \citet{salaga2020}, and \citet{foreman2019} all show that performance strongly drives dismissal, but they measure performance as it is realized during the tenure, and \citet{allen2012} in particular find that what matters is performance relative to expectations rather than raw results. Our pre-hire analysis speaks to the question those in-tenure studies leave open: the performance that drives firing is largely \emph{not} anticipated by the pre-hire record; teams are not failing to act on a signal they already hold, because most of what will determine the outcome is realized only once the coach is in the role and is not encoded in anything observable on hiring day.
 
 This points to a sharper open question. We have shown that a coach's prior on-field record does not forecast his eventual firing, but we have not tested whether his prior performance \emph{relative to expectations} forecasts his future performance relative to expectations, the quantity the dismissal literature finds decisive. A coach who consistently exceeded the expectations placed on his prior units may carry that tendency forward in a way his raw statistics do not capture. Constructing pre-hire expectation baselines and testing that mapping is a natural direction for future work.
 
@@ -370,10 +370,6 @@ The clearest pattern in the estimates concerns where the thin signal sits. The i
 To the extent dismissal is foreseeable, the strongest predictor is structural. Promotion from within is associated with a markedly higher firing hazard. The age effect points the same direction, toward the identity and circumstances of the hire. The protective effect of prior-unit efficiency is the one exception, a thread of the on-field record that does carry forward, though it is the weakest of these signals and the least stably selected. For practitioners, the broader implication is that the detailed football credentials given close attention in evaluation have little power to forecast the outcome teams most want to avoid.
 
 The one robust structural signal favors looking outward: external hires survive longer than internal promotions. We are cautious about a causal reading, because internal promotions are bound up with the distressed situations that often produce them, but the pattern is at least consistent with a broader value to outside perspective in a hire. Whether the advantage reflects the outside perspective itself or the healthier circumstances under which external searches are typically conducted is a question our data cannot settle, and a useful one for future work.
-
-\subsection{Dismissal as a meaningful outcome}
-
-A natural concern is whether dismissal is a sensible target at all, given that a coach may be fired for reasons unrelated to quality. Two features of the data support its use. First, dismissal tracks on-field performance in aggregate: as the validity check of Appendix~\ref{app:winrate} shows, mean winning percentage rises across short, medium, and long stints (0.31, 0.41, and 0.54; Kruskal--Wallis $p < 10^{-30}$), so firing is not noise relative to on-field success. Second, by modeling firing specifically and treating voluntary departures as a competing risk, we avoid conflating dismissal with the qualitatively different decision of a successful coach to move on.
 
 \subsection{Implications for hiring and the turnover debate}
 
@@ -389,7 +385,7 @@ A few limitations qualify these results. The hazard-ratio $p$-values are compute
 
 Framing NFL head coach dismissal as a firing-aware, competing-risks survival problem conditioned only on pre-hire information yields a clear picture. Dismissal is only modestly foreseeable at the moment of hiring, the proportional-hazards model is as accurate as more flexible alternatives, and what foreseeable signal exists lies chiefly in the structural circumstances of the hire, above all whether the coach is promoted from within, with weaker contributions from age and from the yards-per-play efficiency of the coach's prior units, rather than in the broad football record that hiring processes emphasize. The same pre-hire, firing-aware question extends naturally to other coaching markets with frequent turnover and a public hiring record, such as Major League Soccer and the NBA \citep{gilfix2020}; whether the modest ceiling we document is particular to the NFL or general to elite coaching labor markets is a question we leave to future work. Coaching changes may be frequent, but at the moment they are set in motion, their eventual outcome is mostly still unwritten.
 
-\noindent\textbf{Reproducibility.}
+\section*{Data Availability}
 Data were scraped from Pro-Football-Reference.com. Processed data and analysis code are available at \url{https://github.com/jwilliamson7/CoachingProject} or on request to the corresponding author.
 
 \begin{thebibliography}{99}
@@ -418,9 +414,6 @@ Chen, T. and Guestrin, C. (2016). XGBoost: a scalable tree boosting system. In: 
 \bibitem[Cox(1972)]{cox1972}
 Cox, D. R. (1972). Regression models and life-tables. \emph{Journal of the Royal Statistical Society: Series B}, \textbf{34}(2), pp. 187--202.
 
-\bibitem[David et al.(2011)]{david2011}
-David, J. A., Pasteur, R. D., Ahmad, M. S. and Janning, M. C. (2011). NFL prediction using committees of artificial neural networks. \emph{Journal of Quantitative Analysis in Sports}, \textbf{7}(2), pp. 1--15.
-
 \bibitem[Davidson-Pilon(2019)]{davidsonpilon2019}
 Davidson-Pilon, C. (2019). lifelines: survival analysis in Python. \emph{Journal of Open Source Software}, \textbf{4}(40), 1317.
 
@@ -447,9 +440,6 @@ Harrell, F. E., Lee, K. L. and Mark, D. B. (1996). Multivariable prognostic mode
 
 \bibitem[Lin and Wei(1989)]{lin1989}
 Lin, D. Y. and Wei, L. J. (1989). The robust inference for the Cox proportional hazards model. \emph{Journal of the American Statistical Association}, \textbf{84}(408), pp. 1074--1078.
-
-\bibitem[Lock and Nettleton(2014)]{lock2014}
-Lock, D. and Nettleton, D. (2014). Using random forests to estimate win probability before each play of an NFL game. \emph{Journal of Quantitative Analysis in Sports}, \textbf{10}(2), pp. 197--205.
 
 \bibitem[Meinshausen and B\"uhlmann(2010)]{meinshausen2010}
 Meinshausen, N. and B\"uhlmann, P. (2010). Stability selection. \emph{Journal of the Royal Statistical Society: Series B}, \textbf{72}(4), pp. 417--473.
@@ -559,8 +549,8 @@ Roster value & Total Approximate Value of the inherited roster \\
 Starter value & Approximate Value of the inherited starters \\
 Starter experience & Mean seasons of experience among inherited starters \\
 Roster experience & Mean seasons of experience across the inherited roster \\
-Recent first-round picks & First-round draft picks on the inherited roster from recent drafts \\
-Premium draft capital & Recent early-round (premium) draft capital on the roster \\
+Recent first-round picks & First-round picks the hiring team held across the three most recent drafts \\
+Premium draft capital & First- and second-round picks the hiring team held over the prior three drafts \\
 Roster turnover & Share of the roster turned over entering the hire \\
 Offensive retention & Offensive personnel retained from the prior season \\
 Defensive retention & Defensive personnel retained from the prior season \\
@@ -574,7 +564,7 @@ Head coaches in prior decade & Distinct head coaches the organization employed i
 \section{Pooled Unit Statistics}
 \label{app:unitstats}
 
-The pooled unit block summarizes a coach's prior on-field production in 33 statistics, each measured for the unit the coach's role controlled and pooled across his qualifying role-seasons as described in Section~3.2.1. For an offensive coordinator a statistic reflects his own offense, for a defensive coordinator the suppression of the opposing offense, and for a head coach his whole team. Every value is standardized against its season's league distribution (Equation~\ref{eq:zscore}) and oriented so that larger is better, with turnovers, interceptions, penalties, and turnover percentage sign-flipped accordingly. Table~\ref{tab:unitstats} lists the 33 statistics in their source order.
+The pooled unit block summarizes a coach's prior on-field production in 33 statistics, each measured for the unit the coach's role controlled and pooled across his qualifying role-seasons as described in Section~3.2.1. For an offensive coordinator a statistic reflects his own offense, for a defensive coordinator the suppression of the opposing offense, and for a head coach his whole team. Every value is standardized against its season's league distribution (Equation~\ref{eq:zscore}) and oriented so that larger is better, with turnovers, interceptions, penalties, and turnover percentage sign-flipped accordingly. Table~\ref{tab:unitstats} lists the 33 statistics in their source order; the seven marked $^{\ast}$ are collapsed as redundant with a retained statistic, leaving the 26 that enter the 74-feature candidate set (Table~\ref{tab:feature_categories}). The block-level ablations of Section~\ref{sec:performance} are fit on the full 33-statistic block.
 
 {\footnotesize
 \begin{longtable}{@{}l l@{}}
@@ -594,8 +584,8 @@ Statistic & Description \\
 \endfoot
 \bottomrule
 \endlastfoot
-Points scored & Points scored by the unit \\
-Total yards & Total yards gained \\
+Points scored$^{\ast}$ & Points scored by the unit \\
+Total yards$^{\ast}$ & Total yards gained \\
 Yards per play & Yards gained per offensive play \\
 Turnovers & Turnovers committed (sign-flipped) \\
 First downs & First downs gained \\
@@ -603,16 +593,16 @@ Completions & Pass completions \\
 Pass attempts & Pass attempts \\
 Passing yards & Yards gained passing \\
 Passing touchdowns & Touchdown passes \\
-Interceptions & Interceptions thrown (sign-flipped) \\
-Net yards per attempt & Net yards per pass attempt, sacks included \\
+Interceptions$^{\ast}$ & Interceptions thrown (sign-flipped) \\
+Net yards per attempt$^{\ast}$ & Net yards per pass attempt, sacks included \\
 Passing first downs & First downs gained passing \\
 Rush attempts & Rushing attempts \\
 Rushing yards & Yards gained rushing \\
 Rushing touchdowns & Rushing touchdowns \\
 Yards per carry & Yards per rushing attempt \\
-Rushing first downs & First downs gained rushing \\
+Rushing first downs$^{\ast}$ & First downs gained rushing \\
 Penalties & Penalties committed (sign-flipped) \\
-Penalty yards & Yards lost to penalties (sign-flipped) \\
+Penalty yards$^{\ast}$ & Yards lost to penalties (sign-flipped) \\
 First downs by penalty & First downs awarded by opponents' penalties \\
 Drives & Number of offensive drives \\
 Scoring percentage & Share of drives ending in a score \\
@@ -620,7 +610,7 @@ Turnover percentage & Share of drives ending in a turnover (sign-flipped) \\
 Time per drive & Average time of possession per drive \\
 Plays per drive & Average plays per drive \\
 Yards per drive & Average yards per drive \\
-Points per drive & Average points per drive \\
+Points per drive$^{\ast}$ & Average points per drive \\
 Third-down attempts & Third-down attempts \\
 Third-down rate & Third-down conversion rate \\
 Fourth-down attempts & Fourth-down attempts \\
@@ -694,13 +684,41 @@ Bruce Arians & 2013--2017 & 8--8 & C & Retired citing family after a 42-year car
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.75\textwidth]{figures/threshold_winrate.png}
-\caption{Mean regular-season winning percentage by tenure length, which rises from 0.31 for short stints to 0.41 for medium and 0.54 for long (Kruskal--Wallis $p < 10^{-30}$; each adjacent step ordered by a one-sided Mann--Whitney test, $p < 10^{-7}$). Dismissal therefore tracks on-field success and is a meaningful outcome to model.}
+\caption{Mean regular-season winning percentage by tenure length, which rises from 0.31 for short stints to 0.41 for medium and 0.54 for long (Kruskal--Wallis $p < 0.001$; each adjacent step ordered by a one-sided Mann--Whitney test, $p < 0.001$). Dismissal therefore tracks on-field success and is a meaningful outcome to model.}
 \label{fig:winrate}
 \end{figure}
 
+\clearpage
 \section{Model Configuration}
 \label{app:hyperparameters}
 
-For predictive evaluation the Cox model uses elastic-net regularization (penalizer $0.5$, $\ell_1$ ratio $0.25$), selected by coach-level cross-validated concordance from an exhaustive grid over penalizer $\in \{0.001, 0.005, 0.01, 0.05, 0.1, 0.3, 0.5, 1.0, 2.0\}$ and $\ell_1$ ratio $\in \{0, 0.25, 0.5, 0.75, 1.0\}$, and held fixed across the 50 resamples. The reported hazard-ratio model (Table~\ref{tab:hazard}) is unpenalized, for the inferential reasons given in Section~\ref{sec:hazard}. Stability selection operates on the 74-feature pool that remains after collapsing groups of highly correlated duplicates to a single representative (Section~\ref{sec:selection}), drawing 2000 coach-level subsamples at 50\% sampling and retaining features with selection frequency at least 0.6 among the top 10 per subsample, with the selection profile also recorded at the top 15 and 20. The XGBoost-AFT benchmark uses a normal AFT loss and was tuned by random search over 200 draws from a grid spanning the number of boosting rounds, learning rate, tree depth (2 to 5), row and column subsampling, minimum child weight, and $\ell_2$ regularization, so that interaction structure up to depth five was available to it; the parametric AFT benchmarks use a small ridge penalty ($0.01$). All resampling uses an 80/20 coach-level train/test split.
+Table~\ref{tab:hyperparameters} reports the search spaces and selected values for the two tuned models. The Cox elastic-net penalty was chosen by exhaustive grid search maximizing coach-level cross-validated concordance; the XGBoost-AFT benchmark was tuned by random search over 200 draws from the grid shown, making interaction structure up to depth five available to it. Both configurations were held fixed across the 50 resamples. The reported hazard-ratio model (Table~\ref{tab:hazard}) is unpenalized, for the inferential reasons given in Section~\ref{sec:hazard}, and the parametric AFT benchmarks use a small fixed ridge penalty ($0.01$).
+
+Stability selection operates on the 74 candidate features (Section~\ref{sec:selection}), drawing 2000 coach-level subsamples at 50\% sampling and retaining features with selection frequency at least 0.6 among the top 10 per subsample, with the selection profile also recorded at the top 15 and 20. All resampling uses an 80/20 coach-level train/test split.
+
+\begin{table}[!ht]
+\caption{Hyperparameter search spaces and selected values for the two tuned models. The Cox elastic net was searched exhaustively; the XGBoost-AFT benchmark by 200-draw random search. Both were selected by coach-level cross-validated concordance and held fixed across the 50 resamples.}
+\label{tab:hyperparameters}
+\small
+\begin{tabular}{@{}l l c@{}}
+\toprule
+Hyperparameter & Search space & Selected \\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Cox proportional hazards (elastic net)}}\\
+Penalizer & \{0.001, 0.005, 0.01, 0.05, 0.1, 0.3, 0.5, 1.0, 2.0\} & 0.5 \\
+$\ell_1$ ratio & \{0, 0.25, 0.5, 0.75, 1.0\} & 0.25 \\
+\addlinespace
+\multicolumn{3}{@{}l}{\emph{XGBoost-AFT (normal AFT loss; 200 random draws)}}\\
+Boosting rounds & \{30, 50, 80, 120, 200\} & 50 \\
+Learning rate & \{0.02, 0.03, 0.05, 0.1, 0.15\} & 0.02 \\
+Tree depth & \{2, 3, 4, 5\} & 4 \\
+Row subsample & \{0.6, 0.7, 0.85, 1.0\} & 1.0 \\
+Column subsample & \{0.6, 0.7, 0.85, 1.0\} & 1.0 \\
+Minimum child weight & \{1, 3, 5, 8\} & 3 \\
+$\ell_2$ regularization & \{0, 0.5, 1.0, 2.0, 5.0\} & 1.0 \\
+AFT scale & \{0.5, 0.8, 1.0, 1.2, 1.5\} & 1.5 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \end{document}
