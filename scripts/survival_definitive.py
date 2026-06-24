@@ -241,8 +241,13 @@ def main():
     aj_v = aalen_johansen_cif(dur, cause, VOLUNTARY)
 
     def cif_at(aj, t):
+        # Read through the END of season t. lifelines jitters tied integer event
+        # times, so a season-t event lands at t +/- epsilon; reading at exactly t
+        # under-counts season t by ~half. t + 0.5 captures every event with
+        # integer time <= t (jitter << 0.5) and excludes season t + 1.
         c = aj.cumulative_density_
-        return float(c[c.index <= t].iloc[-1, 0]) if (c.index <= t).any() else 0.0
+        m = c.index <= t + 0.5
+        return float(c[m].iloc[-1, 0]) if m.any() else 0.0
     print("\nCumulative incidence (competing risks):")
     for t in (2, 4, 6, 8):
         print(f"  by season {t}: fired={cif_at(aj_f,t):.3f}  voluntary={cif_at(aj_v,t):.3f}")

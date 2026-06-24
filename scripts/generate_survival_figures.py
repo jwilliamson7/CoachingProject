@@ -110,22 +110,44 @@ def fig_calibration(d):
     _save(fig, "survival_calibration.png")
 
 
+def _step_at_seasons(index, vals, seasons):
+    """Cumulative-incidence value through the END of each integer season.
+
+    lifelines' AalenJohansenFitter jitters tied integer event times by a small
+    random offset to break ties, so a season-s firing lands at s +/- epsilon.
+    Reading the step at exactly x = s therefore captures only the season-s
+    events that happened to jitter below s, UNDER-counting that season by ~half.
+    We instead read at s + 0.5: since the jitter is well under half a season,
+    this captures every event with integer time <= s and excludes season s+1,
+    giving the true incidence by the end of season s (e.g. firing incidence
+    ~0.29 by the end of season 2, matching the raw empirical fraction)."""
+    index = np.asarray(index, float)
+    vals = np.asarray(vals, float)
+    out = np.empty(len(seasons))
+    for j, s in enumerate(seasons):
+        mask = index <= s + 0.5
+        out[j] = vals[mask][-1] if mask.any() else 0.0
+    return out
+
+
 def fig_cif():
     df, X, y = load_modeling_data(known_only=False)
     boundary = global_max_season()
     dur, cause = build_competing_targets(df, boundary)
     keep = dur.index
     dur, cause = dur.loc[keep], cause.loc[keep]
+    seasons = np.arange(0, 16)
     fig, ax = plt.subplots(figsize=(6.5, 4.2))
     for ev, color, lab in [(FIRED, REF, "Firing"),
                            (VOLUNTARY, SIG, "Voluntary exit")]:
         aj = aalen_johansen_cif(dur, cause, ev)
         cdf = aj.cumulative_density_
         ci = aj.confidence_interval_
-        t = cdf.index.values
-        ax.step(t, cdf.iloc[:, 0].values, where="post", color=color, lw=2, label=lab)
-        ax.fill_between(ci.index.values, ci.iloc[:, 0].values, ci.iloc[:, 1].values,
-                        step="post", color=color, alpha=0.15)
+        y_int = _step_at_seasons(cdf.index.values, cdf.iloc[:, 0].values, seasons)
+        lo_int = _step_at_seasons(ci.index.values, ci.iloc[:, 0].values, seasons)
+        hi_int = _step_at_seasons(ci.index.values, ci.iloc[:, 1].values, seasons)
+        ax.step(seasons, y_int, where="post", color=color, lw=2, label=lab)
+        ax.fill_between(seasons, lo_int, hi_int, step="post", color=color, alpha=0.15)
     ax.set_xlim(0, 15)
     ax.set_ylim(0, 1)
     ax.set_xlabel("Seasons since hire")
