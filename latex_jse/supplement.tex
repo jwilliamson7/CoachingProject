@@ -21,9 +21,10 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage[natbibapa]{apacite}  % APA 7th author-date; matches the main manuscript
 
-% Supplementary-material numbering: S1, S2, ...; Table S1, Table S2, ...
+% Supplementary-material numbering: S1, S2, ...; Table S1, ...; Figure S1, ...
 \renewcommand{\thesection}{S\arabic{section}}
 \renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\thefigure}{S\arabic{figure}}
 
 \doublespacing
 
@@ -39,14 +40,16 @@ Internal-Promotion Hazard in the NFL''}
 \date{}
 \maketitle
 
-\noindent This supplement provides the full feature reference and model configuration
-for the analysis. Section~\ref{sec:supp_features} defines every candidate pre-hire
-feature outside the pooled unit block, which the main text summarizes by family in its
-Table~1; Section~\ref{sec:supp_unitstats} itemizes the component statistics of the
-pooled unit block introduced in Section~3.2.1 of the main text; and
-Section~\ref{sec:supp_config} reports the hyperparameter search spaces for the tuned
-models and the stability-selection settings. All feature values are measured at or
-before the hire date.
+\noindent This supplement provides the full feature reference, model configuration, and
+supporting classifications for the analysis. Section~\ref{sec:supp_features} defines every
+candidate pre-hire feature outside the pooled unit block, which the main text summarizes by
+family in its Table~1; Section~\ref{sec:supp_unitstats} itemizes the component statistics of
+the pooled unit block introduced in Section~3.2.1 of the main text;
+Section~\ref{sec:supp_config} reports the hyperparameter search spaces for the tuned models
+and the stability-selection settings; Section~\ref{sec:supp_nonfiring} lists every stint
+coded as a voluntary-while-viable departure, the competing event, with its category and a
+one-line justification; and Section~\ref{sec:supp_winrate} reports the win-rate-by-tenure
+outcome-validity check. All feature values are measured at or before the hire date.
 
 \section{Feature Descriptions}
 \label{sec:supp_features}
@@ -228,6 +231,76 @@ AFT scale & \{0.5, 0.8, 1.0, 1.2, 1.5\} & 1.5 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\section{Non-Firing Event Classifications}
+\label{sec:supp_nonfiring}
+
+Table~\ref{supp:nonfiring} lists every stint coded as a voluntary-while-viable departure, the competing event in our analysis, together with the category assigned under the competing-risks coding protocol of the main text and a one-line justification drawn from contemporaneous reporting. All terminated stints not listed here are coded as involuntary non-retention (firings); the conservative default-to-firing rule means a stint appears below only where positive evidence of a voluntary, while-viable exit was found. The 32 further non-firing stints not shown are coaches still active at the 2025 data boundary, who are administratively censored: Aaron Glenn, Andy Reid, Ben Johnson, Brian Callahan, Brian Daboll, Brian Schottenheimer, Dan Campbell, Dan Quinn, Dave Canales, DeMeco Ryans, Jim Harbaugh, John Harbaugh, Jonathan Gannon, Kellen Moore, Kevin O'Connell, Kevin Stefanski, Kyle Shanahan, Liam Coen, Matt LaFleur, Mike Macdonald, Mike McDaniel, Mike Tomlin, Mike Vrabel, Nick Sirianni, Pete Carroll, Raheem Morris, Sean McDermott, Sean McVay, Sean Payton, Shane Steichen, Todd Bowles, and Zac Taylor. Sean Payton appears here for his current stint and in Table~\ref{supp:nonfiring} for an earlier voluntary departure, the two being distinct stints.
+
+{\footnotesize
+\begin{longtable}{@{}l c c c p{7.6cm}@{}}
+\caption{The 27 head coaching stints coded as voluntary-while-viable departures (the competing event), grouped by category. Categories follow the main text's event-coding protocol: (A) departed for another head coaching position while still wanted; (B) retired while still successful and retained; (C) departed for documented health, family, or other non-football reasons. ``Final (W--L)'' is the coach's record in his final season with the team.}
+\label{supp:nonfiring}\\
+\toprule
+Coach & Stint & Final (W--L) & Cat. & Justification \\
+\midrule
+\endfirsthead
+\multicolumn{5}{c}{\tablename~\thetable\ (continued)}\\[2pt]
+\toprule
+Coach & Stint & Final (W--L) & Cat. & Justification \\
+\midrule
+\endhead
+\midrule
+\multicolumn{5}{r}{\footnotesize\itshape continued on next page}\\
+\endfoot
+\bottomrule
+\endlastfoot
+\multicolumn{5}{@{}l}{\emph{(A) Departed for another head coaching position while still wanted}}\\[2pt]
+Chuck Fairbanks & 1973--1978 & 11--4 & A & Left for the University of Colorado head job \\
+Jack Pardee & 1975--1977 & 9--5 & A & Resigned to take the Redskins head job \\
+Bobby Ross & 1992--1996 & 8--8 & A & Left for the Lions head job; Chargers wanted to keep him \\
+Bill Parcells & 1993--1996 & 11--5 & A & Left in a personnel dispute to take the Jets job \\
+Mike Holmgren & 1992--1998 & 11--5 & A & Left for the Seahawks head coach and GM role \\
+Al Groh & 2000 & 9--7 & A & Resigned to take the Virginia (alma mater) head job \\
+Jon Gruden & 1998--2001 & 10--6 & A & Traded to Tampa Bay; remained a sought-after head coach \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{(B) Retired while still successful and retained}}\\[2pt]
+Paul Brown & 1970--1975 & 11--3 & B & Retired voluntarily on top; named his own successor \\
+Sid Gillman & 1974 & 7--7 & B & Retired on top (Coach of the Year); picked his successor \\
+Bill Walsh & 1979--1988 & 10--6 & B & Retired days after winning Super Bowl XXIII \\
+Jerry Burns & 1986--1991 & 8--8 & B & Announced his own retirement at 64; no pressure \\
+Dick Vermeil & 1997--1999 & 13--3 & B & Retired after winning Super Bowl XXXIV \\
+Bill Parcells & 1997--1999 & 8--8 & B & Retired on his own terms; Belichick set to succeed \\
+Jimmy Johnson & 1996--1999 & 9--7 & B & Retired (burnout); Dolphins would have retained him \\
+Dick Vermeil & 2001--2005 & 10--6 & B & Retired on top, still wanted \\
+Bill Cowher & 1992--2006 & 8--8 & B & Stepped down after 15 seasons; SB winner the prior year \\
+Bill Parcells & 2003--2006 & 9--7 & B & Retired by his own choice; the Cowboys wanted him back \\
+Tony Dungy & 2002--2008 & 12--4 & B & Retired on top after a playoff run; picked his successor \\
+Bruce Arians & 2019--2021 & 13--4 & B & Stepped down as a SB winner; picked successor Bowles \\
+Sean Payton & 2006--2021 & 9--8 & B & Stepped away wanting time off; team would have kept him \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{(C) Departed for health, family, or other non-football reasons}}\\[2pt]
+John Madden & 1970--1978 & 9--7 & C & Retired due to an ulcer and burnout while still wanted \\
+Bill Parcells & 1983--1990 & 13--3 & C & Resigned citing health after Super Bowl XXV \\
+Joe Gibbs & 1981--1992 & 9--7 & C & Retired for health and family reasons \\
+Bobby Ross & 1997--2000 & 5--4 & C & Resigned mid-season citing health (blood clots) \\
+Joe Gibbs & 2004--2007 & 9--7 & C & Resigned for family reasons (grandson's illness) \\
+Gary Kubiak & 2015--2016 & 9--7 & C & Retired for health reasons (migraine condition) \\
+Bruce Arians & 2013--2017 & 8--8 & C & Retired citing family after a 42-year career \\
+\end{longtable}
+}
+
+\section{Outcome Validity: Win Rate by Tenure Length}
+\label{sec:supp_winrate}
+
+Longer tenures correspond to stronger regular-season records, which confirms that the modeled outcome, dismissal, tracks on-field success rather than chance variation in record.
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.75\textwidth]{figures/threshold_winrate.png}
+\caption{Mean regular-season winning percentage by tenure length, which rises from 0.31 for short stints to 0.41 for medium and 0.54 for long (Kruskal--Wallis $p < 0.001$; each adjacent step ordered by a one-sided Mann--Whitney test, $p < 0.001$). Dismissal therefore tracks on-field success and is a meaningful outcome to model.}
+\label{supp:winrate}
+\end{figure}
 
 \bibliographystyle{apacite}
 \bibliography{refs}
