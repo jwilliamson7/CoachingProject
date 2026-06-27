@@ -8,3 +8,24 @@ __pycache__/
 # Scratch/safety backups (LEAKY/overfit/era snapshots; not reproducible artifacts)
 *.bak
 data/master_data_4block_backup.csv
+
+# LaTeX build artifacts (manuscript source is the .tex; compiled output is reproducible)
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.out
+*.toc
+*.synctex.gz
+latex_jse/*.log
+latex_jse/_build_*.log
+latex_jse/*.pdf
+
+# Run logs and generated analysis artifacts (reproducible from the scripts)
+analysis/_*.log
+analysis/_*.json
+analysis/_stability_2000.pkl
+analysis/survival_selection_probe.pkl
+analysis/internal_hire_audit_summary.csv
+analysis/internal_hire_history_detail.csv

@@ -1,0 +1,235 @@
+% Online Supplement to the Journal of Sports Economics submission
+% "The Limits of Foresight in Coaching Hires." Self-contained: same 12pt Times
+% / booktabs / longtable setup as the main manuscript. Sections and tables are
+% numbered with an "S" prefix (S1, S2; Table S1, Table S2) per the journal's
+% supplementary-material convention. Cross-references to the main text are given
+% in prose, since this document compiles independently of the manuscript.
+\documentclass[12pt,USenglish]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{mathptmx}            % Times for text and math
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[hidelinks]{hyperref}
+\usepackage[natbibapa]{apacite}  % APA 7th author-date; matches the main manuscript
+
+% Supplementary-material numbering: S1, S2, ...; Table S1, Table S2, ...
+\renewcommand{\thesection}{S\arabic{section}}
+\renewcommand{\thetable}{S\arabic{table}}
+
+\doublespacing
+
+\begin{document}
+
+\title{Online Supplement to\\
+``The Limits of Foresight in Coaching Hires:\\
+Pre-Hire Predictability of Involuntary Separation and the\\
+Internal-Promotion Hazard in the NFL''}
+
+% Author identity is carried on the separate title_page.tex (blinded review).
+\author{}
+\date{}
+\maketitle
+
+\noindent This supplement provides the full feature reference and model configuration
+for the analysis. Section~\ref{sec:supp_features} defines every candidate pre-hire
+feature outside the pooled unit block, which the main text summarizes by family in its
+Table~1; Section~\ref{sec:supp_unitstats} itemizes the component statistics of the
+pooled unit block introduced in Section~3.2.1 of the main text; and
+Section~\ref{sec:supp_config} reports the hyperparameter search spaces for the tuned
+models and the stability-selection settings. All feature values are measured at or
+before the hire date.
+
+\section{Feature Descriptions}
+\label{sec:supp_features}
+
+Table~\ref{supp:featuredefs} defines the pre-hire features outside the pooled unit
+block, grouped by family; the pooled unit block is described in Section~3.2.1 of the
+main text and its component statistics are itemized in Section~\ref{sec:supp_unitstats}.
+All values are measured at or before the hire date.
+
+{\footnotesize\singlespacing
+\begin{longtable}{@{}l p{8.6cm}@{}}
+\caption{Definitions of the pre-hire features by family. The pooled-unit block is itemized separately in Table~\ref{supp:unitstats}.}
+\label{supp:featuredefs}\\
+\toprule
+Feature & Definition \\
+\midrule
+\endfirsthead
+\multicolumn{2}{c}{\tablename~\thetable\ (continued)}\\[2pt]
+\toprule
+Feature & Definition \\
+\midrule
+\endhead
+\midrule
+\multicolumn{2}{r}{\footnotesize\itshape continued on next page}\\
+\endfoot
+\bottomrule
+\endlastfoot
+\multicolumn{2}{@{}l}{\emph{Core experience (8)}}\\[2pt]
+Age at hire & Coach's age in years at the time of hire \\
+Prior HC stints & Number of previous head coaching stints \\
+College position-coach years & Seasons as a college position coach \\
+College coordinator years & Seasons as a college coordinator \\
+College head-coach years & Seasons as a college head coach \\
+NFL position-coach years & Seasons as an NFL position coach \\
+NFL coordinator years & Seasons as an NFL coordinator \\
+NFL head-coach years & Seasons as an NFL head coach \\
+\addlinespace
+\multicolumn{2}{@{}l}{\emph{Career structure (16)}}\\[2pt]
+NFL employers & Distinct NFL employers before the hire (relocation-aware) \\
+College employers & Distinct college employers before the hire \\
+NFL career share & Share of prior coaching seasons spent at the NFL level \\
+Age at first job & Age at the coach's first coaching job of any kind \\
+Age at first NFL job & Age at the coach's first NFL coaching job \\
+Gap before hire & Seasons between the coach's last job and this hire \\
+Internal hire & Indicator: held any coaching role with the hiring organization in the season immediately before the hire, with franchise identity resolved relocation-aware \\
+Years at hiring org & Seasons already spent with the hiring organization before the hire \\
+Prior OC & Indicator: ever an offensive coordinator \\
+Prior DC & Indicator: ever a defensive coordinator \\
+Prior position coach & Indicator: ever a position coach \\
+Prior head coach & Indicator: ever a head coach (NFL or college) \\
+Prior offensive-side role & Indicator: prior experience on the offensive side of the ball \\
+Prior NFL experience & Indicator: any prior NFL-level coaching experience \\
+Ever NFL OC & Indicator: ever an NFL offensive coordinator \\
+Ever NFL DC & Indicator: ever an NFL defensive coordinator \\
+\addlinespace
+\multicolumn{2}{@{}l}{\emph{Recent form (5)}}\\[2pt]
+Final unit percentile & League percentile of the coach's most recent unit (side-appropriate) in his last ranked season \\
+Average unit percentile & Mean league percentile of the coach's units across prior ranked seasons \\
+Unit trajectory & Trend in the coach's unit percentile across prior ranked seasons \\
+Average team-success percentile & Mean league percentile of team winning percentage across prior ranked seasons \\
+Ranked seasons & Number of prior seasons with ranked unit and team data \\
+\addlinespace
+\multicolumn{2}{@{}l}{\emph{Hiring-team results (3)}}\\[2pt]
+Turnovers forced & Turnovers the hiring team forced over its prior two seasons \\
+Turnovers committed & Turnovers the hiring team committed over its prior two seasons \\
+Playoff appearances & Hiring team's playoff appearances over the prior two seasons \\
+\addlinespace
+\multicolumn{2}{@{}l}{\emph{Inherited team quality (4)}}\\[2pt]
+Offensive SRS & Hiring team's offensive Simple Rating System (points per game vs.\ average, schedule-adjusted) \\
+Defensive SRS & Hiring team's defensive Simple Rating System \\
+Strength of schedule & SRS strength-of-schedule component faced by the hiring team \\
+SRS trajectory & Three-season trend in the hiring team's overall SRS \\
+\addlinespace
+\multicolumn{2}{@{}l}{\emph{Inherited roster (10)}}\\[2pt]
+Starting-QB value & Approximate Value of the inherited starting quarterback \\
+Roster value & Total Approximate Value of the inherited roster \\
+Starter value & Approximate Value of the inherited starters \\
+Starter experience & Mean seasons of experience among inherited starters \\
+Roster experience & Mean seasons of experience across the inherited roster \\
+Recent first-round picks & First-round picks the hiring team held across the three most recent drafts \\
+Premium draft capital & First- and second-round picks the hiring team held over the prior three drafts \\
+Roster turnover & Share of the roster turned over entering the hire \\
+Offensive retention & Offensive personnel retained from the prior season \\
+Defensive retention & Defensive personnel retained from the prior season \\
+\addlinespace
+\multicolumn{2}{@{}l}{\emph{Organizational instability (2)}}\\[2pt]
+Predecessor tenure & Seasons the predecessor head coach lasted \\
+Head coaches in prior decade & Distinct head coaches the organization employed in the previous ten years \\
+\end{longtable}
+}
+
+\section{Pooled Unit Statistics}
+\label{sec:supp_unitstats}
+
+The pooled unit block summarizes a coach's prior on-field production in 33 statistics, each measured for the unit the coach's role controlled and pooled across his qualifying role-seasons as described in Section~3.2.1 of the main text. For an offensive coordinator a statistic reflects his own offense, for a defensive coordinator the suppression of the opposing offense, and for a head coach his whole team. Every value is standardized against its season's league distribution, as in Section~3.2.1 of the main text, and oriented so that larger is better, with turnovers, interceptions, penalties, and turnover percentage sign-flipped accordingly. Table~\ref{supp:unitstats} lists the 33 statistics in their source order; the seven marked $^{\ast}$ are collapsed as redundant with a retained statistic, leaving the 26 that enter the 74-feature candidate set (Table~1 of the main text). The block-level ablations reported in the main text's results are fit on the full 33-statistic block.
+
+{\footnotesize\singlespacing
+\begin{longtable}{@{}l l@{}}
+\caption{The 33 pooled unit statistics, each standardized by season and oriented so that larger is better. A defensive coordinator's seasons contribute the same quantities measured against the opposing offense.}
+\label{supp:unitstats}\\
+\toprule
+Statistic & Description \\
+\midrule
+\endfirsthead
+\multicolumn{2}{c}{\tablename~\thetable\ (continued)}\\[2pt]
+\toprule
+Statistic & Description \\
+\midrule
+\endhead
+\midrule
+\multicolumn{2}{r}{\footnotesize\itshape continued on next page}\\
+\endfoot
+\bottomrule
+\endlastfoot
+Points scored$^{\ast}$ & Points scored by the unit \\
+Total yards$^{\ast}$ & Total yards gained \\
+Yards per play & Yards gained per offensive play \\
+Turnovers & Turnovers committed (sign-flipped) \\
+First downs & First downs gained \\
+Completions & Pass completions \\
+Pass attempts & Pass attempts \\
+Passing yards & Yards gained passing \\
+Passing touchdowns & Touchdown passes \\
+Interceptions$^{\ast}$ & Interceptions thrown (sign-flipped) \\
+Net yards per attempt$^{\ast}$ & Net yards per pass attempt, sacks included \\
+Passing first downs & First downs gained passing \\
+Rush attempts & Rushing attempts \\
+Rushing yards & Yards gained rushing \\
+Rushing touchdowns & Rushing touchdowns \\
+Yards per carry & Yards per rushing attempt \\
+Rushing first downs$^{\ast}$ & First downs gained rushing \\
+Penalties & Penalties committed (sign-flipped) \\
+Penalty yards$^{\ast}$ & Yards lost to penalties (sign-flipped) \\
+First downs by penalty & First downs awarded by opponents' penalties \\
+Drives & Number of offensive drives \\
+Scoring percentage & Share of drives ending in a score \\
+Turnover percentage & Share of drives ending in a turnover (sign-flipped) \\
+Time per drive & Average time of possession per drive \\
+Plays per drive & Average plays per drive \\
+Yards per drive & Average yards per drive \\
+Points per drive$^{\ast}$ & Average points per drive \\
+Third-down attempts & Third-down attempts \\
+Third-down rate & Third-down conversion rate \\
+Fourth-down attempts & Fourth-down attempts \\
+Fourth-down rate & Fourth-down conversion rate \\
+Red-zone attempts & Trips inside the opponent's twenty-yard line \\
+Red-zone rate & Share of red-zone trips ending in a touchdown \\
+\end{longtable}
+}
+
+\section{Model Configuration}
+\label{sec:supp_config}
+
+Table~\ref{supp:hyperparameters} reports the search spaces and selected values for the two tuned models. The Cox elastic-net penalty was chosen by exhaustive grid search maximizing coach-level cross-validated concordance; the XGBoost-AFT benchmark was tuned by random search over 200 draws from the grid shown, making interaction structure up to depth five available to it. Both configurations were held fixed across the 50 resamples. The reported hazard-ratio model in the main text is unpenalized, for the inferential reasons given there, and the parametric AFT benchmarks use a small fixed ridge penalty ($0.01$).
+
+Stability selection operates on the 74 candidate features described in the main text, drawing 2000 coach-level subsamples at 50\% sampling and retaining features with selection frequency at least 0.6 among the top 10 per subsample, with the selection profile also recorded at the top 15 and 20. All resampling uses an 80/20 coach-level train/test split. The expected number of falsely selected features is bounded by $\mathbb{E}[V] \leq q^2 / \{(2\pi - 1)\,p\}$ \citep{meinshausen2010}, with $p = 74$ the feature-pool size and $q$ the per-subsample shortlist length; the bound is finite only for $\pi > \tfrac{1}{2}$ and tightens as $q$ shrinks, which motivates the small shortlist and the $\pi = 0.6$ threshold. Recording the profile at $q \in \{10, 15, 20\}$, reported in the main text's stability-selection table, lets the conclusions be read against that otherwise conventional choice.
+
+\begin{table}[!ht]
+\caption{Hyperparameter search spaces and selected values for the two tuned models. The Cox elastic net was searched exhaustively; the XGBoost-AFT benchmark by 200-draw random search. Both were selected by coach-level cross-validated concordance and held fixed across the 50 resamples.}
+\label{supp:hyperparameters}
+\small
+\begin{tabular}{@{}l l c@{}}
+\toprule
+Hyperparameter & Search space & Selected \\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Cox proportional hazards (elastic net)}}\\
+Penalizer & \{0.001, 0.005, 0.01, 0.05, 0.1, 0.3, 0.5, 1.0, 2.0\} & 0.5 \\
+$\ell_1$ ratio & \{0, 0.25, 0.5, 0.75, 1.0\} & 0.25 \\
+\addlinespace
+\multicolumn{3}{@{}l}{\emph{XGBoost-AFT (normal AFT loss; 200 random draws)}}\\
+Boosting rounds & \{30, 50, 80, 120, 200\} & 50 \\
+Learning rate & \{0.02, 0.03, 0.05, 0.1, 0.15\} & 0.02 \\
+Tree depth & \{2, 3, 4, 5\} & 4 \\
+Row subsample & \{0.6, 0.7, 0.85, 1.0\} & 1.0 \\
+Column subsample & \{0.6, 0.7, 0.85, 1.0\} & 1.0 \\
+Minimum child weight & \{1, 3, 5, 8\} & 3 \\
+$\ell_2$ regularization & \{0, 0.5, 1.0, 2.0, 5.0\} & 1.0 \\
+AFT scale & \{0.5, 0.8, 1.0, 1.2, 1.5\} & 1.5 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\bibliographystyle{apacite}
+\bibliography{refs}
+
+\end{document}
