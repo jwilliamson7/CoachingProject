@@ -31,16 +31,50 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter
 
+# Times New Roman to match the LaTeX manuscript body (latex_jse)
+plt.rcParams.update({
+    "font.family": "serif",
+    "font.serif": ["Times New Roman"],
+    "mathtext.fontset": "stix",
+})
+
 from model.pipeline import load_modeling_data
 from scripts.survival_analysis import global_max_season
 from scripts.survival_methods import (
     build_competing_targets, aalen_johansen_cif, FIRED, VOLUNTARY,
 )
 
-FIGDIR = os.path.join(project_root, "ijcss", "figures")
+FIGDIR = os.path.join(project_root, "latex_jse", "figures")
 PKL = os.path.join(project_root, "analysis", "survival_definitive.pkl")
 SIG, NS = "#1f77b4", "#9aa0a6"     # significant / not-significant colors
 REF = "#d62728"                    # reference-line red
+
+# Internal feature keys -> manuscript display labels (Tables 4 & 6 for the core
+# five; Appendix A/B wording for the remaining stability bars).
+LABELS = {
+    "cf_internal_hire": "Internal hire",
+    "age": "Age at hire",
+    "Y/P__unit": "Prior-unit yards-per-play efficiency",
+    "num_yr_nfl_pos": "Years as NFL position coach",
+    "tq_dsrs": "Inherited defensive SRS",
+    "cf_nfl_share": "NFL career share",
+    "cf_age_first_job": "Age at first job",
+    "Pen__unit": "Prior-unit penalties",
+    "hire_starter_av": "Inherited starter value",
+    "rf_unit_traj": "Unit trajectory",
+    "num_yr_nfl_hc": "NFL head-coach years",
+    "rf_final_unit_pctl": "Final unit percentile",
+    "Time Average Drive__unit": "Prior-unit time per drive",
+    "hiring_team_num_playoff_appearances": "Playoff appearances (prior 2 seasons)",
+    "cf_pre_level_nfl": "Prior NFL experience",
+    "hire_starter_exp": "Inherited starter experience",
+    "cf_num_nfl_employers": "NFL employers",
+    "Att Passing__unit": "Prior-unit pass attempts",
+}
+
+
+def _lab(k):
+    return LABELS.get(k, k)
 
 
 def _save(fig, name):
@@ -57,7 +91,7 @@ def fig_stability(d, top=18):
     fig, ax = plt.subplots(figsize=(7, 6.2))
     ax.barh(range(len(freq)), freq.values, color=colors)
     ax.set_yticks(range(len(freq)))
-    ax.set_yticklabels(freq.index, fontsize=8)
+    ax.set_yticklabels([_lab(k) for k in freq.index], fontsize=8)
     ax.axvline(thr, ls="--", color=REF, alpha=0.8,
                label=f"stable threshold = {thr:g}")
     ax.set_xlim(0, 1)
@@ -86,7 +120,7 @@ def fig_forest(d):
     hi = max(hr["CI_high"].max() * 1.1, 2.0)
     ax.set_xlim(lo, hi)
     ax.set_yticks(range(n))
-    ax.set_yticklabels(hr.index, fontsize=9)
+    ax.set_yticklabels([_lab(k) for k in hr.index], fontsize=9)
     ax.set_ylim(-0.6, n - 0.4)
     ax.set_xlabel("Hazard ratio for firing (95% CI, cluster-robust)")
     ax.set_title("Cause-specific firing hazard ratios")
