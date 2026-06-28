@@ -27,5 +27,6 @@ analysis/_*.log
 analysis/_*.json
 analysis/_stability_2000.pkl
 analysis/survival_selection_probe.pkl
+analysis/survival_magnitude.pkl
 analysis/internal_hire_audit_summary.csv
 analysis/internal_hire_history_detail.csv
