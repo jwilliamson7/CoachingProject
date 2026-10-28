@@ -34,11 +34,17 @@ class CoachDataScraper:
         }
     }
     
+    # PFR page titles are not unique and folders are keyed on the title, so two
+    # coaches with one name overwrite each other (the son's "Jim Mora" page replaced
+    # the father's). Known namesakes get explicit folder names, matching Coach_WAR.
+    NAMESAKE_DIRS = {"MoraJi0": "Jim Mora Sr", "MoraJi1": "Jim Mora Jr"}
+
     def __init__(self, output_dir: str = None):
         """Initialize the scraper with output directory"""
         self.output_dir = Path(output_dir) if output_dir else project_root / "Coaches"
         self.output_dir.mkdir(exist_ok=True)
-        
+        self._dir_owner = {}  # folder name -> PFR coach id written this run
+
     def _create_coach_directory(self, coach_name: str) -> Path:
         """Create directory for coach data"""
         coach_dir = self.output_dir / coach_name
@@ -125,9 +131,18 @@ class CoachDataScraper:
             
             soup = BeautifulSoup(response.text, 'lxml')
             
-            # Extract coach name from page title
+            # Extract coach name from page title; disambiguate known namesakes, and
+            # never let a second page with the same title overwrite the first
             coach_name = soup.find('h1').text.strip()
-            coach_dir = self._create_coach_directory(coach_name)
+            coach_id = coach_url.rstrip('/').split('/')[-1].replace('.htm', '')
+            dir_name = self.NAMESAKE_DIRS.get(coach_id, coach_name)
+            owner = self._dir_owner.get(dir_name)
+            if owner is not None and owner != coach_id:
+                print(f"WARNING: {coach_id} and {owner} both map to '{dir_name}'; "
+                      f"writing {coach_id} to '{dir_name} ({coach_id})'. Add it to NAMESAKE_DIRS.")
+                dir_name = f"{dir_name} ({coach_id})"
+            self._dir_owner[dir_name] = coach_id
+            coach_dir = self._create_coach_directory(dir_name)
             
             # Process each table type
             for table_id, config in self.TABLE_CONFIGS.items():
@@ -184,7 +199,9 @@ class CoachDataScraper:
                 '/coaches/CoenLi0.htm', 
                 '/coaches/MoorKe0.htm',
                 '/coaches/GlenAa0.htm',
-                '/coaches/SchoBr0.htm'
+                '/coaches/SchoBr0.htm',
+                '/coaches/MoraJi0.htm',  # Jim E. Mora Sr. (Saints 1986-96, Colts 1998-2001)
+                '/coaches/MoraJi1.htm',  # Jim L. Mora Jr. (Falcons 2004-06, Seahawks 2009)
             ]
         
         # Combine manual URLs with discovered URLs

@@ -49,6 +49,9 @@ def main():
                 "label_source": "research",
                 "resolved_label": label,
                 "event": 1 if label == "event" else 0,
+                # a researched verdict means the stint ended (fired or voluntary),
+                # including boundary-season exits found after the scrape
+                "active": 0,
                 "confidence": str(v.confidence).strip(),
                 "reason": str(v.reason).strip(),
                 "source": str(v.source).strip(),
@@ -59,6 +62,7 @@ def main():
                 "label_source": "deterministic",
                 "resolved_label": label,
                 "event": 1 if label == "event" else 0,
+                "active": int(r.exit_type == "active"),
                 "confidence": "high",
                 "reason": r.exit_type,
                 "source": "record/Notes",

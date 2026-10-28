@@ -20,8 +20,8 @@ CoachingProject/
 │   └── notebooks/           # Archived Jupyter notebooks (v2-v5)
 ├── data/
 │   ├── models/              # Trained model files (.pkl)
-│   ├── master_data.csv      # THE single canonical modeling dataset: 371 hire stints,
-│   │                        #   94 modeled feature cols, un-imputed (1970+, hygiene +
+│   ├── master_data.csv      # THE single canonical modeling dataset: 364 hire stints,
+│   │                        #   101 modeled feature cols, un-imputed (1970+, hygiene +
 │   │                        #   corrected-tenure + engineered features). Built in one
 │   │                        #   pass by create_data.py. (No more _extended / svd_imputed
 │   │                        #   files — imputation is now fit per train split.)
@@ -176,10 +176,35 @@ project's live evaluation is the firing-survival pipeline; `CoachTenureModel` an
 
 ## Data Features and Architecture
 
-`data/master_data.csv` has **94 modeled feature columns** per hire (`iloc[:, 2:-2]`):
-the 51 base features built by `create_data.py` plus 43 engineered features appended by
+`data/master_data.csv` has **101 modeled feature columns** per hire (`iloc[:, 2:-2]`):
+the 51 base features built by `create_data.py` plus 50 engineered features appended by
 `engineer_career_features.build_modeling_dataset()`. (The old all-era 150-feature,
-four-parallel-block layout is retired.)
+four-parallel-block layout is retired.) 364 hire stints, 1970-2025: 316 fired, 26
+voluntary, 22 still active at the start of the 2026 season.
+
+### Data policies (JSE revision, 2026-10-28; documented in the online supplement)
+- **AFL = major league.** `is_nfl` / `_classify_coaching_level` treat the 1960-69 AFL as
+  NFL-level: AFL seasons count toward experience, the unit block, stint continuity and
+  franchise history. So AFL incumbents in 1970 (Stram, Ewbank, ...) are continuing stints,
+  not hires (like Landry). Pre-merger seasons are z-scored WITHIN league
+  (`transform_team_data`), as are the AAFC years. `DTX`/`NYT` 1960-62 map to KC/NYJ.
+- **Missing values are structural and flagged, never imputed by a model.** Indicators:
+  `cf_no_unit_record` (never led an NFL unit), `cf_no_drive_record` (record predates
+  PFR drive stats, ~1999), `rf_no_trend` (one ranked season; trajectory set to 0),
+  `org_expansion` (known list `EXPANSION_FIRST_SEASONS`), `hire_no_roster_data` /
+  `hire_no_retention_data` (rosters begin 1970). After these, ZERO sporadic gaps remain.
+  `cf_age_first_nfl` = age at hire when the hire is the first NFL job (a definition).
+- **Interim titles** never count as head-coach or unit-leading seasons (rank rows too);
+  `cf_ever_interim_hc` records them. Interim detection reads the un-deduped history.
+- **Mid-season takeovers:** PFR shows only "Head Coach" for a partial season, so insider
+  status was verified from period sources (`analysis/midseason_takeovers_summary.md`);
+  `MIDSEASON_OUTSIDE_HIRES` recodes the four outside hires external.
+- **Predecessor** = the prior season's season-opening coach (Primary_Coach), never the
+  hire himself. The 1996 Ravens inherit the 1995 Browns (`INHERITED_FRANCHISES`); the
+  reactivated 1999 Browns inherit nothing.
+- **2025 boundary outcomes** were hand-coded from 2026 reporting
+  (`analysis/boundary_2025_research.txt`, merged via `event_verdicts.csv`); the labels'
+  explicit `active` flag separates censoring from a boundary-season voluntary exit.
 
 ### Base features from create_data.py (51)
 - **Core coach (8):** age at hire; number of previous HC stints; years of experience by

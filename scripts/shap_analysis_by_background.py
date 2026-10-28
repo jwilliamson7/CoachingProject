@@ -170,10 +170,13 @@ def compute_coach_backgrounds_from_history() -> pd.DataFrame:
             non_hc_roles = history_df[~history_df['Role'].str.contains('Head Coach', case=False, na=False)]
 
             # Count offensive and defensive experience
-            offensive_exp = non_hc_roles[non_hc_roles['Role'].str.contains(
-                offensive_pattern, case=False, na=False)]
-            defensive_exp = non_hc_roles[non_hc_roles['Role'].str.contains(
-                defensive_pattern, case=False, na=False)]
+            # Defensive first: bare offensive tokens ('Line Coach', 'Backs Coach',
+            # 'Ends Coach', 'Tackles') also match defensive role names, which were
+            # double counted on both sides (Coach_WAR commit 1433770).
+            is_def = non_hc_roles['Role'].str.contains(defensive_pattern, case=False, na=False)
+            is_off = non_hc_roles['Role'].str.contains(offensive_pattern, case=False, na=False) & ~is_def
+            offensive_exp = non_hc_roles[is_off]
+            defensive_exp = non_hc_roles[is_def]
 
             offensive_years = len(offensive_exp)
             defensive_years = len(defensive_exp)

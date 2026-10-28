@@ -13,6 +13,7 @@ sys.path.insert(0, str(project_root))
 from data_constants import (
     TEAM_FRANCHISE_MAPPINGS,
     standardize_team_abbreviation,
+    prior_season_franchise,
     CURRENT_TEAM_ABBREVIATIONS,
     EXCLUDED_ROLE_KEYWORDS,
     TENURE_CLASSIFICATIONS,
@@ -81,12 +82,14 @@ class CoachingDataProcessor:
         return "Position"
     
     def _classify_coaching_level(self, level: str) -> str:
-        """Classify coaching level (College, NFL, or None)"""
+        """Classify coaching level (College, NFL, or None). The AFL of 1960-69 is
+        classed as NFL (a major league whose franchises are NFL franchises today),
+        matching engineer_career_features.is_nfl."""
         if not level:
             return "None"
         if "College" in level:
             return "College"
-        if "NFL" in level and level != "NFL Europe":
+        if ("NFL" in level and level != "NFL Europe") or level == "AFL":
             return "NFL"
         return "None"
     
@@ -205,7 +208,8 @@ class CoachingDataProcessor:
     
     def _get_hiring_team_context(self, franchise: str, hire_year: int) -> List[float]:
         """Get hiring team's recent performance context"""
-        
+        # the Ravens' first hire inherits the 1995 Browns (data_constants.INHERITED_FRANCHISES)
+        franchise = prior_season_franchise(franchise, hire_year - 1)
         team_dir = self.teams_dir / franchise
         if not team_dir.exists():
             return [nan] * len(get_hiring_team_stat_dict())
@@ -314,13 +318,13 @@ class CoachingDataProcessor:
         from that table comes back 'clean' (kept as detected).
         """
         from scripts.data.engineer_career_features import (
-            classify_hire_instance, _primary_coach_index, MIN_HIRE_YEAR)
+            classify_hire_instance, _primary_coach_index, PRIMARY_COACH_START)
         # Pre-1970 hires are removed by the downstream era filter and are NOT covered
         # by the Coach_WAR Primary_Coach table. Classifying them treats the
         # pre-coverage season as "not primary" and would spuriously re-anchor a clean
         # pre-1970 hire forward INTO the modeled window (e.g. Chuck Noll 1969 -> 1970).
         # Mirror engineer's filter-then-classify order by keeping them as detected.
-        if hire_year < MIN_HIRE_YEAR:
+        if hire_year < PRIMARY_COACH_START:
             return "clean", hire_year
         if self._primary_idx is None:
             try:

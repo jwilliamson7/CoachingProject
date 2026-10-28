@@ -187,7 +187,9 @@ def label_stint(coach, hire_year, boundary):
 
 
 def main():
-    df, X, y = load_modeling_data()          # known-tenure, 1970+, class != -1
+    # every modeled stint, including recent hires still active at the boundary, so
+    # boundary-season outcomes researched after the data were scraped can be merged
+    df, X, y = load_modeling_data(known_only=False)
     boundary = global_max_season()
     print(f"Censoring boundary season = {boundary}")
 
