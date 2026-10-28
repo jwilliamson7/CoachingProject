@@ -183,7 +183,7 @@ def kaplan_meier_figure(dur, evt, df, boundary):
     ax2.set_xlim(0, 15)
     fig.tight_layout()
 
-    figdir = os.path.join(project_root, "ijcss", "figures")
+    figdir = os.path.join(project_root, "papers", "ijcss", "figures")
     os.makedirs(figdir, exist_ok=True)
     figpath = os.path.join(figdir, "survival_km.png")
     fig.savefig(figpath, dpi=150)

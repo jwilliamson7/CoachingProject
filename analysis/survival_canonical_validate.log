@@ -1,0 +1,11 @@
+350 stints | CANONICAL 94 feats (native unit-block) | fired=312, censored=38 | seeds=50
+unit_* feature columns present: 0
+
+CANONICAL: 94 feats, bestK=5
+   Cox     C-index 0.594 [0.581, 0.607]
+   XGB-AFT C-index 0.585 [0.574, 0.597]
+   K-curve (CV C-index): 5:0.617  8:0.606  10:0.606  11:0.606  12:0.606  13:0.594  14:0.594  15:0.594  16:0.593  17:0.593  18:0.592  19:0.592  20:0.584  25:0.583  30:0.583  40:0.583  94:0.583
+   Cox params: {'penalizer': 0.5, 'l1_ratio': 0.25}
+   selected (5): ['Feature 19', 'Feature 23', 'tq_dsrs', 'Feature 11', 'cf_internal_hire']
+
+Saved C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\survival_canonical_validate.pkl

@@ -35,7 +35,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-# Times New Roman to match the LaTeX manuscript body (latex_jse)
+# Times New Roman to match the LaTeX manuscript body (papers/jse)
 plt.rcParams.update({
     "font.family": "serif",
     "font.serif": ["Times New Roman"],
@@ -188,7 +188,7 @@ def main():
     ax2.set_title("Win% by tenure class")
     fig.tight_layout()
 
-    figdir = os.path.join(project_root, "latex_jse", "figures")
+    figdir = os.path.join(project_root, "papers", "jse", "figures")
     os.makedirs(figdir, exist_ok=True)
     figpath = os.path.join(figdir, "threshold_winrate.png")
     fig.savefig(figpath, dpi=150)

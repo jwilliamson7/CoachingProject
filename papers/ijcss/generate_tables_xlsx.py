@@ -231,7 +231,7 @@ def main():
         ],
         [32, 24])
 
-    out = "C:/Users/jonwi/Documents/Projects/CoachingProject/ijcss/tables.xlsx"
+    out = "C:/Users/jonwi/Documents/Projects/CoachingProject/papers/ijcss/tables.xlsx"
     wb.save(out)
     print(f"Saved: {out}")
 

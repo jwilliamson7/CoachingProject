@@ -3,7 +3,7 @@
 Validate every numerical claim in the survival paper against its source of truth.
 
 This is a REGRESSION GUARD, not a recompute-and-paste tool. The numbers quoted in
-latex/2026-Williamson-NFL-Coach-Dismissal-Survival.tex are transcribed into the
+papers/jse/2026-NFL-Coach-Dismissal-JSE.tex are transcribed into the
 PAPER block below (one place to update when the prose changes); the script pulls
 the corresponding truth from the cached analysis artifacts and, for the few
 quantities not stored with their confidence intervals (the cumulative incidence

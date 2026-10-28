@@ -1,0 +1,96 @@
+Nested evaluation: 50 splits x 2000 stability subsamples, 14 workers
+
+  split  8: Cox C=0.534  IBS=0.2078 (KM 0.2089)  internal=True  K=8  [681s; 1/50 at 696s]
+  split 11: Cox C=0.578  IBS=0.1873 (KM 0.1898)  internal=True  K=20  [683s; 2/50 at 698s]
+  split  4: Cox C=0.490  IBS=0.2271 (KM 0.2139)  internal=True  K=25  [683s; 3/50 at 698s]
+  split  9: Cox C=0.586  IBS=0.1929 (KM 0.1905)  internal=True  K=8  [684s; 4/50 at 699s]
+  split  7: Cox C=0.610  IBS=0.1705 (KM 0.1736)  internal=True  K=10  [684s; 5/50 at 699s]
+  split  2: Cox C=0.544  IBS=0.1655 (KM 0.1617)  internal=True  K=8  [686s; 6/50 at 701s]
+  split 10: Cox C=0.626  IBS=0.1826 (KM 0.1858)  internal=True  K=8  [688s; 7/50 at 703s]
+  split 13: Cox C=0.608  IBS=0.1574 (KM 0.1600)  internal=True  K=14  [690s; 8/50 at 705s]
+  split  3: Cox C=0.570  IBS=0.1588 (KM 0.1558)  internal=True  K=8  [695s; 9/50 at 710s]
+  split  0: Cox C=0.562  IBS=0.1515 (KM 0.1561)  internal=True  K=8  [696s; 10/50 at 711s]
+  split  6: Cox C=0.580  IBS=0.1595 (KM 0.1629)  internal=True  K=10  [696s; 11/50 at 711s]
+  split 12: Cox C=0.498  IBS=0.1608 (KM 0.1609)  internal=True  K=5  [699s; 12/50 at 714s]
+  split  1: Cox C=0.575  IBS=0.1550 (KM 0.1531)  internal=True  K=5  [699s; 13/50 at 714s]
+  split  5: Cox C=0.599  IBS=0.1453 (KM 0.1504)  internal=True  K=10  [706s; 14/50 at 721s]
+  split 17: Cox C=0.559  IBS=0.2063 (KM 0.2070)  internal=True  K=19  [677s; 15/50 at 1376s]
+  split 16: Cox C=0.568  IBS=0.1974 (KM 0.2075)  internal=True  K=17  [680s; 16/50 at 1378s]
+  split 19: Cox C=0.562  IBS=0.1882 (KM 0.1958)  internal=True  K=5  [680s; 17/50 at 1381s]
+  split 18: Cox C=0.597  IBS=0.1474 (KM 0.1575)  internal=True  K=10  [682s; 18/50 at 1381s]
+  split 20: Cox C=0.602  IBS=0.1710 (KM 0.1780)  internal=True  K=11  [678s; 19/50 at 1382s]
+  split 24: Cox C=0.548  IBS=0.1818 (KM 0.1773)  internal=True  K=11  [674s; 20/50 at 1385s]
+  split 14: Cox C=0.520  IBS=0.1650 (KM 0.1654)  internal=True  K=5  [690s; 21/50 at 1386s]
+  split 22: Cox C=0.557  IBS=0.1762 (KM 0.1818)  internal=True  K=20  [676s; 22/50 at 1386s]
+  split 15: Cox C=0.506  IBS=0.1739 (KM 0.1748)  internal=True  K=10  [691s; 23/50 at 1389s]
+  split 26: Cox C=0.503  IBS=0.1871 (KM 0.1850)  internal=True  K=5  [677s; 24/50 at 1391s]
+  split 25: Cox C=0.561  IBS=0.1841 (KM 0.1801)  internal=True  K=12  [680s; 25/50 at 1394s]
+  split 21: Cox C=0.550  IBS=0.1702 (KM 0.1569)  internal=True  K=13  [693s; 26/50 at 1398s]
+  split 23: Cox C=0.553  IBS=0.1748 (KM 0.1746)  internal=True  K=5  [692s; 27/50 at 1403s]
+  split 27: Cox C=0.626  IBS=0.1712 (KM 0.1733)  internal=True  K=5  [700s; 28/50 at 1421s]
+  split 28: Cox C=0.590  IBS=0.1635 (KM 0.1725)  internal=True  K=8  [679s; 29/50 at 2055s]
+  split 29: Cox C=0.578  IBS=0.1865 (KM 0.1764)  internal=True  K=19  [678s; 30/50 at 2056s]
+  split 31: Cox C=0.608  IBS=0.1800 (KM 0.1798)  internal=True  K=8  [678s; 31/50 at 2059s]
+  split 35: Cox C=0.601  IBS=0.1745 (KM 0.1814)  internal=True  K=11  [674s; 32/50 at 2060s]
+  split 34: Cox C=0.575  IBS=0.1947 (KM 0.1952)  internal=True  K=25  [675s; 33/50 at 2061s]
+  split 30: Cox C=0.588  IBS=0.1786 (KM 0.1861)  internal=True  K=10  [681s; 34/50 at 2062s]
+  split 36: Cox C=0.643  IBS=0.1717 (KM 0.1825)  internal=True  K=10  [678s; 35/50 at 2067s]
+  split 32: Cox C=0.552  IBS=0.1702 (KM 0.1674)  internal=True  K=5  [689s; 36/50 at 2071s]
+  split 33: Cox C=0.569  IBS=0.2032 (KM 0.2078)  internal=True  K=20  [687s; 37/50 at 2072s]
+  split 37: Cox C=0.573  IBS=0.1955 (KM 0.2028)  internal=True  K=19  [688s; 38/50 at 2079s]
+  split 40: Cox C=0.627  IBS=0.1960 (KM 0.2072)  internal=True  K=12  [676s; 39/50 at 2080s]
+  split 39: Cox C=0.650  IBS=0.1699 (KM 0.1817)  internal=True  K=13  [683s; 40/50 at 2080s]
+  split 38: Cox C=0.625  IBS=0.1677 (KM 0.1692)  internal=True  K=5  [692s; 41/50 at 2086s]
+  split 41: Cox C=0.590  IBS=0.1912 (KM 0.1928)  internal=True  K=16  [684s; 42/50 at 2104s]
+  split 42: Cox C=0.632  IBS=0.1585 (KM 0.1655)  internal=True  K=11  [532s; 43/50 at 2587s]
+  split 46: Cox C=0.597  IBS=0.1676 (KM 0.1740)  internal=True  K=25  [530s; 44/50 at 2591s]
+  split 45: Cox C=0.616  IBS=0.1855 (KM 0.1892)  internal=True  K=13  [532s; 45/50 at 2592s]
+  split 49: Cox C=0.499  IBS=0.1649 (KM 0.1681)  internal=True  K=8  [524s; 46/50 at 2595s]
+  split 44: Cox C=0.549  IBS=0.1674 (KM 0.1665)  internal=True  K=5  [540s; 47/50 at 2599s]
+  split 43: Cox C=0.500  IBS=0.1782 (KM 0.1778)  internal=True  K=12  [544s; 48/50 at 2600s]
+  split 47: Cox C=0.573  IBS=0.1737 (KM 0.1725)  internal=True  K=5  [540s; 49/50 at 2602s]
+  split 48: Cox C=0.532  IBS=0.1937 (KM 0.1981)  internal=True  K=15  [535s; 50/50 at 2602s]
+
+Model bake-off, NESTED (Nadeau-Bengio 95% CI)   vs   published (selection on all data)
+  model                                Harrell C                 Uno C     published Harrell
+  Cox                         0.573 [0.531,0.615]    0.606 [0.478,0.734]         0.602
+  Cox (headline penalty)      0.584 [0.535,0.634]    0.597 [0.453,0.741]              
+  Weibull AFT                 0.569 [0.528,0.610]    0.585 [0.441,0.728]         0.615
+  LogNormal AFT               0.570 [0.532,0.609]    0.584 [0.440,0.727]         0.615
+  LogLogistic AFT             0.570 [0.532,0.607]    0.583 [0.439,0.726]         0.615
+  XGB-AFT                     0.575 [0.539,0.611]    0.589 [0.446,0.732]         0.608
+
+Stable set vs CV-argmax set (both nested), Cox Harrell: delta=+0.0047 t=+0.257 p=0.798  (CV-argmax 0.568; K chosen: median 10)
+
+Integrated Brier, NESTED: Cox 0.1770 [0.1596,0.1944]   KM null 0.1791 [0.1618,0.1963]   (published Cox 0.1758)
+  KM - Cox = +0.0021, t=0.71, p=0.48; skill vs KM 0.012
+  Cox Brier by horizon: {np.int64(1): np.float64(0.092), np.int64(2): np.float64(0.187), np.int64(3): np.float64(0.246), np.int64(4): np.float64(0.252), np.int64(5): np.float64(0.22), np.int64(6): np.float64(0.19), np.int64(7): np.float64(0.162), np.int64(8): np.float64(0.137), np.int64(10): np.float64(0.085)}
+  KM  Brier by horizon: {np.int64(1): np.float64(0.093), np.int64(2): np.float64(0.193), np.int64(3): np.float64(0.255), np.int64(4): np.float64(0.259), np.int64(5): np.float64(0.224), np.int64(6): np.float64(0.191), np.int64(7): np.float64(0.158), np.int64(8): np.float64(0.135), np.int64(10): np.float64(0.083)}
+
+Features selected across 50 training partitions:
+  cf_internal_hire             50
+  age                          33
+  tq_dsrs                      32
+  Y/P__unit                    21
+  num_yr_nfl_pos               20
+  cf_nfl_share                 15
+  hiring_team_num_playoff_appearances 13
+  cf_age_first_job             11
+  Pen__unit                     9
+  rf_avg_winpct_pctl            8
+
+Inner-CV Cox penalty chosen:
+  {'penalizer': 0.01, 'l1_ratio': 0.0}         12
+  {'penalizer': 1.0, 'l1_ratio': 0.0}           7
+  {'penalizer': 0.5, 'l1_ratio': 0.0}           7
+  {'penalizer': 1.0, 'l1_ratio': 0.5}           6
+  {'penalizer': 1.0, 'l1_ratio': 1.0}           6
+  {'penalizer': 0.5, 'l1_ratio': 0.5}           3
+  {'penalizer': 0.05, 'l1_ratio': 0.0}          3
+  {'penalizer': 0.1, 'l1_ratio': 1.0}           2
+  {'penalizer': 0.05, 'l1_ratio': 0.5}          1
+  {'penalizer': 0.01, 'l1_ratio': 1.0}          1
+  {'penalizer': 0.1, 'l1_ratio': 0.0}           1
+  {'penalizer': 0.01, 'l1_ratio': 0.5}          1
+
+Saved C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\survival_nested_eval.pkl  (2603s)
