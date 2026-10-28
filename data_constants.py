@@ -314,6 +314,24 @@ def get_output_column_names() -> List[str]:
     return columns
 
 
+# The 1996 Baltimore Ravens took over the 1995 Cleveland Browns' roster, staff and
+# ownership; PFR files them as a new franchise and keeps 1946-95 with the reactivated
+# 1999 Browns. For a hire's INHERITED situation (prior-season record, team quality,
+# roster, predecessor and coaching turnover) the organization is what matters, so the
+# Ravens inherit the Browns' seasons through 1995 and the 1999 Browns, an expansion
+# team, inherit none of them. Maps franchise -> (source franchise, last source season).
+INHERITED_FRANCHISES = {"rav": ("cle", 1995)}
+
+
+def prior_season_franchise(franchise: str, season: int) -> str:
+    """Franchise whose `season` a team inherited (the Browns, for the Ravens through
+    1995); otherwise the franchise itself. Case is preserved for the input."""
+    src = INHERITED_FRANCHISES.get(str(franchise).lower())
+    if src and season <= src[1]:
+        return src[0].upper() if str(franchise).isupper() else src[0]
+    return franchise
+
+
 def standardize_team_abbreviation(team: str, year: Optional[int] = None) -> str:
     """
     Standardize a team abbreviation to a canonical PFR franchise key, resolving
@@ -344,6 +362,12 @@ def standardize_team_abbreviation(team: str, year: Optional[int] = None) -> str:
             return 'oti' if year <= 1996 else 'htx'  # Oilers (->Tenn) vs Texans
         elif team == 'STL':
             return 'crd' if year <= 1987 else 'ram'  # Cardinals (->AZ) vs Rams
+        # AFL-era names of today's franchises (the AFL counts as a major league).
+        # 'DTX' is also the unrelated 1952 NFL Dallas Texans, so only 1960-62 maps.
+        elif team == 'DTX' and 1960 <= year <= 1962:
+            return 'kan'  # AFL Dallas Texans -> Kansas City Chiefs
+        elif team == 'NYT' and 1960 <= year <= 1962:
+            return 'nyj'  # AFL New York Titans -> New York Jets
 
     # Relocations/renames without era-based ambiguity
     standard_mappings = {

@@ -25,6 +25,7 @@ Usage:
 """
 
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -49,7 +50,23 @@ COACH_WAR_COMBINED = Path(
 # missing "Passing Game Coordinator", "Pass Gm. Coord." and "Associate Head Coach"),
 # so the base-builder and the feature-engineer disagreed on 28 role-seasons. Import,
 # don't duplicate, so the two classifiers can never drift again.
-from data_constants import EXCLUDED_ROLE_KEYWORDS
+from data_constants import EXCLUDED_ROLE_KEYWORDS, get_all_feature_names
+
+# Drive and situational unit statistics, which PFR records only from about the 1999
+# season; a coach whose record predates them has a unit record but no drive record.
+DRIVE_ERA_STATS = {"#Dr", "Sc%", "TO%", "Time Average Drive", "Plays Average Drive",
+                   "Yds Average Drive", "Pts Average Drive", "3DAtt", "3D%", "4DAtt",
+                   "4D%", "RZAtt", "RZPct"}
+
+
+def unit_block_columns():
+    """(all pooled-unit columns, drive-era subset) as the generic 'Feature N' names
+    the base build writes, located by their data_constants feature names."""
+    names = get_all_feature_names()
+    unit = [f"Feature {i + 1}" for i, n in enumerate(names) if n.endswith("__unit")]
+    drive = [f"Feature {i + 1}" for i, n in enumerate(names)
+             if n.endswith("__unit") and n[:-len("__unit")] in DRIVE_ERA_STATS]
+    return unit, drive
 
 OFF_KW = ["offensive", "quarterback", "running back", "wide receiver", "tight end",
           "o-line", "passing game", "pass game"]
@@ -156,8 +173,13 @@ def canon_employer(employer, level, year=None):
 
 
 def is_nfl(level):
+    """Major-league (NFL-equivalent) level: the NFL, plus the AFL of 1960-69, whose
+    ten franchises are NFL franchises today. AFL seasons therefore count toward
+    coaching experience, unit performance, stint continuity (so AFL incumbents in
+    1970 are continuing stints, not hires) and franchise history. Minor leagues
+    (NFL Europe, USFL, WFL, CFL) do not count."""
     s = str(level)
-    return ("NFL" in s and s != "NFL Europe")
+    return ("NFL" in s and s != "NFL Europe") or s == "AFL"
 
 
 def _slope(values):
@@ -203,7 +225,10 @@ def _dedupe_history(df):
     return df.loc[keep]
 
 
-def load_history(coach):
+def load_history(coach, dedupe=True):
+    """Coach history rows. dedupe=False keeps PFR's split same-season rows, which
+    interim detection needs: a season listed as "Defensive Line" and "Defensive
+    Line/Interim HC" dedupes to the first row and would lose the interim title."""
     p = COACHES_DIR / coach / "all_coaching_history.csv"
     if not p.exists():
         return None
@@ -212,7 +237,7 @@ def load_history(coach):
         df["Year"] = pd.to_numeric(df["Year"], errors="coerce")
         df = df.dropna(subset=["Year"])
         df["Year"] = df["Year"].astype(int)
-        return _dedupe_history(df)
+        return _dedupe_history(df) if dedupe else df
     except Exception:
         return None
 
@@ -257,8 +282,45 @@ TIER1_KEYS = ["cf_num_nfl_employers", "cf_num_college_employers",
               # 8 num_yr_nfl_hc.) Addresses the JQAS missing-data critique.
               "cf_ever_nfl_oc", "cf_ever_nfl_dc"]
 
-# Restrict the modeling population to the modern era (AFL-NFL merger onward).
+# Restrict the modeling population to hires from the 1970 merger on. AFL seasons
+# count as major-league seasons (is_nfl), so AFL incumbents in 1970 (Stram, Ewbank,
+# Lemm, Saban, P. Brown, Madden, Rush, Rauch, Waller) are continuing stints that began
+# before the window, exactly like NFL incumbents such as Landry, and are not hires.
+# Data a 1970-71 hire lacks (rosters begin in 1970) is flagged, not imputed.
 MIN_HIRE_YEAR = 1970
+# Inherited-roster data (Coach_WAR combined team-year file) begins with this season:
+# a 1970 hire has no prior-season roster, and 1970-71 hires have no prior-season
+# retention (which compares two consecutive rosters).
+ROSTER_DATA_START = 1970
+
+# Expansion franchises' first head coaches inherit no predecessor, record, team
+# quality or roster. A known list, not a data rule: a data rule misreads franchises
+# whose prior season is merely absent from a source (e.g. the AFL). The 1996 Ravens
+# are not an expansion team; they inherit the 1995 Browns (INHERITED_FRANCHISES).
+EXPANSION_FIRST_SEASONS = {("Seattle Seahawks", 1976), ("Tampa Bay Buccaneers", 1976),
+                           ("Carolina Panthers", 1995), ("Jacksonville Jaguars", 1995),
+                           ("Cleveland Browns", 1999), ("Houston Texans", 2002)}
+
+# First season covered by the Coach_WAR Primary_Coach table used for interim
+# resolution. Distinct from MIN_HIRE_YEAR: 1970-71 hires are still resolved (so a
+# 1971 mid-season takeover is folded and re-anchored to 1972) before the window cut.
+PRIMARY_COACH_START = 1970
+
+# Mid-season appointments hired from OUTSIDE the organization, keyed by anchored hire
+# year. PFR lists only "Head Coach" for a partial season (earlier same-season roles are
+# not recorded), so the data cannot separate these from staff or front-office insiders
+# promoted mid-season, and the prior-season rule codes all of them internal. All 16
+# such takeovers were checked against contemporaneous sources
+# (analysis/midseason_takeovers_summary.md): six were verified insiders (Khayat 1971,
+# Svare 1971, Gillman 1973, McVay 1976, Hudspeth 1976, Rice 1978) and stay internal;
+# these four were outside appointments and are recoded external.
+MIDSEASON_OUTSIDE_HIRES = {("Don Coryell", 1979), ("Raymond Berry", 1985),
+                           ("Marv Levy", 1987), ("Ron Meyer", 1987)}
+
+_INTERIM_HC = re.compile(r"Interim\s*(?:Head Coach|HC|Co-HC)")
+_INTERIM_TITLE = {"HC": _INTERIM_HC,
+                  "OC": re.compile(r"Interim\s*(?:OC|Offensive Coordinator)"),
+                  "DC": re.compile(r"Interim\s*(?:DC|Defensive Coordinator)")}
 
 
 def tier1_features(hist, hire_year):
@@ -298,8 +360,13 @@ def tier1_features(hist, hire_year):
         ages = pd.to_numeric(coaching["Age"], errors="coerce")
         f["cf_age_first_job"] = float(ages.min()) if ages.notna().any() else np.nan
         nfl_ages = pd.to_numeric(nfl_rows["Age"], errors="coerce") if len(nfl_rows) else pd.Series(dtype=float)
-        # NaN is meaningful: coach had no prior NFL coaching (college-to-NFL jump)
-        f["cf_age_first_nfl"] = float(nfl_ages.min()) if len(nfl_ages) and nfl_ages.notna().any() else np.nan
+        if len(nfl_ages) and nfl_ages.notna().any():
+            f["cf_age_first_nfl"] = float(nfl_ages.min())
+        else:
+            # no prior NFL coaching (college-to-NFL jump): this hire IS the first
+            # NFL job, so the value is the age at hire (a definition, not an imputation)
+            hire_age = pd.to_numeric(hist.loc[hist["Year"] == hire_year, "Age"], errors="coerce")
+            f["cf_age_first_nfl"] = float(hire_age.min()) if hire_age.notna().any() else np.nan
     f["cf_gap_before_hire"] = hire_year - int(years.max()) - 1
 
     # hiring franchise: employer in the hire-year row whose role is Head Coach
@@ -314,12 +381,11 @@ def tier1_features(hist, hire_year):
         hiring_level = hire_row.iloc[0].get("Level", "")
     hiring_key = canon_employer(hiring_team, hiring_level, hire_year) if hiring_team else None
 
-    # internal hire: employed by the hiring franchise in the IMMEDIATE prior season
-    # TODO: for re-anchored mid-season takeovers, the prior season is the partial HC
-    # season itself, so outside coaches hired mid-season (Coryell 1978, Berry 1984,
-    # Levy 1986, Meyer 1986) are flagged internal alongside true interim promotions.
-    # Treated as interim conversions for now; a future version could separate them
-    # with a hand-verified override list (recoding the four as external: HR 1.52 -> 1.75).
+    # internal hire: employed by the hiring franchise in the IMMEDIATE prior season.
+    # For a re-anchored mid-season takeover the prior season is the partial HC season
+    # itself, which correctly codes staff (and front-office) promotions as internal.
+    # The verified mid-season OUTSIDE appointments are recoded in
+    # build_modeling_dataset via MIDSEASON_OUTSIDE_HIRES.
     prior = coaching[coaching["Year"] == hire_year - 1]
     prior_keys = {canon_employer(e, l, y)
                   for e, l, y in zip(prior["Employer"], prior["Level"], prior["Year"])}
@@ -359,20 +425,49 @@ def _unit_col(role):
     return "Pts±"   # HC -> net point differential rank
 
 
-def tier2_features(ranks, hire_year):
+def _interim_rank_row(row, hist):
+    """True if a ranks-table row records an INTERIM appointment (e.g. PFR history
+    "TE Coach/Interim Head Coach" or "QB Coach/Interim OC") rather than a season the
+    coach held that title outright. Interim stints are excluded from the unit block
+    by classify_role, so they are excluded here too, keeping the two consistent."""
+    title = str(row.get("Role", "")).upper()
+    pat = _INTERIM_TITLE.get(title)
+    if pat is None or hist is None:
+        return False
+    roles = hist.loc[(hist["Year"] == row["Year"]) & hist["Level"].apply(is_nfl), "Role"]
+    roles = roles.astype(str)
+    held_outright = any(classify_role(r) == title for r in roles)
+    return bool(roles.str.contains(pat).any()) and not held_outright
+
+
+def interim_features(raw_hist, hire_year):
+    """Held an interim head-coach title in a prior NFL season. Interim appointments
+    never count as head-coaching or unit-leading seasons anywhere in the feature set;
+    this flag records the experience instead. Needs the un-deduplicated history."""
+    if raw_hist is None:
+        return {"cf_ever_interim_hc": np.nan}
+    pre = raw_hist[(raw_hist["Year"] < hire_year) & raw_hist["Level"].apply(is_nfl)]
+    return {"cf_ever_interim_hc": int(pre["Role"].astype(str).str.contains(_INTERIM_HC).any())}
+
+
+def tier2_features(ranks, hire_year, hist=None):
     """Side-appropriate unit performance + team success from prior ranked seasons.
 
     For each prior season the coach's OWN unit is used: offensive points rank when
     they were OC, DEFENSIVE points-allowed rank when DC, net point differential
     when HC. Ranks are converted to percentiles (1=best) normalized by league size.
+    Seasons where the title was held only on an interim basis are dropped.
     """
     f = {k: np.nan for k in ["rf_final_unit_pctl", "rf_avg_unit_pctl",
                              "rf_unit_traj", "rf_final_winpct_pctl",
                              "rf_avg_winpct_pctl", "rf_n_seasons_rank"]}
+    f["rf_no_trend"] = 0
     if ranks is None:
         f["rf_n_seasons_rank"] = 0
         return f
     pre = ranks[ranks["Year"] < hire_year].sort_values("Year")
+    if hist is not None and len(pre):
+        pre = pre[~pre.apply(lambda r: _interim_rank_row(r, hist), axis=1)]
     f["rf_n_seasons_rank"] = int(len(pre))
     if len(pre) == 0:
         return f
@@ -398,6 +493,12 @@ def tier2_features(ranks, hire_year):
         f["rf_final_unit_pctl"] = unit_valid[-1]
         f["rf_avg_unit_pctl"] = float(np.mean(unit_valid))
         f["rf_unit_traj"] = _slope([x for x in unit[-3:] if x == x])
+        if f["rf_unit_traj"] != f["rf_unit_traj"]:
+            # one ranked unit season: the trajectory is undefined. Set it to 0 and
+            # flag it, so the model estimates these coaches' hazard separately
+            # instead of treating them as a genuinely flat multi-season trend.
+            f["rf_unit_traj"] = 0.0
+            f["rf_no_trend"] = 1
     return f
 
 
@@ -619,27 +720,76 @@ def build_franchise_hc_history():
     return hc
 
 
-def tier5_features(hist, hire_year, hc_hist):
-    """Org instability: previous coach's tenure + distinct HCs in the prior decade."""
-    f = {"org_prev_coach_tenure": np.nan, "org_unique_hc_10yr": np.nan}
+_PRIMARY_IDX = None
+
+
+def _franchise_hc_years(hc_hist, fkey, hire_year):
+    """A franchise's head-coach seasons as its ORGANIZATION experienced them: the
+    Ravens include the Browns' seasons through 1995, and the reactivated Browns
+    (1999 on) exclude them (data_constants.INHERITED_FRANCHISES)."""
+    from data_constants import INHERITED_FRANCHISES
+    years = dict(hc_hist.get(fkey) or {})
+    fr = fkey.split(":", 1)[-1]
+    if fr in INHERITED_FRANCHISES:
+        src, last = INHERITED_FRANCHISES[fr]
+        years = {**{y: v for y, v in (hc_hist.get("nfl:" + src) or {}).items() if y <= last}, **years}
+    for heir, (src, last) in INHERITED_FRANCHISES.items():
+        if fr == src and hire_year > last + 1:
+            years = {y: v for y, v in years.items() if y > last}
+    return years
+
+
+def _predecessor(names, year, years_hc, exclude):
+    """The coach a hire replaced: the franchise's SEASON-OPENING head coach in the
+    prior season (Coach_WAR Primary_Coach), never the hire himself. When a season had
+    two head coaches (a mid-season change), picking one arbitrarily could return the
+    hire's own partial season or a one-game caretaker. Falls back to the
+    longest-serving remaining coach if the table lacks the team-year."""
+    global _PRIMARY_IDX
+    if _PRIMARY_IDX is None:
+        try:
+            _PRIMARY_IDX = _primary_coach_index()
+        except Exception:
+            _PRIMARY_IDX = {}
+    cands = set(names) - {exclude}
+    for team_names, prim in _PRIMARY_IDX.get(year, []):
+        if team_names & set(names) and prim in cands:
+            return prim
+
+    def run(c):
+        t, y = 0, year
+        while c in years_hc.get(y, set()):
+            t, y = t + 1, y - 1
+        return t
+    return max(sorted(cands), key=run) if cands else None
+
+
+def tier5_features(hist, hire_year, hc_hist, coach=None):
+    """Org instability: previous coach's tenure + distinct HCs in the prior decade
+    (a re-anchored mid-season takeover's own partial season is not counted)."""
+    f = {"org_prev_coach_tenure": np.nan, "org_unique_hc_10yr": np.nan, "org_expansion": np.nan}
     name, level = hiring_team_info(hist, hire_year)
     if not name:
         return f
     fkey = canon_employer(name, level, hire_year)
-    years_hc = hc_hist.get(fkey)
+    f["org_expansion"] = int((name, hire_year) in EXPANSION_FIRST_SEASONS)
+    years_hc = _franchise_hc_years(hc_hist, fkey, hire_year)
     if not years_hc:
         return f
 
     # distinct HCs in [hire_year-10, hire_year-1]
+    # (the hire's own partial takeover season at hire_year - 1 belongs to this stint
+    # and is excluded; earlier stints of a returning coach, e.g. Bud Grant, still count)
     uniq = set()
     for y in range(hire_year - 10, hire_year):
-        uniq |= years_hc.get(y, set())
+        s = years_hc.get(y, set())
+        uniq |= (s - {coach}) if y == hire_year - 1 else s
     f["org_unique_hc_10yr"] = len(uniq)  # 0 is meaningful (e.g., expansion team)
 
-    # previous coach tenure: HC in season Y-1, counted consecutively backwards
+    # previous coach tenure: the coach replaced, counted consecutively backwards
     prev = years_hc.get(hire_year - 1)
-    if prev:
-        pc = sorted(prev)[0]
+    pc = _predecessor(prev, hire_year - 1, years_hc, coach) if prev else None
+    if pc:
         t, y = 0, hire_year - 1
         while pc in years_hc.get(y, set()):
             t += 1
@@ -688,8 +838,9 @@ def tier6_features(hist, hire_year):
     abbr = name2abbr().get(name.lower())
     if not abbr:
         return f
+    from data_constants import prior_season_franchise
     py = hire_year - 1
-    team = standardize_team_abbreviation(abbr, py).upper()
+    team = prior_season_franchise(standardize_team_abbreviation(abbr, hire_year), py).upper()
     row = _roster_lookup().get((team, py))
     if row is None:
         return f
@@ -784,6 +935,18 @@ def _team_rec_row(cands, year):
     return None
 
 
+def _inherited_cands(cands, hire_year, season):
+    """Team-file candidates for a prior season, following an inherited franchise
+    (the Ravens' seasons before 1996 come from the Browns; data_constants)."""
+    from data_constants import standardize_team_abbreviation, prior_season_franchise
+    for a in cands:
+        own = standardize_team_abbreviation(a, hire_year)
+        src = prior_season_franchise(own, season)
+        if src != own:
+            return [src]
+    return cands
+
+
 def team_quality_features(hist, hire_year):
     """Schedule-adjusted hiring-team quality at hire_year-1 + 3-season SRS slope."""
     keys = ["tq_srs", "tq_osrs", "tq_dsrs", "tq_mov", "tq_sos", "tq_srs_traj"]
@@ -791,7 +954,7 @@ def team_quality_features(hist, hire_year):
     cands = _hiring_franchise_abbrs(hist, hire_year)
     if not cands:
         return f
-    row = _team_rec_row(cands, hire_year - 1)
+    row = _team_rec_row(_inherited_cands(cands, hire_year, hire_year - 1), hire_year - 1)
     if row is not None:
         for k, col in [("tq_srs", "SRS"), ("tq_osrs", "OSRS"), ("tq_dsrs", "DSRS"),
                        ("tq_mov", "MoV"), ("tq_sos", "SoS")]:
@@ -799,7 +962,7 @@ def team_quality_features(hist, hire_year):
             f[k] = float(v) if v == v else np.nan
     srs_seq = []
     for y in (hire_year - 3, hire_year - 2, hire_year - 1):
-        r = _team_rec_row(cands, y)
+        r = _team_rec_row(_inherited_cands(cands, hire_year, y), y)
         v = (pd.to_numeric(pd.Series([r.get("SRS")]), errors="coerce").iloc[0]
              if r is not None else np.nan)
         srs_seq.append(v)
@@ -822,15 +985,19 @@ def build_modeling_dataset(df, verbose=True):
     the single result. Kept as an importable function so the build has ONE code path.
     """
     n_all = len(df)
-    df = df[df["Year"] >= MIN_HIRE_YEAR].copy()
-    if verbose:
-        print(f"Loaded {n_all} instances; kept {len(df)} from {MIN_HIRE_YEAR}+ (modern era)")
+    # one season of slack so a mid-season takeover in MIN_HIRE_YEAR - 1 can be
+    # re-anchored into the window by the hygiene step before the final cut; never
+    # before the Primary_Coach table starts, where hygiene would misclassify
+    df = df[df["Year"] >= max(MIN_HIRE_YEAR - 1, PRIMARY_COACH_START)].copy()
 
     # Population hygiene: remove mid-season interim caretakers + duplicate hire
     # instances and re-anchor interim->permanent hires to their season-opening
     # year (reuses Coach_WAR's Primary_Coach resolution). Must precede the tenure
     # recompute and feature build so both use the anchored hire year.
     df = clean_population(df)
+    df = df[df["Year"] >= MIN_HIRE_YEAR].copy()
+    if verbose:
+        print(f"Loaded {n_all} instances; kept {len(df)} hires from {MIN_HIRE_YEAR}+")
 
     # Correct the target labels: the original pipeline truncated tenure at franchise
     # relocations/renames and undercounted mid-season exits. Recompute the class
@@ -875,14 +1042,37 @@ def build_modeling_dataset(df, verbose=True):
             feat = {}
         else:
             feat = tier1_features(hist, hire_year)
+            if (coach, hire_year) in MIDSEASON_OUTSIDE_HIRES:
+                feat["cf_internal_hire"] = 0
+                feat["cf_years_at_hiring_org"] = 0
             if INCLUDE_TIER56:
-                feat.update(tier5_features(hist, hire_year, hc_hist))
+                feat.update(tier5_features(hist, hire_year, hc_hist, coach))
                 feat.update(tier6_features(hist, hire_year))
                 feat.update(team_quality_features(hist, hire_year))
-        feat.update(tier2_features(ranks, hire_year))
+        raw_hist = load_history(coach, dedupe=False)
+        feat.update(interim_features(raw_hist, hire_year))
+        feat.update(tier2_features(ranks, hire_year, raw_hist))
         rows.append(feat)
 
     new_df = pd.DataFrame(rows, index=df.index)
+
+    # Structural indicators for the pooled unit block. A coach who never led an NFL
+    # unit (no OC, DC or non-interim HC season) has no unit record: the statistics
+    # are undefined, not unobserved. A coach whose record predates PFR's drive data
+    # has a unit record but no drive record. Paired with a constant fill these let
+    # the model estimate each group's hazard separately, so the filled values carry
+    # no information and the unit coefficients come only from observed records.
+    unit_cols, drive_cols = unit_block_columns()
+    no_unit = df[unit_cols].isna().all(axis=1)
+    new_df["cf_no_unit_record"] = no_unit.astype(int)
+    new_df["cf_no_drive_record"] = (~no_unit & df[drive_cols].isna().all(axis=1)).astype(int)
+
+    # Coverage flags for inherited-roster data, by the known coverage rule (rosters
+    # begin in ROSTER_DATA_START), so any other missing roster value still surfaces.
+    # Expansion hires inherit no roster at all and are covered by org_expansion.
+    not_exp = new_df["org_expansion"] != 1
+    new_df["hire_no_roster_data"] = (not_exp & (df["Year"] - 1 < ROSTER_DATA_START)).astype(int)
+    new_df["hire_no_retention_data"] = (not_exp & (df["Year"] - 2 < ROSTER_DATA_START)).astype(int)
     print(f"Engineered {new_df.shape[1]} new features ({missing_hist} coaches missing history)"
           f"{' [incl. Tier5/6]' if INCLUDE_TIER56 else ' [Tier1+2 only]'}")
 
