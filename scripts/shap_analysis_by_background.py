@@ -1299,7 +1299,7 @@ def main():
     print(f"\nData loaded: {X.shape[0]} samples, {X.shape[1]} features")
 
     # Output directories
-    paper_dir = os.path.join(project_root, 'latex', 'figures')
+    paper_dir = os.path.join(project_root, 'papers', 'jqas', 'figures')
     exploratory_dir = os.path.join(project_root, 'figures', 'tenure')
     os.makedirs(paper_dir, exist_ok=True)
     os.makedirs(exploratory_dir, exist_ok=True)

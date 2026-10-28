@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 Generate the four JQAS firing-survival figures from analysis/survival_definitive.pkl
-(the Cox-native pipeline output). Saved to ijcss/figures/ at 150 dpi to match the
+(the Cox-native pipeline output). Saved to papers/jse/figures/ at 150 dpi to match the
 existing survival_km.png convention.
 
   1. survival_stability.png    Cox stability-selection frequency bar (the steep
@@ -31,7 +31,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter
 
-# Times New Roman to match the LaTeX manuscript body (latex_jse)
+# Times New Roman to match the LaTeX manuscript body (papers/jse)
 plt.rcParams.update({
     "font.family": "serif",
     "font.serif": ["Times New Roman"],
@@ -44,7 +44,7 @@ from scripts.survival_methods import (
     build_competing_targets, aalen_johansen_cif, FIRED, VOLUNTARY,
 )
 
-FIGDIR = os.path.join(project_root, "latex_jse", "figures")
+FIGDIR = os.path.join(project_root, "papers", "jse", "figures")
 PKL = os.path.join(project_root, "analysis", "survival_definitive.pkl")
 SIG, NS = "#1f77b4", "#9aa0a6"     # significant / not-significant colors
 REF = "#d62728"                    # reference-line red

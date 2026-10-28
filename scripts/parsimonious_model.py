@@ -261,7 +261,7 @@ def generate_parsimony_figure(all_results, output_dir):
     )
     plt.tight_layout()
 
-    for subdir in [output_dir, os.path.join(project_root, 'latex', 'figures')]:
+    for subdir in [output_dir, os.path.join(project_root, 'papers', 'jqas', 'figures')]:
         os.makedirs(subdir, exist_ok=True)
         path = os.path.join(subdir, 'parsimony_curve.png')
         plt.savefig(path, dpi=300, bbox_inches='tight')

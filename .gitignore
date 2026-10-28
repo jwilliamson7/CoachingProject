@@ -18,9 +18,13 @@ data/master_data_4block_backup.csv
 *.out
 *.toc
 *.synctex.gz
-latex_jse/*.log
-latex_jse/_build_*.log
-latex_jse/*.pdf
+papers/jse/*.log
+papers/jse/_build_*.log
+papers/jse/*.pdf
+papers/*/*.zip
+
+# Journal decision letters and reviewer reports (confidential; never commit)
+papers/*/feedback/
 
 # Run logs and generated analysis artifacts (reproducible from the scripts)
 analysis/_*.log
@@ -30,3 +34,6 @@ analysis/survival_selection_probe.pkl
 analysis/survival_magnitude.pkl
 analysis/internal_hire_audit_summary.csv
 analysis/internal_hire_history_detail.csv
+
+# Downloaded third-party papers for the JSE revision (copyrighted; keep local)
+literature/jse_round1/*.pdf

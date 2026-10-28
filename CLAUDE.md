@@ -27,8 +27,12 @@ CoachingProject/
 │   │                        #   files — imputation is now fit per train split.)
 │   ├── coach_war_trajectories_with_team.csv  # WAR data by coach/team/year (legacy)
 │   └── war_prediction_data.csv  # Merged WAR prediction dataset (legacy)
-├── latex/
-│   └── figures/             # Paper figures ONLY (7 files used in LaTeX)
+├── papers/                  # One folder per journal submission
+│   ├── jqas/                # JQAS survival submission (Jun 2026) + legacy tenure paper docs
+│   ├── ijcss/               # IJCSS submission (Word draft, tables, figures)
+│   ├── jse/                 # Journal of Sports Economics (CURRENT: R&R on JSE-26-0210)
+│   │   └── figures/         # Survival figures written by generate_survival_figures.py
+│   └── */feedback/          # Decision letters + reviewer reports (gitignored)
 ├── figures/                 # All exploratory/supplementary figures
 │   ├── tenure/              # Tenure model figures (SHAP, feature importance)
 │   ├── war/                 # WAR model figures
@@ -256,6 +260,7 @@ Key configuration in `model/config.py`:
 - `WAR_CONFIG`: WAR model feature configuration
 
 ## Research Output
-- LaTeX files for academic paper formatting (IEEE conference style) in `LaTeX/`
+- Manuscripts live under `papers/<journal>/` (current: `papers/jse/`); journal feedback goes in
+  `papers/<journal>/feedback/<round>/` and is gitignored. The legacy IEEE paper is in `archive/LaTeX/`
 - Trained models saved to `data/models/`
 - Archived notebooks in `archive/notebooks/`

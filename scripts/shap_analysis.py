@@ -12,7 +12,7 @@ Outputs:
     - Per-class SHAP importance
 
 Usage:
-    python scripts/shap_analysis.py [--top-n 20] [--output-dir latex/figures] [--n-samples 635]
+    python scripts/shap_analysis.py [--top-n 20] [--output-dir papers/jqas/figures] [--n-samples 635]
 """
 
 import os

@@ -34,7 +34,7 @@ from model.config import MODEL_PATHS, FEATURE_CONFIG, MODEL_CONFIG, ORDINAL_CONF
 
 def setup_output_dirs():
     """Create output directories for figures."""
-    paper_dir = os.path.join(project_root, 'latex', 'figures')
+    paper_dir = os.path.join(project_root, 'papers', 'jqas', 'figures')
     exploratory_dir = os.path.join(project_root, 'figures', 'tenure')
     os.makedirs(paper_dir, exist_ok=True)
     os.makedirs(exploratory_dir, exist_ok=True)
