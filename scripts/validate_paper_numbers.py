@@ -85,9 +85,9 @@ PAPER = {
         "Weibull AFT":    {"h": [0.615, 0.573, 0.657], "u": [0.643, 0.526, 0.760]},
         "LogNormal AFT":  {"h": [0.615, 0.576, 0.654], "u": [0.641, 0.525, 0.758]},
         "LogLogistic AFT":{"h": [0.615, 0.575, 0.654], "u": [0.640, 0.524, 0.757]},
-        "XGB-AFT":        {"h": [0.608, 0.567, 0.648], "u": [0.634, 0.515, 0.753]},
+        "XGB-AFT":        {"h": [0.621, 0.585, 0.657], "u": [0.649, 0.535, 0.764]},
     },
-    "bakeoff_max_gap_from_cox": 0.013,  # "no more than about 0.013 in concordance"
+    "bakeoff_max_gap_from_cox": 0.019,  # "no more than about 0.02 in concordance" (XGB-AFT 0.0185)
 
     # --- Ablation (Sec 4.4, Table 4) ---  [mean, lo, hi]
     "ablation": {
@@ -117,9 +117,9 @@ PAPER = {
 
     # --- Hyperparameters (Appendix E, Table 10) ---
     "cox_params": {"penalizer": 0.5, "l1_ratio": 0.25},
-    "xgb_params": {"num_boost_round": 50, "eta": 0.02, "max_depth": 4,
-                   "subsample": 1.0, "colsample_bytree": 1.0,
-                   "min_child_weight": 3, "reg_lambda": 1.0, "scale": 1.5},
+    "xgb_params": {"num_boost_round": 50, "eta": 0.03, "max_depth": 4,
+                   "subsample": 0.6, "colsample_bytree": 0.6,
+                   "min_child_weight": 5, "reg_lambda": 1.0, "scale": 0.8},
 }
 
 # Name aliases: the Table-3 / Table-6 display names map to internal columns.

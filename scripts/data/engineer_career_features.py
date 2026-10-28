@@ -315,6 +315,11 @@ def tier1_features(hist, hire_year):
     hiring_key = canon_employer(hiring_team, hiring_level, hire_year) if hiring_team else None
 
     # internal hire: employed by the hiring franchise in the IMMEDIATE prior season
+    # TODO: for re-anchored mid-season takeovers, the prior season is the partial HC
+    # season itself, so outside coaches hired mid-season (Coryell 1978, Berry 1984,
+    # Levy 1986, Meyer 1986) are flagged internal alongside true interim promotions.
+    # Treated as interim conversions for now; a future version could separate them
+    # with a hand-verified override list (recoding the four as external: HR 1.52 -> 1.75).
     prior = coaching[coaching["Year"] == hire_year - 1]
     prior_keys = {canon_employer(e, l, y)
                   for e, l, y in zip(prior["Employer"], prior["Level"], prior["Year"])}
