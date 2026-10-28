@@ -81,6 +81,7 @@ def global_max_season():
 
 EVENT_LABELS_FILE = os.path.join(project_root, "analysis", "event_labels_final.csv")
 _EVENT_LABELS = None
+_ACTIVE_LABELS = None
 
 
 def _firing_event_labels():
@@ -93,6 +94,18 @@ def _firing_event_labels():
         _EVENT_LABELS = {(r.coach, int(r.last_year)): int(r.event)
                          for r in lab.itertuples()}
     return _EVENT_LABELS
+
+
+def _active_labels():
+    """(coach, last_year) -> 1 if the stint was still running at the start of the
+    season after the data boundary. Distinguishes administrative censoring from a
+    voluntary exit in the boundary season itself (e.g. Tomlin, Jan 2026)."""
+    global _ACTIVE_LABELS
+    if _ACTIVE_LABELS is None:
+        lab = pd.read_csv(EVENT_LABELS_FILE)
+        _ACTIVE_LABELS = {(r.coach, int(r.last_year)): int(r.active)
+                          for r in lab.itertuples()}
+    return _ACTIVE_LABELS
 
 
 def build_survival_targets(df, boundary):

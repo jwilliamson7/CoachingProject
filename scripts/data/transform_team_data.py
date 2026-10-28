@@ -79,7 +79,17 @@ class TeamDataTransformer:
         
         return df_cleaned
     
-    def _save_datasets(self, df: pd.DataFrame, year_dir: Path, data_type: str) -> None:
+    def _league_by_year(self, team_dir: Path) -> Dict[int, str]:
+        """Season -> league ('NFL', 'AFL', 'AAFC', ...) from the team's record file."""
+        record_file = team_dir / "team_record.csv"
+        if not record_file.exists():
+            return {}
+        rec = pd.read_csv(record_file, usecols=['Year', 'Lg'])
+        rec = rec.dropna(subset=['Year'])
+        return {int(y): str(lg) for y, lg in zip(rec['Year'], rec['Lg'])}
+
+    def _save_datasets(self, df: pd.DataFrame, year_dir: Path, data_type: str,
+                       leagues: List[str] = None) -> None:
         """Save both raw and normalized datasets"""
         # Save raw data
         raw_file = year_dir / f"league_{data_type}_data.csv"
@@ -90,7 +100,16 @@ class TeamDataTransformer:
         numeric_cols = df_normalized.select_dtypes(include=[np.number]).columns
         
         if len(numeric_cols) > 0:
-            df_normalized[numeric_cols] = df_normalized[numeric_cols].apply(zscore)
+            if leagues is not None and len(set(leagues)) > 1:
+                # Seasons shared by two leagues (AFL-NFL 1960-69, AAFC-NFL 1946-49):
+                # standardize each team against its own league, since the leagues
+                # played separate schedules in different scoring environments and a
+                # pooled z-score would misstate units in both.
+                groups = pd.Series(leagues, index=df_normalized.index)
+                df_normalized[numeric_cols] = (df_normalized[numeric_cols]
+                                               .groupby(groups).transform(zscore))
+            else:
+                df_normalized[numeric_cols] = df_normalized[numeric_cols].apply(zscore)
             
         # Save normalized data
         normalized_file = year_dir / f"league_{data_type}_data_normalized.csv"
@@ -103,6 +122,8 @@ class TeamDataTransformer:
         # Organize data by year
         team_records_by_year = {}
         opponent_records_by_year = {}
+        team_leagues_by_year = {}
+        opponent_leagues_by_year = {}
         
         print(f"Processing {len(team_dirs)} teams...")
         
@@ -112,6 +133,7 @@ class TeamDataTransformer:
             
             # Load team data
             team_data = self._load_team_data(team_dir)
+            league_of = self._league_by_year(team_dir)
             
             # Process team stats
             if 'team' in team_data:
@@ -121,6 +143,7 @@ class TeamDataTransformer:
                     if year not in team_records_by_year:
                         team_records_by_year[year] = []
                     team_records_by_year[year].append(record['data'])
+                    team_leagues_by_year.setdefault(year, []).append(league_of.get(year, 'NFL'))
             
             # Process opponent stats
             if 'opponent' in team_data:
@@ -130,6 +153,7 @@ class TeamDataTransformer:
                     if year not in opponent_records_by_year:
                         opponent_records_by_year[year] = []
                     opponent_records_by_year[year].append(record['data'])
+                    opponent_leagues_by_year.setdefault(year, []).append(league_of.get(year, 'NFL'))
         
         # Create and save yearly datasets
         print(f"\nCreating league datasets for {len(team_records_by_year)} years...")
@@ -142,13 +166,13 @@ class TeamDataTransformer:
             if year in team_records_by_year:
                 team_df = pd.DataFrame(team_records_by_year[year])
                 team_df = self._clean_data_types(team_df)
-                self._save_datasets(team_df, year_dir, "team")
+                self._save_datasets(team_df, year_dir, "team", team_leagues_by_year.get(year))
             
             # Process opponent data  
             if year in opponent_records_by_year:
                 opponent_df = pd.DataFrame(opponent_records_by_year[year])
                 opponent_df = self._clean_data_types(opponent_df)
-                self._save_datasets(opponent_df, year_dir, "opponent")
+                self._save_datasets(opponent_df, year_dir, "opponent", opponent_leagues_by_year.get(year))
             
             print(f"Created datasets for {year}")
 

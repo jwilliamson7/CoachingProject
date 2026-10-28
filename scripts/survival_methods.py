@@ -43,7 +43,7 @@ from lifelines.statistics import proportional_hazard_test
 from lifelines.utils import concordance_index
 
 from model.pipeline import leakage_free_split
-from scripts.survival_analysis import _firing_event_labels
+from scripts.survival_analysis import _firing_event_labels, _active_labels
 from scripts.data.engineer_career_features import reconstruct_tenure
 
 warnings.filterwarnings("ignore")
@@ -123,11 +123,13 @@ def build_competing_targets(df, boundary):
                treating it as plain censoring overstates firing incidence
     cause = 0  still active at the data boundary -- legitimate right-censoring
 
-    The split of the 38 non-firings is exact: an event=0 label at last_year >=
-    boundary is administrative censoring (active coach), otherwise it is a
-    documented voluntary departure (the competing risk).
+    The non-firings split on the labels' explicit `active` flag: a stint still
+    running at the start of the season after the boundary is administrative
+    censoring; every other non-firing is a documented voluntary departure (the
+    competing risk), including one that happened in the boundary season itself.
     """
     labels = _firing_event_labels()
+    active = _active_labels()
     dur, cause = {}, {}
     for c, yr in zip(df["Coach Name"], df["Year"]):
         t = reconstruct_tenure(c, int(yr))
@@ -140,7 +142,7 @@ def build_competing_targets(df, boundary):
         if ev == 1:
             cause[idx] = FIRED
         else:
-            cause[idx] = CENSORED if last >= boundary else VOLUNTARY
+            cause[idx] = CENSORED if active.get((c, last), last >= boundary) else VOLUNTARY
     return pd.Series(dur), pd.Series(cause)
 
 
