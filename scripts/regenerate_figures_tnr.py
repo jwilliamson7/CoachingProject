@@ -2,7 +2,7 @@
 """
 Regenerate paper figures with Times New Roman font for IJCSS submission.
 
-Outputs to ijcss/figures/ without modifying existing figures.
+Outputs to papers/ijcss/figures/ without modifying existing figures.
 Regenerates all 4 paper figures:
   1. parsimony_curve.png - from parsimony_results.pkl
   2. confusion_matrix_50seed.png - recomputed across 50 seeds
@@ -41,7 +41,7 @@ matplotlib.rcParams.update({
     'mathtext.fontset': 'stix',  # Math font compatible with TNR
 })
 
-OUTPUT_DIR = os.path.join(project_root, 'ijcss', 'figures')
+OUTPUT_DIR = os.path.join(project_root, 'papers', 'ijcss', 'figures')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 

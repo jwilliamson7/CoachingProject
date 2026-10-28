@@ -1,0 +1,27 @@
+Jon Williamson
+Des Moines, Iowa
+jon@williamsonconsultinggroup.com
+
+June 24, 2026
+
+To the Editors, Journal of Quantitative Analysis in Sports
+
+Dear Editors,
+
+Please consider the enclosed manuscript, "Predicting NFL Head Coach Dismissal at the Time of Hire: A Firing-Aware Survival Analysis," for publication in the Journal of Quantitative Analysis in Sports as a Research Article.
+
+Head coach turnover in the NFL is frequent and consequential, and the quantitative work on it has consistently traced dismissal to a coach's performance once in the job. Those studies, which the manuscript reviews, share a structural feature: every predictor is realized during the tenure, such as in-season winning percentage, player penalties and fines, or results relative to expectation. They answer a retrospective question, namely what about a tenure tends to accompany its ending, and their recurring conclusion, that losing leads to firing, offers little to a team deciding whom to hire in the first place.
+
+This manuscript poses the prospective version of the question instead: using only what is observable when the contract is signed, how much of an eventual dismissal is already foreseeable? I recast the problem as a firing-aware, competing-risks survival analysis over 371 modern-era head coaching stints (1970 to 2025), modeling the time from hire to firing entirely from pre-hire information while treating voluntary departures as a competing event and coaches still active at the data boundary as censored. To my knowledge this is the first treatment of NFL coach dismissal as a pre-hire forecasting problem with explicit firing-versus-voluntary event coding, and the careful, individually adjudicated separation of those two exit types is itself part of the contribution.
+
+The central finding is one of bounded predictability. A cause-specific Cox model, benchmarked against parametric and gradient-boosted alternatives and fit on Cox-native stability-selected features, reaches a Harrell concordance of 0.602 and an integrated Brier score of 0.176. The broad on-field record that hiring searches scrutinize, points, yards, and turnovers measured against league average, forecasts dismissal no better than chance. The one durable pre-hire signal is structural rather than performance-based: internally promoted coaches face a higher firing hazard than external hires (HR 1.52), with weaker contributions from age at hire and prior-unit efficiency. I read the modest concordance not as a failed prediction exercise but as the substantive result: most of what determines a coach's fate is realized only after he is hired. That conclusion bears directly on how franchises allocate their evaluation effort and on the broader debate over whether coaching changes accomplish what teams intend.
+
+The work fits the journal in both subject and method, pairing a question of standing interest in sports analytics with a careful survival treatment: a cause-specific Cox primary model, Aalen-Johansen cumulative incidence for the competing risks, cluster-robust inference for coaches with repeat stints, stability selection for feature choice, and IPCW time-dependent calibration. The full analysis pipeline and dataset are released in a public repository cited in the manuscript so that every reported number can be reproduced.
+
+The manuscript is original, has not been published previously, and is not under consideration at any other journal. I have no conflicts of interest to declare. Author-identifying information has been removed from the manuscript file to support blind review.
+
+Thank you for your consideration. I would be glad to respond to any questions during the review process.
+
+Sincerely,
+
+Jon Williamson
