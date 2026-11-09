@@ -1,0 +1,39 @@
+================================================================
+(a) duration identity: predictive (durb) vs inferential (dur)
+================================================================
+  n rows compared : 365
+  identical       : True  (mismatches: 0)
+
+================================================================
+(b) HR table: ridge (penalizer=0.1) vs unpenalized (penalizer=0)
+================================================================
+  feature                HR_ridge  p_ridge  HR_unpen  p_unpen
+  -----------------------------------------------------------
+  cf_internal_hire          1.789    0.000     1.912    0.000
+
+  unpenalized 95% CI (cluster-robust):
+    cf_internal_hire       HR 1.912  [1.439, 2.541]  p=0.000
+
+  PH test (unpenalized): all p>0.05? False  (min p=0.043)
+
+  max |HR drift| ridge->unpen: 0.124  (cf_internal_hire)
+
+================================================================
+(c) collinearity of the 1 model features (unpenalized MLE safe?)
+================================================================
+  one feature: no collinearity to check
+
+================================================================
+(d) internal-hire HR across labor-market eras {'salary_cap': 1994, 'rooney_rule': 2003}
+================================================================
+  era 0: 142 hires, 33% internal
+  era 1: 66 hires, 26% internal
+  era 2: 157 hires, 14% internal
+  stratified by era: internal HR 2.035 [1.528, 2.712]  p=0.000
+    cf_internal_hire           HR 1.803  [1.243, 2.615]  p=0.002
+    salary_cap                 HR 1.048  [0.810, 1.356]  p=0.723
+    internal_x_salary_cap      HR 1.176  [0.658, 2.104]  p=0.584
+    cf_internal_hire           HR 1.856  [1.336, 2.579]  p=0.000
+    rooney_rule                HR 1.157  [0.900, 1.488]  p=0.256
+    internal_x_rooney_rule     HR 1.378  [0.717, 2.648]  p=0.336
+================================================================

@@ -1,11 +1,11 @@
-350 stints | CANONICAL 94 feats (native unit-block) | fired=312, censored=38 | seeds=50
+365 stints | CANONICAL 102 feats (native unit-block) | fired=314, censored=51 | seeds=50
 unit_* feature columns present: 0
 
-CANONICAL: 94 feats, bestK=5
-   Cox     C-index 0.594 [0.581, 0.607]
-   XGB-AFT C-index 0.585 [0.574, 0.597]
-   K-curve (CV C-index): 5:0.617  8:0.606  10:0.606  11:0.606  12:0.606  13:0.594  14:0.594  15:0.594  16:0.593  17:0.593  18:0.592  19:0.592  20:0.584  25:0.583  30:0.583  40:0.583  94:0.583
-   Cox params: {'penalizer': 0.5, 'l1_ratio': 0.25}
-   selected (5): ['Feature 19', 'Feature 23', 'tq_dsrs', 'Feature 11', 'cf_internal_hire']
+CANONICAL: 102 feats, bestK=16
+   Cox     C-index 0.581 [0.569, 0.593]
+   XGB-AFT C-index 0.611 [0.600, 0.622]
+   K-curve (CV C-index): 5:0.595  8:0.593  10:0.605  11:0.605  12:0.604  13:0.618  14:0.620  15:0.620  16:0.620  17:0.612  18:0.611  19:0.604  20:0.604  25:0.603  30:0.601  40:0.601  102:0.607
+   Cox params: {'penalizer': 0.1, 'l1_ratio': 1.0}
+   selected (16): ['cf_internal_hire', 'tq_dsrs', 'cf_age_first_nfl', 'Feature 26', 'Feature 48', 'Feature 49', 'cf_years_at_hiring_org', 'hire_starter_exp', 'Feature 30', 'Feature 34', 'cf_age_first_job', 'cf_nfl_share', 'Feature 11', 'Feature 20', 'rf_final_winpct_pctl', 'hire_off_retention']
 
 Saved C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\survival_canonical_validate.pkl

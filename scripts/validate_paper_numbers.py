@@ -36,6 +36,10 @@ sys.path.insert(0, project_root)
 
 import numpy as np
 
+from scripts.survival_methods import nm, cif_at
+
+ANALYSIS_DIR = os.path.join(project_root, "analysis")   # the cached artifacts read below
+
 # --------------------------------------------------------------------------- #
 # PAPER block: every number quoted in the .tex, at the precision quoted.
 # Update this when the prose changes; the script checks it against the truth.
@@ -156,9 +160,22 @@ def check_lt(name, actual, bound):
     RESULTS.append((ok, name, f"actual={float(actual):.2e} < {bound}"))
 
 
+def check_set(name, paper, actual):
+    """Pass if the paper's feature set equals the fitted one; report each side's extras."""
+    p, a = set(paper), set(actual)
+    detail = (f"{len(p)} features" if p == a else
+              f"paper-only={sorted(p - a)}  pkl-only={sorted(a - p)}")
+    RESULTS.append((p == a, name, detail))
+
+
+def missing(name, why):
+    """Record a check that cannot run (absent row/feature/key) as a failure."""
+    RESULTS.append((False, name, why))
+
+
 # --------------------------------------------------------------------------- #
 def main():
-    A = os.path.join(project_root, "analysis")
+    A = ANALYSIS_DIR
     D = pickle.load(open(os.path.join(A, "survival_definitive.pkl"), "rb"))
     NB = pickle.load(open(os.path.join(A, "survival_null_baseline.pkl"), "rb"))
     WR = pickle.load(open(os.path.join(A, "threshold_winrate.pkl"), "rb"))
@@ -175,13 +192,32 @@ def main():
 
     # ---- firing-time distribution ----
     check_eq("km_median", PAPER["km_median"], int(D["km_median"]))
-    check("era_logrank_p", PAPER["era_logrank_p"], D["era_logrank_p"], 2)
+    # era_logrank_p is a dict of tests (salary_cap, rooney_rule, three_era); the paper
+    # value may be the same dict or a single legacy p, which has no counterpart
+    era, pe = D["era_logrank_p"], PAPER["era_logrank_p"]
+    if not isinstance(era, dict):
+        check("era_logrank_p", pe, era, 2)
+    elif isinstance(pe, dict):
+        for k, v in pe.items():
+            if k in era:
+                check(f"era_logrank_p {k}", v, era[k], 2)
+            else:
+                missing(f"era_logrank_p {k}", f"no such test in pkl ({sorted(era)})")
+    else:
+        missing("era_logrank_p", f"paper quotes one p ({pe}); pkl has "
+                + ", ".join(f"{k}={v:.3f}" for k, v in era.items()))
 
-    # ---- stability (Table 3) ----
-    named_q = {q: _stab_named(D, q) for q in (10, 15, 20)}
+    # ---- stability (Table 3): the paper's set must be the fitted stable set ----
+    stable_named = D.get("stable_named") or [nm(c) for c in D["stable"]]
+    check_set("stability feature set = stable", PAPER["stability"], stable_named)
+    named_q = {q: _stab_named(D, q) for q in D["stab_freq_multi"]}
     for feat, qmap in PAPER["stability"].items():
         for q, pv in qmap.items():
-            check(f"stability {feat} q={q}", pv, named_q[q].get(feat), 2)
+            v = named_q[q].get(feat) if q in named_q else None
+            if v is None:
+                missing(f"stability {feat} q={q}", "feature or q not in pkl")
+            else:
+                check(f"stability {feat} q={q}", pv, v, 2)
     check("stable_vs_topk delta", PAPER["stable_vs_topk_delta"],
           D["nb_stable_vs_topk"]["delta"], 3)
     check("stable_vs_topk p", PAPER["stable_vs_topk_p"],
@@ -193,6 +229,9 @@ def main():
     cox_h = D["bakeoff"]["Cox"]["harrell"][0]
     max_gap = 0.0
     for m, vals in PAPER["bakeoff"].items():
+        if key[m] not in D["bakeoff"]:   # now in the nested comparison (own selection)
+            check(f"bakeoff {m} present in survival_definitive", 1, 0, 0)
+            continue
         bh = D["bakeoff"][key[m]]["harrell"]
         bu = D["bakeoff"][key[m]]["uno"]
         check_triplet(f"bakeoff {m} Harrell", vals["h"], bh, 3)
@@ -202,19 +241,31 @@ def main():
 
     # ---- ablation (Table 4) ----
     for label, vals in PAPER["ablation"].items():
-        s = NB["summary"][label]
+        s = NB["summary"].get(label)
+        if s is None:
+            missing(f"ablation {label}", f"row not in pkl ({list(NB['summary'])})")
+            continue
         check_triplet(f"ablation {label}", vals, [s["mean"], s["lo"], s["hi"]], 3)
 
-    # ---- calibration ----
+    # ---- calibration: skill relative to the covariate-free Kaplan-Meier null on the
+    # same splits (survival_methods.km_null_brier), not to a 0.25 coin flip ----
     check_triplet("integrated Brier", PAPER["ibs"], D["ibs_ci"], 3)
-    check("Brier skill score", PAPER["brier_skill"],
-          (0.25 - D["ibs_ci"][0]) / 0.25, 2)
+    if "ibs_km_ci" in D:
+        check("Brier skill vs KM null", PAPER["brier_skill"],
+              1.0 - D["ibs_ci"][0] / D["ibs_km_ci"][0], 2)
+    else:
+        missing("Brier skill vs KM null", "pkl has no ibs_km_ci (rerun survival_definitive)")
 
-    # ---- hazard ratios (Table 6) ----
+    # ---- hazard ratios (Table 6): the paper's rows must be the fitted model ----
     hr = D["hazard_ratios"]
+    model_named = D.get("model_features_named") or [nm(c) for c in D["model_features"]]
+    check_set("HR feature set = model_features", PAPER["hazard"], model_named)
     for feat, (HR, lo, hi, p) in PAPER["hazard"].items():
+        lbl = HR_LABEL.get(feat, feat)
+        if feat not in hr.index:
+            missing(f"HR {lbl}", "paper feature not in the fitted model")
+            continue
         r = hr.loc[feat]
-        lbl = HR_LABEL[feat]
         check(f"HR {lbl} value", HR, r["HR"], 3)
         check(f"HR {lbl} CI_low", lo, r["CI_low"], 3)
         check(f"HR {lbl} CI_high", hi, r["CI_high"], 3)
@@ -252,13 +303,11 @@ def main():
 
 
 def _stab_named(D, q):
-    """stab_freq_multi[q] keyed by placeholder; remap to display names via the
-    same alignment the named series uses at q=10."""
-    placeholder = D["stab_freq_multi"][q]
-    named10 = D["stab_freq_named"]              # q=10 named order
-    base10 = D["stab_freq_multi"][10]
-    remap = dict(zip(base10.index, named10.index))
-    return placeholder.rename(index=lambda c: remap.get(c, c))
+    """stab_freq_multi[q] (keyed by column) re-keyed by variable name. Each column is
+    resolved directly with nm(), so this is right whatever primary q (D["stab_k"])
+    the run used; the old remap aligned positions against stab_freq_named, which is
+    the stab_k series, and was right only when stab_k happened to be 10."""
+    return D["stab_freq_multi"][q].rename(index=nm)
 
 
 def _live_checks():
@@ -266,28 +315,33 @@ def _live_checks():
     from scripts.survival_analysis import global_max_season
     from scripts.survival_methods import (
         build_competing_targets, aalen_johansen_cif, firing_event,
-        drop_redundant_features, DROP_REDUNDANT_FEATURES, FIRED, VOLUNTARY)
-    from scripts.survival_definitive import nm, _PLACEHOLDER_NAMES
+        drop_redundant_features, _PLACEHOLDER_NAMES, FIRED, VOLUNTARY)
     from lifelines import KaplanMeierFitter
     from lifelines.utils import median_survival_times
     from collections import Counter
 
+    # the analysis sample: every stint with a reconstructed tenure and outcome
     df, X, y = load_modeling_data(known_only=False)
+    boundary = global_max_season()
+    dur, cause = build_competing_targets(df, boundary)
+    df, X = df.loc[dur.index], X.loc[dur.index]
 
     check_eq("distinct coaches", PAPER["n_distinct_coaches"], df["Coach Name"].nunique())
     vc = df["Coach Name"].value_counts()
     check_eq("multi-stint coaches", PAPER["n_multi_stint_coaches"], int((vc > 1).sum()))
 
-    # feature pool + redundancy
+    # feature pool + redundancy, counted from the columns actually present and removed
     Xd = drop_redundant_features(X.copy())
+    dropped = [nm(c) for c in X.columns if c not in Xd.columns]
+    du = [c for c in dropped if c.endswith("__unit")]
     check_eq("candidate features", PAPER["n_candidate_features"], Xd.shape[1])
-    check_eq("features dropped", PAPER["n_features_dropped"], X.shape[1] - Xd.shape[1])
-    du = [c for c in DROP_REDUNDANT_FEATURES if str(c).endswith("__unit")]
+    check_eq("features dropped", PAPER["n_features_dropped"], len(dropped))
     check_eq("unit dropped", PAPER["n_unit_dropped"], len(du))
-    check_eq("non-unit dropped", PAPER["n_nonunit_dropped"],
-             len(DROP_REDUNDANT_FEATURES) - len(du))
-    check_eq("unit candidate (33-7)", PAPER["n_unit_candidate"],
-             PAPER["n_unit_total"] - len(du))
+    check_eq("non-unit dropped", PAPER["n_nonunit_dropped"], len(dropped) - len(du))
+    check_eq("unit total", PAPER["n_unit_total"],
+             sum(nm(c).endswith("__unit") for c in X.columns))
+    check_eq("unit candidate", PAPER["n_unit_candidate"],
+             sum(nm(c).endswith("__unit") for c in Xd.columns))
 
     # family decomposition
     core = _PLACEHOLDER_NAMES[:8]
@@ -309,23 +363,16 @@ def _live_checks():
         check_eq(f"family {k}", v, counts.get(k, 0))
 
     # KM median CI
-    boundary = global_max_season()
-    dur, cause = build_competing_targets(df, boundary)
     evt = firing_event(cause)
     kmf = KaplanMeierFitter().fit(dur.values, evt)
     ci = median_survival_times(kmf.confidence_interval_).values.ravel()
     check_eq("KM median CI", PAPER["km_median_ci"], [int(ci[0]), int(ci[1])])
 
-    # competing-risks CIF at the end of each season (read at s+0.5; see
-    # generate_survival_figures._step_at_seasons for the jitter rationale)
+    # competing-risks CIF at the end of each season (survival_methods.cif_at)
     def cif_band(ev, t):
         aj = aalen_johansen_cif(dur, cause, ev)
         c, q = aj.cumulative_density_, aj.confidence_interval_
-
-        def at(frame, col):
-            m = frame.index <= t + 0.5
-            return float(frame[m].iloc[-1, col]) if m.any() else 0.0
-        return [at(c, 0), at(q, 0), at(q, 1)]
+        return [cif_at(c, t), cif_at(q, t, 0), cif_at(q, t, 1)]
     for s in (2, 4, 8):
         check_triplet(f"CIF firing s{s}", PAPER[f"cif_fire_s{s}"], cif_band(FIRED, s), 2)
         check_triplet(f"CIF voluntary s{s}", PAPER[f"cif_vol_s{s}"], cif_band(VOLUNTARY, s), 2)

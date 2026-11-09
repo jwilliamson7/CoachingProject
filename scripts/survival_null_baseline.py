@@ -20,8 +20,15 @@ Baselines, weakest to strongest:
        - COACH RESUME (who the coach is, not the team): core career + career-path
          features + recent-form percentiles.
        - COACH UNIT PERFORMANCE (the oriented prior on-field unit block).
-  4. FULL CV-selected model (the headline top-K), recomputed here on the same
-     seeds so the whole table is strictly comparable.
+     Blocks hold substantive features only (their labels count those); the
+     structural indicators each one needs are added as companions, exactly as in
+     the headline model, never hand-listed.
+  4. FULL model: the headline stable set + its companions and tuned penalty,
+     recomputed here on the same seeds so the whole table is strictly comparable.
+     It was SELECTED on all the data, so it is optimistic relative to the single
+     and block rows, which are pre-specified. When survival_nested_eval.pkl exists,
+     the nested estimate (selection rerun inside every training partition) is
+     added as "Full model (nested selection)".
 
 Usage:
     python scripts/survival_null_baseline.py
@@ -42,7 +49,9 @@ from model.pipeline import load_modeling_data, leakage_free_split
 from model.config import MODEL_CONFIG
 from scripts.survival_analysis import global_max_season, build_survival_targets, nb_tci
 from scripts.survival_models import cox_builder, eval_model, N_SEEDS
-from scripts.survival_methods import drop_redundant_features
+from scripts.survival_methods import (
+    drop_redundant_features, with_structural_indicators, STRUCTURAL_INDICATORS,
+)
 
 warnings.filterwarnings("ignore")
 
@@ -51,6 +60,8 @@ warnings.filterwarnings("ignore")
 # CV-tuned penalizer, loaded from the canonical-validate artifact.)
 BASELINE_COX = {"penalizer": 0.1, "l1_ratio": 0.0}
 DEF_PKL = os.path.join(project_root, "analysis", "survival_definitive.pkl")
+NESTED_PKL = os.path.join(project_root, "analysis", "survival_nested_eval.pkl")
+OUT_PKL = os.path.join(project_root, "analysis", "survival_null_baseline.pkl")
 
 
 def km_null_cindex(df, X, y, dur, evt):
@@ -94,16 +105,22 @@ def main():
     tq = [p for c, p in pos.items() if c.startswith("tq_")]
     rf = [p for c, p in pos.items() if c.startswith("rf_")]
 
-    inherited = sorted(hiring_orig + org + hire + tq)   # the situation walked into
-    resume = sorted(core + cf + rf)                      # who the coach is
-    # unit = the coach's prior on-field performance
+    def substantive(idx):
+        # structural indicators are never block members; with_companions adds the
+        # ones a block's features need
+        return sorted(i for i in idx if cols[i] not in STRUCTURAL_INDICATORS)
+
+    inherited = substantive(hiring_orig + org + hire + tq)   # the situation walked into
+    resume = substantive(core + cf + rf)                      # who the coach is
+    unit = substantive(unit)                                  # prior on-field performance
 
     # ---- full selected model: use the SAME stable set + params as the headline
     # (survival_definitive.pkl) so the ablation's full row equals the bake-off ----
     with open(DEF_PKL, "rb") as f:
         defn = pickle.load(f)
-    full_feats = defn["stable"]
-    full_params = defn.get("cox_params", BASELINE_COX)
+    full_feats = list(defn.get("model_features") or defn["stable"])
+    n_full = sum(c not in STRUCTURAL_INDICATORS for c in full_feats)
+    full_params = defn.get("cox_params_stable", defn.get("cox_params", BASELINE_COX))
     # The full row must equal survival_definitive's headline exactly, so it uses
     # the SAME redundancy-pruned matrix the selection + hazard model used (the
     # construct ablations above intentionally stay on the full feature set).
@@ -119,19 +136,29 @@ def main():
         ("Internal hire only", "cf_internal_hire"),
         ("Inherited team SRS only", "tq_srs"),
         ("Inherited defensive SRS only", "tq_dsrs"),
-        ("Roster turnover only", "hire_roster_turnover"),
+        ("Roster retention only", "hire_roster_retention"),
     ]
+    def with_companions(idx):
+        # structural indicators enter with the features whose filled values they mark
+        return sorted(pos[c] for c in with_structural_indicators([cols[i] for i in idx], X))
+
     for label, name in singles:
-        rows.append((label, cox_cindex(df, X, y, dur, evt, [pos[name]])))
+        rows.append((label, cox_cindex(df, X, y, dur, evt, with_companions([pos[name]]))))
 
     rows.append((f"Inherited situation ({len(inherited)})",
-                 cox_cindex(df, X, y, dur, evt, inherited)))
+                 cox_cindex(df, X, y, dur, evt, with_companions(inherited))))
     rows.append((f"Coach resume ({len(resume)})",
-                 cox_cindex(df, X, y, dur, evt, resume)))
+                 cox_cindex(df, X, y, dur, evt, with_companions(resume))))
     rows.append((f"Coach unit performance ({len(unit)})",
-                 cox_cindex(df, X, y, dur, evt, unit)))
-    rows.append((f"FULL CV-selected ({len(full_idx)})",
+                 cox_cindex(df, X, y, dur, evt, with_companions(unit))))
+    rows.append((f"Stability-selected model ({n_full})",
                  cox_cindex(df, Xp, y, dur, evt, full_idx, full_params)))
+    # the selection-honest counterpart of the FULL row (same splits, same Cox C)
+    if os.path.exists(NESTED_PKL):
+        with open(NESTED_PKL, "rb") as f:
+            nested = pickle.load(f)
+        rows.append(("Full model (nested selection)",
+                     [r["Cox"][0] for r in sorted(nested["splits"], key=lambda r: r["seed"])]))
 
     tf = MODEL_CONFIG["test_size"]
     print("=" * 64)
@@ -146,12 +173,11 @@ def main():
     print("\nFull-model selected features:", full_feats)
     print("Full-model Cox params:", full_params)
 
-    out = os.path.join(project_root, "analysis", "survival_null_baseline.pkl")
-    with open(out, "wb") as f:
+    with open(OUT_PKL, "wb") as f:
         pickle.dump({"summary": summary, "n_seeds": N_SEEDS,
                      "n_stints": int(len(df)), "boundary": boundary,
                      "full_feats": full_feats, "full_params": full_params}, f)
-    print(f"\nSaved {out}")
+    print(f"\nSaved {OUT_PKL}")
 
 
 if __name__ == "__main__":

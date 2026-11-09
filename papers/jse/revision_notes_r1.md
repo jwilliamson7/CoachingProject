@@ -159,7 +159,7 @@ A Holmes-style learning model: head-coach ability in the role, theta, has a hiri
 
 ### E5. Paper structure (JSE style)
 1. Introduction: economic question first; three findings; one paragraph on why firing duration.
-2. Institutional background: how hires happen, the internal ladder (Fee), Rooney Rule, owner/GM roles, turnover (22.3% of teams per season, 1970-2025).
+2. Institutional background: how hires happen, the internal ladder (Fee), Rooney Rule, owner/GM roles, turnover (21.9% of team-seasons open with a new head coach, 1970-2025; see G).
 3. Conceptual framework (E3), ending in P1-P5.
 4. Data: sample and event coding, variable definitions in the main text (internal-hire rule with R2's example), missingness (24% of hires have no prior NFL unit seasons), descriptive table by internal vs external.
 5. Empirical strategy: cause-specific Cox, coach clustering, franchise strata, era strata (1994 cap, 2003 Rooney Rule); predictability measured as concordance and Brier skill relative to Kaplan-Meier.
@@ -175,3 +175,35 @@ Standard-format tables: columns adding blocks (channel only; + credentials; + in
 - Recode the 4 outside midseason hires coded internal (Coryell 1979, Levy 1987, Berry 1985, Meyer 1987); report both codings.
 - Disclose and handle structural missingness of the unit block.
 - Fix B1 to B7 above.
+
+## G. Paper-pass to-do: method changes made during the revision (held until methods are final)
+- Headline model is internal hire alone (stability frequency >= 0.6 at q = 10; next candidate 0.49).
+  Age and the other controls move to the block table (Table A of `survival_channel_table.py`).
+- Model comparison: nested, each model class choosing its own features in every training split
+  (Cox and three AFTs: own ridge rank, K and penalty by inner CV; elastic-net Cox and XGB-AFT on all
+  candidates), reference row internal hire alone. Replaces the fixed-feature bake-off.
+- Brier scores now use product-limit Cox survival (a no-covariate Cox equals Kaplan-Meier exactly);
+  the old exp(-H) form overstated skill by about a third.
+- Proportional hazards rejects for internal hire (p ~ 0.04): report the early (years 1-2) vs later HR
+  from `survival_tenure_srs.py` (6a) rather than a single constant HR only.
+- New results sections: block table, robustness table (franchise and era strata, first stint per coach in
+  place of frailty, first-time head coaches, 1994+/2003+, mid-season recoding, any-exit and voluntary
+  events), succession split (predecessor fired vs voluntary), hiring-side logits, in-tenure SRS check.
+  Footnote: the SRS panel ends in 2024 because the scraped team records do.
+- Supplement: Table S1 "Ever interim HC" now = any prior interim year as head coach (title, mid-season
+  takeover, caretaker credit; not a suspension or a permanent outside mid-season hire); the
+  interim-year paragraph should name the pre-1970 continuity rule and Payton's 2012 suspension.
+  Main text: selection pool 75 (not 78); no-unit-record share 93 of 365 (25%).
+- Validator: rewrite the PAPER block once the text is final.
+
+Decisions 2026-11-09 (Jon):
+- Yards per play: no new run. It left the model with the data corrections; the response says so.
+- Turnover (R1 minor 1): 21.9% of team-seasons open with a newly hired head coach (365 of 1,669,
+  1970-2025; no team-season has two hires; by season 7% to 38%). The 22.3% above came from the old
+  371-stint data and the draft response's 22.0% from a 1971-2025 window; both are superseded.
+- Early vs later tenure: present as suggestive (years 1-2 HR 2.38 vs later 1.74, difference p = 0.27),
+  and name the limitation that a single Cox HR assumes the same effect in every tenure year, which
+  the proportional-hazards test (p = 0.04) suggests does not hold.
+- Disclose plainly that the submitted text said selection ran inside each split and it did not.
+- Keep the submitted title.
+- Succession split: framing pending.

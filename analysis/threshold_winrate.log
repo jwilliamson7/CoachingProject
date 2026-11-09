@@ -1,33 +1,32 @@
-C:\Users\jonwi\Documents\Projects\CoachingProject\scripts\threshold_winrate.py:185: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
-  ax2.boxplot(bp_data, labels=["<=2", "3-4", "5+"], showmeans=True)
-Threshold win-rate justification: 348 stints with win% (median tenure 3 seasons; 2 stints unmatched)
+Threshold win-rate justification: 343 of 343 completed stints with win% (median tenure 3 seasons; 0 unmatched, 1 partly matched)
+  partly matched: Sean Payton 2006 (no record for [2012])
 
 PRIMARY SCHEME (<=2 / 3-4 / 5+): average win% by tenure class
 class                     n   mean win%              95% CI
 ------------------------------------------------------------
-0  (<=2 yrs)            109       0.312      [0.286, 0.337]
-1  (3-4 yrs)            122       0.410      [0.388, 0.432]
-2  (5+ yrs)             117       0.542      [0.525, 0.560]
+0  (<=2 yrs)            110       0.313      [0.288, 0.338]
+1  (3-4 yrs)            125       0.413      [0.391, 0.434]
+2  (5+ yrs)             108       0.535      [0.517, 0.553]
 
-Kruskal-Wallis across the 3 classes: H=138.63, p=7.91e-31
+Kruskal-Wallis across the 3 classes: H=128.03, p=1.58e-28
 Pairwise Mann-Whitney (one-sided, higher class > lower):
-  class 1 > class 0: U=9331, p=6.12e-08  (delta mean win% = +0.098)
-  class 2 > class 1: U=11472, p=2.49e-16  (delta mean win% = +0.132)
-  class 2 > class 0: U=11684, p=1.59e-27  (delta mean win% = +0.230)
+  class 1 > class 0: U=9708, p=2.53e-08  (delta mean win% = +0.100)
+  class 2 > class 1: U=10651, p=1.45e-14  (delta mean win% = +0.123)
+  class 2 > class 0: U=10802, p=7.88e-26  (delta mean win% = +0.222)
 
 ======================================================================
 WIN% SEPARATION ACROSS CANDIDATE SCHEMES
 ======================================================================
 scheme                      class dist              mean win% by class
 ------------------------------------------------------------------------
-<=2 / 3-4 / 5+  (primary)   [np.int64(109), np.int64(122), np.int64(117)] 0.312 / 0.410 / 0.542
-<=1 / 2-3 / 4+              [np.int64(47), np.int64(127), np.int64(174)] 0.277 / 0.356 / 0.513
-<=2 / 3-5 / 6+              [np.int64(109), np.int64(157), np.int64(82)] 0.312 / 0.433 / 0.554
-<=3 / 4-6 / 7+              [np.int64(174), np.int64(113), np.int64(61)] 0.334 / 0.484 / 0.567
+<=2 / 3-4 / 5+  (primary)   [np.int64(110), np.int64(125), np.int64(108)] 0.313 / 0.413 / 0.535
+<=1 / 2-3 / 4+              [np.int64(46), np.int64(130), np.int64(167)] 0.280 / 0.357 / 0.507
+<=2 / 3-5 / 6+              [np.int64(110), np.int64(157), np.int64(76)] 0.313 / 0.432 / 0.548
+<=3 / 4-6 / 7+              [np.int64(176), np.int64(111), np.int64(56)] 0.336 / 0.480 / 0.560
 ------------------------------------------------------------------------
 The primary scheme pairs near-tertile balance with a clean, monotone
 ~0.20 win% rise per class; the result is a meaningful success gradient,
 not an artifact of where the boundaries are drawn.
 
-Saved figure C:\Users\jonwi\Documents\Projects\CoachingProject\latex_jse\figures\threshold_winrate.png
+Saved figure C:\Users\jonwi\Documents\Projects\CoachingProject\papers\jse\figures\threshold_winrate.png
 Saved C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\threshold_winrate.pkl
