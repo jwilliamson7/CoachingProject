@@ -20,8 +20,8 @@ CoachingProject/
 │   └── notebooks/           # Archived Jupyter notebooks (v2-v5)
 ├── data/
 │   ├── models/              # Trained model files (.pkl)
-│   ├── master_data.csv      # THE single canonical modeling dataset: 364 hire stints,
-│   │                        #   101 modeled feature cols, un-imputed (1970+, hygiene +
+│   ├── master_data.csv      # THE single canonical modeling dataset: 365 hire stints,
+│   │                        #   102 modeled feature cols, un-imputed (1970+, hygiene +
 │   │                        #   corrected-tenure + engineered features). Built in one
 │   │                        #   pass by create_data.py. (No more _extended / svd_imputed
 │   │                        #   files — imputation is now fit per train split.)
@@ -176,10 +176,10 @@ project's live evaluation is the firing-survival pipeline; `CoachTenureModel` an
 
 ## Data Features and Architecture
 
-`data/master_data.csv` has **101 modeled feature columns** per hire (`iloc[:, 2:-2]`):
-the 51 base features built by `create_data.py` plus 50 engineered features appended by
+`data/master_data.csv` has **102 modeled feature columns** per hire (`iloc[:, 2:-2]`):
+the 51 base features built by `create_data.py` plus 51 engineered features appended by
 `engineer_career_features.build_modeling_dataset()`. (The old all-era 150-feature,
-four-parallel-block layout is retired.) 364 hire stints, 1970-2025: 316 fired, 26
+four-parallel-block layout is retired.) 365 hire stints, 1970-2025: 314 fired, 29
 voluntary, 22 still active at the start of the 2026 season.
 
 ### Data policies (JSE revision, 2026-10-28; documented in the online supplement)
@@ -194,11 +194,34 @@ voluntary, 22 still active at the start of the 2026 season.
   `org_expansion` (known list `EXPANSION_FIRST_SEASONS`), `hire_no_roster_data` /
   `hire_no_retention_data` (rosters begin 1970). After these, ZERO sporadic gaps remain.
   `cf_age_first_nfl` = age at hire when the hire is the first NFL job (a definition).
-- **Interim titles** never count as head-coach or unit-leading seasons (rank rows too);
-  `cf_ever_interim_hc` records them. Interim detection reads the un-deduped history.
+- **Interim years: the head-coaching side never counts toward unit stats** (base unit
+  block AND recent-form `rf_*`, one shared rule: `engineer.interim_seasons`): a season with
+  an interim title ("DC/Interim HC"), an HC ranks row the history doesn't show held
+  outright (Lynn 2016), or a head-coach season taken over mid-season (not the
+  Primary_Coach). A coordinator title held outright that season still counts on its own
+  side (Fisher 1994 keeps the defense, gets no offense); interim coordinator titles
+  ("QB/Interim OC") never count. Everything still counts as experience. Interim HC titles
+  never count as HC seasons; `cf_ever_interim_hc` records any prior interim year on the HC
+  side (title, mid-season takeover, or caretaker credit; not a suspension or a permanent
+  outside mid-season hire). Reads the un-deduped history.
 - **Mid-season takeovers:** PFR shows only "Head Coach" for a partial season, so insider
   status was verified from period sources (`analysis/midseason_takeovers_summary.md`);
-  `MIDSEASON_OUTSIDE_HIRES` recodes the four outside hires external.
+  `MIDSEASON_OUTSIDE_HIRES` recodes the outside hires external. `PRIMARY_COACH_OVERRIDES`
+  fixes Coach_WAR's tie-break (Fears opened the 1970 Saints, so Roberts anchors 1971);
+  a takeover in 1969, before the Primary_Coach table, is re-anchored by games coached
+  (Waller, 1969 AFL Chargers -> 1970).
+- **Role titles:** an excluded duty in a compound title excludes only itself
+  (`data_constants.coaching_title`: "Quarterbacks/Passing Game Coordinator" is a QB-coach
+  season). Career-path features (ages, employer counts, NFL share, years at the hiring
+  org, internal hire) count EVERY job in the record, including QC/GA/assistant titles:
+  `cf_age_first_nfl` is the age at which the NFL first appears. Coordinator seasons
+  missing from PFR's coach ranks table come from the team's season record.
+- **Outcome-label overrides** live in `analysis/event_verdicts.csv` (hand-coded verdicts,
+  keyed coach + last_year) and `analysis/predecessor_exits_prewindow.csv`; generated
+  files (`event_labels*.csv`, `master_data.csv`) are rebuilt by script, never edited.
+  Build order: create_data -> build_event_labels -> merge_event_labels -> create_data
+  (predecessor features read the labels). A losing final season is a firing however
+  described, except death/health (C) and a retirement announced before the final game (B).
 - **Predecessor** = the prior season's season-opening coach (Primary_Coach), never the
   hire himself. The 1996 Ravens inherit the 1995 Browns (`INHERITED_FRANCHISES`); the
   reactivated 1999 Browns inherit nothing.
@@ -259,8 +282,8 @@ misattribution bug that was fixed by making the locator try the standardized key
 - Population hygiene (Coach_WAR Primary_Coach resolution, in `create_data._classify_hire`):
   mid-season interim caretakers who never open a season as primary are NOT emitted;
   interim→permanent promotions are anchored at the season-opening year with the interim
-  partial HC season FOLDED into prior experience (performance + HC-year count + age/context
-  as-of the anchored year). `Sean Payton 2013` is a documented `EXCLUDED_HIRING_INSTANCES`
+  partial HC season FOLDED into prior experience (HC-year count + age/context as-of the
+  anchored year; as an interim year it adds no head-coaching unit statistics). `Sean Payton 2013` is a documented `EXCLUDED_HIRING_INSTANCES`
   override (2012 suspension creates a ranks gap that otherwise looks like a fresh hire).
 - Handles current coaches (hired 2022+ / still active) as tenure class -1 (insufficient
   data); these are right-censored in the survival pipeline.

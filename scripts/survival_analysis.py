@@ -205,7 +205,11 @@ def kaplan_meier_figure(dur, evt, df, boundary):
 
 
 def main():
-    df, X, y = load_modeling_data()
+    from scripts.survival_models import known_class   # (survival_models imports us)
+
+    # every stint: active coaches are right-censored survival rows; the class-based
+    # comparison below uses the stints that have a tenure class (known_class)
+    df, X, y = load_modeling_data(known_only=False)
     idx = shap_feature_ranking()[:best_k()]
     bk = len(idx)
     feat_cols = [f"f{i}" for i in range(bk)]
@@ -244,19 +248,20 @@ def main():
         cph = CoxPHFitter(penalizer=PENALIZER)
         cph.fit(tr_df, duration_col="T", event_col="E")
 
-        proba = surv_to_class_proba(cph, te_df)
+        ks = known_class(split)                  # held-out stints with a class
+        proba = surv_to_class_proba(cph, pd.DataFrame(ks.X_test, columns=feat_cols))
         pred = proba.argmax(axis=1)
-        m = ordinal_metrics(split.y_test, pred, proba, ORDINAL_CONFIG["class_names"])
+        m = ordinal_metrics(ks.y_test, pred, proba, ORDINAL_CONFIG["class_names"])
         for k in metrics:
             cox[k].append(m[k])
         # native C-index: higher partial hazard = higher risk = shorter tenure
         risk = cph.predict_partial_hazard(te_df).values
         cox["c_index"].append(concordance_index(Tte, -risk, Ete))
 
-        # ordinal classifier on the identical split (paired reference)
-        om = fit_model(split, ordinal_model, seed)
-        Xte = pd.DataFrame(split.X_test)
-        mc = ordinal_metrics(split.y_test, om.predict(Xte), om.predict_proba(Xte),
+        # ordinal classifier on the identical split (paired reference), class rows only
+        om = fit_model(ks, ordinal_model, seed)
+        Xte = pd.DataFrame(ks.X_test)
+        mc = ordinal_metrics(ks.y_test, om.predict(Xte), om.predict_proba(Xte),
                              ORDINAL_CONFIG["class_names"])
         for k in metrics:
             clf[k].append(mc[k])

@@ -1,0 +1,92 @@
+redundancy prune: 102 -> 81 feats (21 dropped)
+
+365 stints | 81 feats | fired=314 voluntary=29 active-censored=22 | seeds=50
+
+Stability selection: 2000 coach-level subsamples, top-K K in (10, 15, 20) (primary K=10, threshold 0.6)...
+
+Selection-frequency distribution: 75 candidates (structural indicators excluded), B=2000; Monte-Carlo SE = sqrt(p(1-p)/B)
+    #  feature                               variable                          q=10  (SE)      q=15  (SE)      q=20  (SE)  companions
+    1  Internal hire                         cf_internal_hire                0.998 (0.001)    0.999 (0.001)    0.999 (0.001)  -
+    2  Unit trajectory                       rf_unit_traj                    0.467 (0.011)    0.592 (0.011)    0.689 (0.010)  rf_no_trend, cf_no_unit_record
+    3  Age at hire                           age                             0.426 (0.011)    0.561 (0.011)    0.661 (0.011)  -
+    4  NFL career share                      cf_nfl_share                    0.416 (0.011)    0.530 (0.011)    0.624 (0.011)  -
+    5  Final unit percentile                 rf_final_unit_pctl              0.416 (0.011)    0.540 (0.011)    0.643 (0.011)  cf_no_unit_record
+    6  Inherited defensive SRS               tq_dsrs                         0.391 (0.011)    0.512 (0.011)    0.609 (0.011)  org_expansion
+    7  Prior-unit penalties                  Pen__unit                       0.344 (0.011)    0.462 (0.011)    0.556 (0.011)  cf_no_unit_record
+    8  Prior-unit fourth-down attempts       4DAtt__unit                     0.342 (0.011)    0.463 (0.011)    0.554 (0.011)  cf_no_unit_record, cf_no_drive_record
+    9  Inherited starter value               hire_starter_av                 0.339 (0.011)    0.472 (0.011)    0.586 (0.011)  org_expansion, hire_no_roster_data
+   10  Prior-unit time per drive             Time Average Drive__unit        0.331 (0.011)    0.445 (0.011)    0.519 (0.011)  cf_no_unit_record, cf_no_drive_record
+   11  Prior-unit completions                Cmp Passing__unit               0.311 (0.010)    0.410 (0.011)    0.502 (0.011)  cf_no_unit_record
+   12  Prior-unit yards-per-play efficiency  Y/P__unit                       0.237 (0.010)    0.364 (0.011)    0.451 (0.011)  cf_no_unit_record
+   13  Playoff appearances (prior 2 seasons) hiring_team_num_playoff_app     0.236 (0.009)    0.339 (0.011)    0.418 (0.011)  -
+   14  Inherited roster value                hire_roster_av                  0.191 (0.009)    0.283 (0.010)    0.356 (0.011)  org_expansion, hire_no_roster_data
+   15  Premium draft capital                 hire_premium_draft              0.180 (0.009)    0.282 (0.010)    0.363 (0.011)  org_expansion, hire_no_roster_data
+   16  Defensive retention                   hire_def_retention              0.176 (0.009)    0.272 (0.010)    0.363 (0.011)  org_expansion, hire_no_retention_data
+   17  Years as NFL position coach           num_yr_nfl_pos                  0.170 (0.008)    0.256 (0.010)    0.328 (0.010)  -
+   18  Prior-unit first downs by penalty     1stPy__unit                     0.153 (0.008)    0.235 (0.009)    0.317 (0.010)  cf_no_unit_record
+   19  Prior-unit rushing touchdowns         TD Rushing__unit                0.146 (0.008)    0.216 (0.009)    0.299 (0.010)  cf_no_unit_record
+   20  Age at first NFL job                  cf_age_first_nfl                0.141 (0.008)    0.221 (0.009)    0.291 (0.010)  -
+   21  Years at hiring org                   cf_years_at_hiring_org          0.139 (0.008)    0.227 (0.009)    0.303 (0.010)  -
+   22  Average team-success percentile       rf_avg_winpct_pctl              0.124 (0.007)    0.201 (0.009)    0.279 (0.010)  cf_no_unit_record
+   23  Inherited roster experience           hire_roster_exp                 0.121 (0.007)    0.197 (0.009)    0.268 (0.010)  org_expansion, hire_no_roster_data
+   24  Prior-unit passing first downs        1stD Passing__unit              0.118 (0.007)    0.190 (0.009)    0.271 (0.010)  cf_no_unit_record
+   25  Inherited starting-QB value           hire_qb_av                      0.112 (0.007)    0.185 (0.009)    0.254 (0.010)  org_expansion, hire_no_roster_data
+   26  NFL employers                         cf_num_nfl_employers            0.107 (0.007)    0.181 (0.009)    0.252 (0.010)  -
+   27  Inherited starter experience          hire_starter_exp                0.106 (0.007)    0.180 (0.009)    0.273 (0.010)  org_expansion, hire_no_roster_data
+   28  Hired from offensive role             cf_pre_side_off                 0.105 (0.007)    0.173 (0.008)    0.246 (0.010)  -
+   29  Ever NFL OC                           cf_ever_nfl_oc                  0.102 (0.007)    0.166 (0.008)    0.234 (0.009)  -
+   30  College head-coach years              num_yr_col_hc                   0.100 (0.007)    0.167 (0.008)    0.232 (0.009)  -
+   31  Prior HC stints                       num_times_hc                    0.098 (0.007)    0.159 (0.008)    0.225 (0.009)  -
+   32  Hiring-team turnovers committed       hiring_team_turnovers_commi     0.095 (0.007)    0.162 (0.008)    0.235 (0.009)  org_expansion
+   33  College employers                     cf_num_college_employers        0.091 (0.006)    0.159 (0.008)    0.222 (0.009)  -
+   34  Ever NFL DC                           cf_ever_nfl_dc                  0.090 (0.006)    0.157 (0.008)    0.226 (0.009)  -
+   35  Inherited SRS trajectory              tq_srs_traj                     0.090 (0.006)    0.155 (0.008)    0.233 (0.009)  org_expansion
+   36  Prior-unit yards per drive            Yds Average Drive__unit         0.088 (0.006)    0.159 (0.008)    0.233 (0.009)  cf_no_unit_record, cf_no_drive_record
+   37  Hired from OC role                    cf_pre_OC                       0.086 (0.006)    0.159 (0.008)    0.227 (0.009)  -
+   38  Prior-unit passing touchdowns         TD Passing__unit                0.083 (0.006)    0.128 (0.007)    0.184 (0.009)  cf_no_unit_record
+   39  Predecessor fired                     org_prev_fired                  0.081 (0.006)    0.135 (0.008)    0.204 (0.009)  org_expansion
+   40  Prior-unit red-zone rate              RZPct__unit                     0.078 (0.006)    0.140 (0.008)    0.201 (0.009)  cf_no_unit_record, cf_no_drive_record
+   41  NFL coordinator years                 num_yr_nfl_coor                 0.076 (0.006)    0.131 (0.008)    0.203 (0.009)  -
+   42  Prior-unit first downs                1stD__unit                      0.075 (0.006)    0.127 (0.007)    0.189 (0.009)  cf_no_unit_record
+   43  Prior-unit turnovers                  TO__unit                        0.070 (0.006)    0.130 (0.008)    0.188 (0.009)  cf_no_unit_record
+   44  Inherited offensive SRS               tq_osrs                         0.067 (0.006)    0.117 (0.007)    0.167 (0.008)  org_expansion
+   45  Prior-unit turnover percentage        TO%__unit                       0.065 (0.006)    0.134 (0.008)    0.192 (0.009)  cf_no_unit_record, cf_no_drive_record
+   46  Predecessor tenure                    org_prev_coach_tenure           0.064 (0.005)    0.100 (0.007)    0.148 (0.008)  org_expansion
+   47  Average unit percentile               rf_avg_unit_pctl                0.064 (0.005)    0.114 (0.007)    0.174 (0.008)  cf_no_unit_record
+   48  Prior-unit red-zone attempts          RZAtt__unit                     0.059 (0.005)    0.108 (0.007)    0.166 (0.008)  cf_no_unit_record, cf_no_drive_record
+   49  Prior-unit rush attempts              Att Rushing__unit               0.057 (0.005)    0.117 (0.007)    0.182 (0.009)  cf_no_unit_record
+   50  Prior-unit third-down rate            3D%__unit                       0.057 (0.005)    0.111 (0.007)    0.177 (0.009)  cf_no_unit_record, cf_no_drive_record
+   51  College position-coach years          num_yr_col_pos                  0.057 (0.005)    0.108 (0.007)    0.168 (0.008)  -
+   52  Prior-unit pass attempts              Att Passing__unit               0.055 (0.005)    0.112 (0.007)    0.167 (0.008)  cf_no_unit_record
+   53  Hired from position-coach role        cf_pre_POS                      0.055 (0.005)    0.107 (0.007)    0.175 (0.009)  -
+   54  College coordinator years             num_yr_col_coor                 0.052 (0.005)    0.101 (0.007)    0.169 (0.008)  -
+   55  Recent first-round picks              hire_recent_r1_picks            0.052 (0.005)    0.095 (0.007)    0.160 (0.008)  org_expansion, hire_no_roster_data
+   56  NFL head-coach years                  num_yr_nfl_hc                   0.051 (0.005)    0.110 (0.007)    0.167 (0.008)  -
+   57  Hired from NFL-level role             cf_pre_level_nfl                0.051 (0.005)    0.111 (0.007)    0.173 (0.008)  -
+   58  Prior-unit scoring percentage         Sc%__unit                       0.049 (0.005)    0.102 (0.007)    0.166 (0.008)  cf_no_unit_record, cf_no_drive_record
+   59  Head coaches in prior decade          org_unique_hc_10yr              0.048 (0.005)    0.103 (0.007)    0.158 (0.008)  -
+   60  Ever interim HC                       cf_ever_interim_hc              0.041 (0.004)    0.081 (0.006)    0.133 (0.008)  -
+   61  Prior-unit third-down attempts        3DAtt__unit                     0.041 (0.004)    0.097 (0.007)    0.158 (0.008)  cf_no_unit_record, cf_no_drive_record
+   62  Age at first job                      cf_age_first_job                0.037 (0.004)    0.081 (0.006)    0.141 (0.008)  -
+   63  Prior-unit yards per carry            Y/A Rushing__unit               0.037 (0.004)    0.076 (0.006)    0.121 (0.007)  cf_no_unit_record
+   64  Offensive retention                   hire_off_retention              0.035 (0.004)    0.082 (0.006)    0.134 (0.008)  org_expansion, hire_no_retention_data
+   65  Inherited strength of schedule        tq_sos                          0.033 (0.004)    0.069 (0.006)    0.111 (0.007)  org_expansion
+   66  Gap before hire                       cf_gap_before_hire              0.030 (0.004)    0.054 (0.005)    0.105 (0.007)  -
+   67  Hiring-team turnovers forced          hiring_team_turnovers_force     0.029 (0.004)    0.065 (0.005)    0.107 (0.007)  org_expansion
+   68  Prior-unit rushing yards              Yds Rushing__unit               0.028 (0.004)    0.075 (0.006)    0.135 (0.008)  cf_no_unit_record
+   69  Hired from head-coach role            cf_pre_HC                       0.028 (0.004)    0.065 (0.006)    0.111 (0.007)  -
+   70  Ranked seasons                        rf_n_seasons_rank               0.026 (0.004)    0.061 (0.005)    0.105 (0.007)  -
+   71  Hired from DC role                    cf_pre_DC                       0.021 (0.003)    0.053 (0.005)    0.101 (0.007)  -
+   72  Prior-unit drives                     #Dr__unit                       0.019 (0.003)    0.049 (0.005)    0.086 (0.006)  cf_no_unit_record, cf_no_drive_record
+   73  Prior-unit fourth-down rate           4D%__unit                       0.019 (0.003)    0.048 (0.005)    0.092 (0.006)  cf_no_unit_record, cf_no_drive_record
+   74  Prior-unit plays per drive            Plays Average Drive__unit       0.014 (0.003)    0.037 (0.004)    0.074 (0.006)  cf_no_unit_record, cf_no_drive_record
+   75  Prior-unit passing yards              Yds Passing__unit               0.011 (0.002)    0.038 (0.004)    0.071 (0.006)  cf_no_unit_record
+
+  candidates at or above each frequency, by q:
+    freq >= 0.5: q=10:  1  q=15:  6  q=20: 11
+    freq >= 0.6: q=10:  1  q=15:  1  q=20:  6
+    freq >= 0.7: q=10:  1  q=15:  1  q=20:  1
+    freq >= 0.8: q=10:  1  q=15:  1  q=20:  1
+    freq >= 0.9: q=10:  1  q=15:  1  q=20:  1
+
+Saved C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\survival_selection_distribution.pkl

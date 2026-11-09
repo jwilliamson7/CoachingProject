@@ -50,7 +50,7 @@ COACH_WAR_COMBINED = Path(
 # missing "Passing Game Coordinator", "Pass Gm. Coord." and "Associate Head Coach"),
 # so the base-builder and the feature-engineer disagreed on 28 role-seasons. Import,
 # don't duplicate, so the two classifiers can never drift again.
-from data_constants import EXCLUDED_ROLE_KEYWORDS, get_all_feature_names
+from data_constants import coaching_title, get_all_feature_names
 
 # Drive and situational unit statistics, which PFR records only from about the 1999
 # season; a coach whose record predates them has a unit record but no drive record.
@@ -68,19 +68,22 @@ def unit_block_columns():
              if n.endswith("__unit") and n[:-len("__unit")] in DRIVE_ERA_STATS]
     return unit, drive
 
-OFF_KW = ["offensive", "quarterback", "running back", "wide receiver", "tight end",
+OFF_KW = ["offensive", "quarterback", "running back", "receiver", "tight end",
           "o-line", "passing game", "pass game"]
 DEF_KW = ["defensive", "linebacker", "defensive back", "secondary", "cornerback",
           "safet", "d-line", "nickel", "pass rush", "run game coordinator/def"]
+# Position abbreviations, matched as whole words ("TE", "WR Coach", "LBs")
+OFF_ABBR = {"qb", "qbs", "rb", "rbs", "wr", "wrs", "te", "tes", "ol"}
+DEF_ABBR = {"lb", "lbs", "db", "dbs", "dl", "cb", "cbs"}
 
 
 def classify_role(role):
     """Return one of: HC, OC, DC, STC, POS, NONE (mirrors create_data logic)."""
     if not isinstance(role, str) or not role.strip():
         return "NONE"
-    for kw in EXCLUDED_ROLE_KEYWORDS:
-        if kw in role:
-            return "NONE"
+    role = coaching_title(role)   # drop excluded duties from compound titles
+    if not role:
+        return "NONE"
     if ("Assistant" in role or "Asst" in role) and "/" not in role and "\\" not in role:
         return "NONE"
     if "Head Coach" in role and "Ass" not in role and "Interim" not in role:
@@ -99,8 +102,9 @@ def classify_role(role):
 def role_side(role):
     """Return 'off', 'def', or 'other' based on the role string."""
     r = str(role).lower()
-    is_off = any(k in r for k in OFF_KW)
-    is_def = any(k in r for k in DEF_KW)
+    words = set(re.findall(r"[a-z]+", r))
+    is_off = any(k in r for k in OFF_KW) or bool(words & OFF_ABBR)
+    is_def = any(k in r for k in DEF_KW) or bool(words & DEF_ABBR)
     if is_off and not is_def:
         return "off"
     if is_def and not is_off:
@@ -309,11 +313,15 @@ PRIMARY_COACH_START = 1970
 # Mid-season appointments hired from OUTSIDE the organization, keyed by anchored hire
 # year. PFR lists only "Head Coach" for a partial season (earlier same-season roles are
 # not recorded), so the data cannot separate these from staff or front-office insiders
-# promoted mid-season, and the prior-season rule codes all of them internal. All 16
+# promoted mid-season, and the prior-season rule codes all of them internal. All 18
 # such takeovers were checked against contemporaneous sources
 # (analysis/midseason_takeovers_summary.md): six were verified insiders (Khayat 1971,
 # Svare 1971, Gillman 1973, McVay 1976, Hudspeth 1976, Rice 1978) and stay internal;
-# these four were outside appointments and are recoded external.
+# these four were outside appointments and are recoded external. J.D. Roberts (Saints,
+# took over in November 1970; anchored 1971 once PRIMARY_COACH_OVERRIDES restores Fears
+# as the 1970 opener) stays internal: he came from the Richmond Roadrunners, the Saints'
+# minor-league affiliate, after two seasons as a Saints scout and linebackers coach, so
+# he was inside the organization (author decision, 2026-10-29).
 MIDSEASON_OUTSIDE_HIRES = {("Don Coryell", 1979), ("Raymond Berry", 1985),
                            ("Marv Levy", 1987), ("Ron Meyer", 1987)}
 
@@ -335,13 +343,20 @@ def tier1_features(hist, hire_year):
 
     pre = hist[hist["Year"] < hire_year].copy().sort_values("Year")
     pre["rtype"] = pre["Role"].apply(classify_role)
+    # Career-path measures (ages, employers, NFL share, years at the hiring
+    # organization) count every job in the record, including the entry-level titles
+    # (quality control, graduate or generic assistant) that the role-year counters
+    # skip: the age at a coach's first NFL job is the age at which the NFL first
+    # appears in his record. Role measures (most recent role, gap since the last
+    # coaching season) use coaching seasons only.
+    career = pre[pre["Role"].astype(str).str.strip().ne("") & pre["Role"].notna()]
     coaching = pre[pre["rtype"] != "NONE"]
-    if len(coaching) == 0:
+    if len(career) == 0:
         return f
 
-    years = coaching["Year"].values
     nfl_rows = coaching[coaching["Level"].apply(is_nfl)]
-    col_rows = coaching[coaching["Level"].astype(str).str.contains("College")]
+    nfl_career = career[career["Level"].apply(is_nfl)]
+    col_career = career[career["Level"].astype(str).str.contains("College")]
 
     # structural-missingness indicators for the OC / DC performance blocks
     f["cf_ever_nfl_oc"] = int(any(classify_role(rr) == "OC" for rr in nfl_rows["Role"]))
@@ -349,24 +364,28 @@ def tier1_features(hist, hire_year):
 
     # Relocation-aware employer counts (year-based franchise identity for NFL)
     nfl_keys = {canon_employer(e, l, y)
-                for e, l, y in zip(nfl_rows["Employer"], nfl_rows["Level"], nfl_rows["Year"])}
+                for e, l, y in zip(nfl_career["Employer"], nfl_career["Level"], nfl_career["Year"])}
     col_keys = {canon_employer(e, l, y)
-                for e, l, y in zip(col_rows["Employer"], col_rows["Level"], col_rows["Year"])}
+                for e, l, y in zip(col_career["Employer"], col_career["Level"], col_career["Year"])}
     f["cf_num_nfl_employers"] = int(len(nfl_keys))
     f["cf_num_college_employers"] = int(len(col_keys))
-    f["cf_nfl_share"] = len(nfl_rows) / len(coaching)
+    # share of career SEASONS spent in the NFL (a season can carry several titles)
+    f["cf_nfl_share"] = nfl_career["Year"].nunique() / career["Year"].nunique()
 
-    if "Age" in coaching.columns:
-        ages = pd.to_numeric(coaching["Age"], errors="coerce")
+    if "Age" in career.columns:
+        ages = pd.to_numeric(career["Age"], errors="coerce")
         f["cf_age_first_job"] = float(ages.min()) if ages.notna().any() else np.nan
-        nfl_ages = pd.to_numeric(nfl_rows["Age"], errors="coerce") if len(nfl_rows) else pd.Series(dtype=float)
+        nfl_ages = pd.to_numeric(nfl_career["Age"], errors="coerce") if len(nfl_career) else pd.Series(dtype=float)
         if len(nfl_ages) and nfl_ages.notna().any():
             f["cf_age_first_nfl"] = float(nfl_ages.min())
         else:
-            # no prior NFL coaching (college-to-NFL jump): this hire IS the first
-            # NFL job, so the value is the age at hire (a definition, not an imputation)
+            # no prior NFL job (college-to-NFL jump): this hire IS the first NFL
+            # job, so the value is the age at hire (a definition, not an imputation)
             hire_age = pd.to_numeric(hist.loc[hist["Year"] == hire_year, "Age"], errors="coerce")
             f["cf_age_first_nfl"] = float(hire_age.min()) if hire_age.notna().any() else np.nan
+    if len(coaching) == 0:
+        return f
+    years = coaching["Year"].values
     f["cf_gap_before_hire"] = hire_year - int(years.max()) - 1
 
     # hiring franchise: employer in the hire-year row whose role is Head Coach
@@ -386,14 +405,14 @@ def tier1_features(hist, hire_year):
     # itself, which correctly codes staff (and front-office) promotions as internal.
     # The verified mid-season OUTSIDE appointments are recoded in
     # build_modeling_dataset via MIDSEASON_OUTSIDE_HIRES.
-    prior = coaching[coaching["Year"] == hire_year - 1]
+    prior = career[career["Year"] == hire_year - 1]
     prior_keys = {canon_employer(e, l, y)
                   for e, l, y in zip(prior["Employer"], prior["Level"], prior["Year"])}
     f["cf_internal_hire"] = int(hiring_key in prior_keys) if hiring_key else 0
-    # consecutive seasons at the hiring franchise immediately before the hire
+    # consecutive seasons at the hiring franchise immediately before the hire, in any job
     yrs_at_org = 0
     if hiring_key:
-        org_years = {int(y) for e, l, y in zip(coaching["Employer"], coaching["Level"], coaching["Year"])
+        org_years = {int(y) for e, l, y in zip(career["Employer"], career["Level"], career["Year"])
                      if canon_employer(e, l, y) == hiring_key}
         yr = hire_year - 1
         while yr in org_years:
@@ -425,49 +444,198 @@ def _unit_col(role):
     return "Pts±"   # HC -> net point differential rank
 
 
-def _interim_rank_row(row, hist):
-    """True if a ranks-table row records an INTERIM appointment (e.g. PFR history
-    "TE Coach/Interim Head Coach" or "QB Coach/Interim OC") rather than a season the
-    coach held that title outright. Interim stints are excluded from the unit block
-    by classify_role, so they are excluded here too, keeping the two consistent."""
-    title = str(row.get("Role", "")).upper()
-    pat = _INTERIM_TITLE.get(title)
-    if pat is None or hist is None:
+def interim_seasons(coach, raw_hist, ranks=None):
+    """Interim years, whose HEAD-COACHING side never counts toward a coach's unit
+    statistics, in either the base unit block (create_data) or the recent-form features
+    (tier2). A coordinator title held outright that season still counts, on its own side
+    of the ball: a defensive coordinator named interim head coach (Fisher 1994) keeps
+    that season's defense and gets no offense. Every other title counts as experience
+    only. A season is an interim year when the coach
+      - held an interim title in it ("Defensive Coordinator/Interim HC",
+        "QB Coach/Interim OC");
+      - is credited with a head-coaching season in PFR's ranks table that his history
+        does not show him holding outright (Lynn 2016, a one-game caretaker stint
+        listed under his OC title); or
+      - took over as head coach mid-season, so the season was not his to open
+        (Coach_WAR Primary_Coach from 1970, with PRIMARY_COACH_OVERRIDES; before the
+        table, _took_over_pre_table). Most of that season was coached by his
+        predecessor; or
+      - was suspended for it (Payton 2012: the history keeps his head-coach title for a
+        season he did not coach).
+    Needs the un-deduplicated history, whose split rows can carry the interim title."""
+    out = set()
+    if raw_hist is None or not len(raw_hist):
+        return out
+    years = lambda d: pd.to_numeric(d["Year"], errors="coerce")
+    raw_hist = raw_hist[years(raw_hist).notna()].assign(Year=lambda d: years(d).astype(int))
+    if ranks is not None:
+        ranks = ranks[years(ranks).notna()].assign(Year=lambda d: years(d).astype(int))
+    nfl = raw_hist[raw_hist["Level"].apply(is_nfl)]
+    for y, g in nfl.groupby("Year"):
+        roles = g["Role"].astype(str)
+        if any(roles.str.contains(pat).any() for pat in _INTERIM_TITLE.values()):
+            out.add(int(y))
+        if roles.str.contains("suspended", case=False).any():
+            out.add(int(y))
+    hc_years = {int(y) for y, r in zip(nfl["Year"], nfl["Role"]) if classify_role(r) == "HC"}
+    if ranks is not None:
+        nfl_years = set(nfl["Year"].astype(int))
+        for y, t in zip(ranks["Year"].astype(int), ranks["Role"].astype(str).str.upper()):
+            if t == "HC" and y not in hc_years and y in nfl_years:
+                out.add(y)
+    for y in hc_years:
+        took_over = (_is_primary(_primary_idx(), coach, y) is False if y >= PRIMARY_COACH_START
+                     else _took_over_pre_table(coach, y))
+        if took_over:
+            out.add(y)
+    return out
+
+
+def _coordinator_held(hist, year):
+    """'OC' or 'DC' if the coach held that coordinator title outright in an NFL season
+    (offense first if both), else None."""
+    if hist is None:
+        return None
+    rows = hist[(hist["Year"] == year) & hist["Level"].apply(is_nfl)]
+    held = {classify_role(r) for r in rows["Role"]}
+    return next((r for r in ("OC", "DC") if r in held), None)
+
+
+_FRANCHISE_HC = None
+
+
+def _franchise_hc():
+    """build_franchise_hc_history(), built once per process."""
+    global _FRANCHISE_HC
+    if _FRANCHISE_HC is None:
+        _FRANCHISE_HC = build_franchise_hc_history()
+    return _FRANCHISE_HC
+
+
+def _took_over_pre_table(coach, year):
+    """Before the Primary_Coach table: True if the coach took over as head coach during
+    `year`. He shared the club's season with another head coach and had not led the
+    club the season before, and either one of the others had (the continuing coach
+    opened the season: Gillman for the 1969 AFL Chargers, whom Waller replaced; Collier
+    for the 1968 Bills, whom Harvey Johnson replaced, though Johnson was not kept) or,
+    when no one continued, he was the one kept the next season. A coach who opened a
+    season and was fired during it is not a takeover."""
+    h = load_history(coach)
+    if h is None:
         return False
-    roles = hist.loc[(hist["Year"] == row["Year"]) & hist["Level"].apply(is_nfl), "Role"]
-    roles = roles.astype(str)
-    held_outright = any(classify_role(r) == title for r in roles)
-    return bool(roles.str.contains(pat).any()) and not held_outright
+    rows = h[(h["Year"] == year) & h["Level"].apply(is_nfl)]
+    rows = rows[[classify_role(r) == "HC" for r in rows["Role"]]]
+    if rows.empty:
+        return False
+    r = rows.iloc[0]
+    by_year = _franchise_hc().get(canon_employer(r["Employer"], r["Level"], year), {})
+    cur, prev = by_year.get(year, set()), by_year.get(year - 1, set())
+    if len(cur) < 2 or coach in prev:
+        return False
+    return bool((cur - {coach}) & prev) or coach in by_year.get(year + 1, set())
 
 
-def interim_features(raw_hist, hire_year):
-    """Held an interim head-coach title in a prior NFL season. Interim appointments
-    never count as head-coaching or unit-leading seasons anywhere in the feature set;
-    this flag records the experience instead. Needs the un-deduplicated history."""
+def _team_rank_row(employer, year, role):
+    """A ranks-table-style row for a season PFR's coach ranks omit (e.g. Tobin's
+    1994-95 Colts defenses), built from the team's own season record: points scored,
+    points allowed and net-points ranks, league size, and a win-pct rank within that
+    season's league. None if the team-season cannot be located."""
+    from data_constants import standardize_team_abbreviation
+    abbr = name2abbr().get(str(employer).strip().lower())
+    if not abbr:
+        return None
+    lk = _team_record_lookup()
+    r = lk.get((standardize_team_abbreviation(abbr, year).lower(), year))
+    if r is None:
+        return None
+    num = lambda v, c: float(pd.to_numeric(pd.Series([v.get(c)]), errors="coerce").fillna(0).iloc[0])
+    wp = lambda v: (num(v, "W") + 0.5 * num(v, "T")) / max(num(v, "W") + num(v, "L") + num(v, "T"), 1)
+    peers = [v for (_, y), v in lk.items() if y == year and v.get("Lg") == r.get("Lg")]
+    return {"Year": year, "Role": role, "Tms": r.get("out of"),
+            "WL%": 1 + sum(wp(v) > wp(r) for v in peers),
+            "Pts": r.get("Pts"), "Pts_2": r.get("Pts Def Rank"), "Pts±": r.get("Pts±")}
+
+
+def _unranked_unit_seasons(ranks, hist, hire_year, interim=()):
+    """Ranks-style rows for prior NFL seasons the history shows as an outright HC, OC or
+    DC season but PFR's coach ranks table lacks (in an interim year, a coordinator
+    title only)."""
+    if hist is None:
+        return []
+    have = set() if ranks is None else set(ranks["Year"].astype(int))
+    out = []
+    pre = hist[(hist["Year"] < hire_year) & hist["Level"].apply(is_nfl)]
+    for y, g in pre.groupby("Year"):
+        if int(y) in have:
+            continue
+        held = {classify_role(r) for r in g["Role"]}
+        if int(y) in interim:
+            held.discard("HC")
+        role = next((r for r in ("HC", "OC", "DC") if r in held), None)
+        if role:
+            emp = g.loc[g["Role"].apply(classify_role) == role, "Employer"].iloc[0]
+            row = _team_rank_row(emp, int(y), role)
+            if row is not None:
+                out.append(row)
+    return out
+
+
+def interim_features(raw_hist, hire_year, coach=None, ranks=None):
+    """Served as an interim head coach in a prior NFL season: an interim head-coach
+    title, or a head-coaching season that interim_seasons marks as an interim year (a
+    mid-season takeover, or a caretaker stint PFR credits without the title, as with
+    Lynn in 2016). PFR titles many interim coaches plain "Head Coach" (Garrett and
+    Frazier in 2010), so the title alone misses them. A suspension (Payton 2012) is not
+    interim service, nor is the takeover season of a mid-season hire appointed
+    permanently from outside (MIDSEASON_OUTSIDE_HIRES). Interim seasons never count as
+    head-coaching or unit-leading seasons anywhere in the feature set; this flag records
+    the experience instead. Needs the un-deduplicated history."""
     if raw_hist is None:
         return {"cf_ever_interim_hc": np.nan}
-    pre = raw_hist[(raw_hist["Year"] < hire_year) & raw_hist["Level"].apply(is_nfl)]
-    return {"cf_ever_interim_hc": int(pre["Role"].astype(str).str.contains(_INTERIM_HC).any())}
+    year = pd.to_numeric(raw_hist["Year"], errors="coerce")
+    pre = raw_hist[(year < hire_year) & raw_hist["Level"].apply(is_nfl)]
+    if pre["Role"].astype(str).str.contains(_INTERIM_HC).any():
+        return {"cf_ever_interim_hc": 1}
+    roles = list(zip(pd.to_numeric(pre["Year"]).astype(int), pre["Role"].astype(str)))
+    hc = {y for y, r in roles if classify_role(r) == "HC"}
+    if ranks is not None:
+        hc |= {int(y) for y, t in zip(pd.to_numeric(ranks["Year"], errors="coerce"),
+                                      ranks["Role"].astype(str).str.upper())
+               if t == "HC" and y == y and y < hire_year}
+    suspended = {y for y, r in roles if "suspended" in r.lower()}
+    held = {y for y in interim_seasons(coach, raw_hist, ranks) if y < hire_year} & hc
+    held -= suspended
+    if (coach, hire_year) in MIDSEASON_OUTSIDE_HIRES:
+        held.discard(hire_year - 1)
+    return {"cf_ever_interim_hc": int(bool(held))}
 
 
-def tier2_features(ranks, hire_year, hist=None):
+def tier2_features(ranks, hire_year, hist=None, coach=None):
     """Side-appropriate unit performance + team success from prior ranked seasons.
 
     For each prior season the coach's OWN unit is used: offensive points rank when
     they were OC, DEFENSIVE points-allowed rank when DC, net point differential
     when HC. Ranks are converted to percentiles (1=best) normalized by league size.
-    Seasons where the title was held only on an interim basis are dropped.
+    In an interim year (interim_seasons) a row is scored on the coordinator title held
+    outright that season and dropped if there is none, exactly as in the base unit
+    block; outright unit seasons missing from PFR's coach ranks come from the team's
+    season record.
     """
     f = {k: np.nan for k in ["rf_final_unit_pctl", "rf_avg_unit_pctl",
                              "rf_unit_traj", "rf_final_winpct_pctl",
                              "rf_avg_winpct_pctl", "rf_n_seasons_rank"]}
     f["rf_no_trend"] = 0
-    if ranks is None:
-        f["rf_n_seasons_rank"] = 0
-        return f
-    pre = ranks[ranks["Year"] < hire_year].sort_values("Year")
-    if hist is not None and len(pre):
-        pre = pre[~pre.apply(lambda r: _interim_rank_row(r, hist), axis=1)]
+    interim = interim_seasons(coach, hist, ranks)
+    pre = ranks[ranks["Year"] < hire_year].copy() if ranks is not None else pd.DataFrame()
+    if len(pre):
+        pre["Role"] = [_coordinator_held(hist, int(y)) if int(y) in interim else r
+                       for y, r in zip(pre["Year"], pre["Role"])]
+        pre = pre[pre["Role"].notna()]
+    extra = _unranked_unit_seasons(ranks, hist, hire_year, interim)
+    if extra:
+        pre = pd.concat([pre, pd.DataFrame(extra)], ignore_index=True)
+    if len(pre):
+        pre = pre.sort_values("Year")
     f["rf_n_seasons_rank"] = int(len(pre))
     if len(pre) == 0:
         return f
@@ -619,8 +787,9 @@ def classify_exit(coach, hire_year, boundary, retire_age=DEFAULT_RETIRE_AGE):
 # As of the single-builder consolidation, create_data._process_coach_career applies
 # this hygiene AT THE SOURCE (via _classify_hire): interim-only caretakers are never
 # emitted, and an interim->permanent promotion is built directly at the season-opening
-# year with the interim partial HC season FOLDED INTO prior experience (its unit
-# performance + the HC-year count + age/context as-of the anchored year). So there is
+# year with the interim partial HC season FOLDED INTO prior experience (the HC-year
+# count + age/context as-of the anchored year; as an interim year it adds no
+# head-coaching unit statistics, see interim_seasons). So there is
 # no longer any one-season feature staleness. clean_population below now runs only as a
 # VERIFICATION GUARD on the already-clean data -- it reuses the same classify_hire_
 # instance logic and is expected to report "dropped 0, re-anchored 0".
@@ -636,6 +805,14 @@ COACH_WAR_HC_TABLE = Path(
 DUPLICATE_HIRE_INSTANCES = []
 
 
+# Corrections to the Coach_WAR Primary_Coach table, keyed (season, a coach named in
+# that team-season) -> the coach who actually opened the season. Coach_WAR breaks a
+# tie in games coached by prior-year continuity, which is unavailable in the table's
+# first season: Tom Fears opened the 1970 Saints and was fired after a 1-5-1 start,
+# and J.D. Roberts coached the last seven games.
+PRIMARY_COACH_OVERRIDES = {(1970, "J.D. Roberts"): "Tom Fears"}
+
+
 def _primary_coach_index():
     """year -> list of (set(coach names sharing the team-year), primary coach).
     Primary = season-opening / prior-year-continuity coach (Coach_WAR rule)."""
@@ -643,8 +820,11 @@ def _primary_coach_index():
     by_year = {}
     for _, r in hc.iterrows():
         names = {n.strip() for n in str(r["Combined_Coach"]).split("/")}
-        by_year.setdefault(int(r["Year"]), []).append(
-            (names, str(r["Primary_Coach"]).strip()))
+        prim = str(r["Primary_Coach"]).strip()
+        for (y, member), opener in PRIMARY_COACH_OVERRIDES.items():
+            if int(r["Year"]) == y and member in names:
+                prim = opener
+        by_year.setdefault(int(r["Year"]), []).append((names, prim))
     return by_year
 
 
@@ -723,6 +903,17 @@ def build_franchise_hc_history():
 _PRIMARY_IDX = None
 
 
+def _primary_idx():
+    """Cached _primary_coach_index ({} if the Coach_WAR table is unavailable)."""
+    global _PRIMARY_IDX
+    if _PRIMARY_IDX is None:
+        try:
+            _PRIMARY_IDX = _primary_coach_index()
+        except Exception:
+            _PRIMARY_IDX = {}
+    return _PRIMARY_IDX
+
+
 def _franchise_hc_years(hc_hist, fkey, hire_year):
     """A franchise's head-coach seasons as its ORGANIZATION experienced them: the
     Ravens include the Browns' seasons through 1995, and the reactivated Browns
@@ -745,14 +936,8 @@ def _predecessor(names, year, years_hc, exclude):
     two head coaches (a mid-season change), picking one arbitrarily could return the
     hire's own partial season or a one-game caretaker. Falls back to the
     longest-serving remaining coach if the table lacks the team-year."""
-    global _PRIMARY_IDX
-    if _PRIMARY_IDX is None:
-        try:
-            _PRIMARY_IDX = _primary_coach_index()
-        except Exception:
-            _PRIMARY_IDX = {}
     cands = set(names) - {exclude}
-    for team_names, prim in _PRIMARY_IDX.get(year, []):
+    for team_names, prim in _primary_idx().get(year, []):
         if team_names & set(names) and prim in cands:
             return prim
 
@@ -767,7 +952,8 @@ def _predecessor(names, year, years_hc, exclude):
 def tier5_features(hist, hire_year, hc_hist, coach=None):
     """Org instability: previous coach's tenure + distinct HCs in the prior decade
     (a re-anchored mid-season takeover's own partial season is not counted)."""
-    f = {"org_prev_coach_tenure": np.nan, "org_unique_hc_10yr": np.nan, "org_expansion": np.nan}
+    f = {"org_prev_coach_tenure": np.nan, "org_unique_hc_10yr": np.nan, "org_expansion": np.nan,
+         "org_prev_fired": np.nan}
     name, level = hiring_team_info(hist, hire_year)
     if not name:
         return f
@@ -786,36 +972,106 @@ def tier5_features(hist, hire_year, hc_hist, coach=None):
         uniq |= (s - {coach}) if y == hire_year - 1 else s
     f["org_unique_hc_10yr"] = len(uniq)  # 0 is meaningful (e.g., expansion team)
 
-    # previous coach tenure: the coach replaced, counted consecutively backwards
+    # previous coach tenure: the coach replaced. A stint in the sample uses its own
+    # anchored tenure, so a predecessor's partial takeover season is folded into his
+    # prior experience as everywhere else (Garrett's Dallas stint is 9 seasons, not
+    # 10); a stint that began before the window is counted consecutively backwards.
     prev = years_hc.get(hire_year - 1)
     pc = _predecessor(prev, hire_year - 1, years_hc, coach) if prev else None
     if pc:
-        t, y = 0, hire_year - 1
-        while pc in years_hc.get(y, set()):
-            t += 1
-            y -= 1
-        f["org_prev_coach_tenure"] = t
+        fired, tenure = _predecessor_exit(pc, hire_year - 1)
+        if tenure != tenure:
+            tenure, y = 0, hire_year - 1
+            while pc in years_hc.get(y, set()):
+                tenure += 1
+                y -= 1
+        f["org_prev_coach_tenure"] = tenure
+        f["org_prev_fired"] = fired
     return f
 
 
+_PRED_EXITS = None
+
+
+def _predecessor_exit(coach, last_season):
+    """(fired, tenure) for the predecessor's stint ending in last_season. fired is 1
+    if it ended in involuntary non-retention, 0 if he left voluntarily while still
+    wanted (same protocol as the outcome). Read from the outcome labels
+    (analysis/event_labels_final.csv, which also give the anchored tenure) for stints
+    in the sample, and from analysis/predecessor_exits_prewindow.csv (tenure NaN) for
+    stints that began before 1970. The labels file is built from master_data, so after
+    a change to stints or outcomes rebuild the labels and then rerun create_data."""
+    global _PRED_EXITS
+    if _PRED_EXITS is None:
+        _PRED_EXITS = {}
+        pw = project_root / "analysis" / "predecessor_exits_prewindow.csv"
+        if pw.exists():
+            t = pd.read_csv(pw)
+            _PRED_EXITS.update({(c, int(y)): (int(e), np.nan)
+                                for c, y, e in zip(t["predecessor"], t["last_season"], t["event"])})
+        lab = project_root / "analysis" / "event_labels_final.csv"
+        if lab.exists():
+            t = pd.read_csv(lab)
+            _PRED_EXITS.update({(c, int(y)): (int(e), int(d)) for c, y, e, d
+                                in zip(t["coach"], t["last_year"], t["event"], t["duration"])})
+    return _PRED_EXITS.get((coach, int(last_season)), (np.nan, np.nan))
+
+
 _ROSTER_LKUP = None
-_RET_COLS = None
 
 
 def _roster_lookup():
     """(Team, Year) -> row dict from the Coach_WAR combined team-year dataset."""
-    global _ROSTER_LKUP, _RET_COLS
+    global _ROSTER_LKUP
     if _ROSTER_LKUP is None:
         cw = pd.read_csv(COACH_WAR_COMBINED)
-        _RET_COLS = [c for c in cw.columns
-                     if c.endswith("_Retention_Rate_Pct") and not c.endswith("_crosstab")]
         _ROSTER_LKUP = cw.set_index(["Team", "Year"]).to_dict("index")
     return _ROSTER_LKUP
 
 
-# Position groups for offense/defense retention splits (Coach_WAR convention)
-_OFF_POS = ["QB", "RB", "WR", "TE", "OL"]
-_DEF_POS = ["DL", "LB", "CB", "S"]
+# Roster retention is computed here from the raw PFR team rosters rather than taken
+# from the Coach_WAR combined file, whose position-group retention mapped starters'
+# side-specific codes (RDE, LCB, LOLB, ...) to no group and so reported 0% where the
+# rosters show otherwise (1984->85 Vikings defense: 0% reported, 13 of 29 defenders
+# returned). Coach_WAR's mapping is now fixed, but its rates still count a player as
+# retained only within his position group. For the inherited roster the question is
+# continuity of personnel, so here a player is retained if he is on the next season's
+# roster at ANY position; position (first listed code, previous season) only assigns
+# him to the offense or defense split.
+COACH_WAR_ROSTERS = COACH_WAR_COMBINED.parent.parent / "raw" / "Rosters"
+_OFF_CODES = {"QB", "RB", "HB", "FB", "TB", "WR", "FL", "SE", "TE", "C", "G", "T", "OL",
+              "OG", "OT", "LT", "RT", "LG", "RG"}
+_DEF_CODES = {"DE", "DT", "NT", "DL", "LDE", "RDE", "LDT", "RDT", "LB", "MLB", "ILB",
+              "OLB", "LLB", "RLB", "LOLB", "ROLB", "LILB", "RILB", "DB", "CB", "LCB",
+              "RCB", "S", "SS", "FS", "SAF"}
+_ROSTERS = {}
+
+
+def _roster(team, year):
+    """(player name, side) for a franchise-season's PFR roster; None if absent."""
+    key = (team, year)
+    if key not in _ROSTERS:
+        f = COACH_WAR_ROSTERS / team / f"{team.lower()}_{year}_roster.csv"
+        if f.exists():
+            r = pd.read_csv(f, usecols=["Player", "Pos"])
+            code = r["Pos"].astype(str).str.upper().str.split("/").str[0].str.strip()
+            side = np.where(code.isin(_OFF_CODES), "off", np.where(code.isin(_DEF_CODES), "def", "other"))
+            _ROSTERS[key] = pd.DataFrame({"name": r["Player"].astype(str).str.strip().str.upper(),
+                                          "side": side})
+        else:
+            _ROSTERS[key] = None
+    return _ROSTERS[key]
+
+
+def roster_retention(team_from, team_to, year_to):
+    """Percent of the year_to-1 roster still on the year_to roster: overall, offense,
+    defense (sides by the earlier season's position)."""
+    a, b = _roster(team_from, year_to - 1), _roster(team_to, year_to)
+    if a is None or b is None or not len(a):
+        return np.nan, np.nan, np.nan
+    kept = a["name"].isin(set(b["name"]))
+    pct = lambda m: float(100 * kept[m].mean()) if m.any() else np.nan
+    return float(100 * kept.mean()), pct(a["side"] == "off"), pct(a["side"] == "def")
 
 
 def tier6_features(hist, hire_year):
@@ -830,7 +1086,7 @@ def tier6_features(hist, hire_year):
     keys = ["hire_qb_av", "hire_roster_av", "hire_starter_av", "hire_starter_age",
             "hire_roster_age", "hire_starter_exp", "hire_roster_exp",
             "hire_recent_r1_picks", "hire_premium_draft",
-            "hire_roster_turnover", "hire_off_retention", "hire_def_retention"]
+            "hire_roster_retention", "hire_off_retention", "hire_def_retention"]
     f = {k: np.nan for k in keys}
     name, _ = hiring_team_info(hist, hire_year)
     if not name:
@@ -852,28 +1108,23 @@ def tier6_features(hist, hire_year):
     f["hire_roster_age"] = row.get("Avg_Roster_Age", np.nan)
     f["hire_starter_exp"] = row.get("Avg_Starter_Experience", np.nan)
     f["hire_roster_exp"] = row.get("Avg_Roster_Experience", np.nan)
-    # draft capital: R1 (recent) and premium R1+R2 over the prior 3 years
-    r1 = 0.0
-    for c in ["Current_Round_1_Picks", "Prev_1Yr_Round_1_Picks", "Prev_2Yr_Round_1_Picks"]:
-        v = row.get(c)
-        r1 += v if v == v and v is not None else 0.0
-    f["hire_recent_r1_picks"] = r1
-    prem, any_prem = 0.0, False
-    for c in [f"Prev_{n}Yr_Round_{r}_Picks" for n in (1, 2, 3) for r in (1, 2)]:
-        v = row.get(c)
-        if v == v and v is not None:
-            prem += v
-            any_prem = True
-    f["hire_premium_draft"] = prem if any_prem else np.nan
-    # roster churn entering Y-1 (overall + offense/defense split)
-    rets = [row[c] for c in _RET_COLS if c in row and row[c] == row[c]]
-    f["hire_roster_turnover"] = float(np.mean(rets)) if rets else np.nan
-    offv = [row.get(f"{p}_Retention_Rate_Pct") for p in _OFF_POS]
-    offv = [x for x in offv if x == x and x is not None]
-    defv = [row.get(f"{p}_Retention_Rate_Pct") for p in _DEF_POS]
-    defv = [x for x in defv if x == x and x is not None]
-    f["hire_off_retention"] = float(np.mean(offv)) if offv else np.nan
-    f["hire_def_retention"] = float(np.mean(defv)) if defv else np.nan
+    # draft capital over the three drafts before the hire (Y-1, Y-2, Y-3). In the Y-1
+    # row, "Current" is the Y-1 draft and "Prev_kYr" the Y-1-k draft. First-round
+    # picks, and first- plus second-round ("premium") picks over the SAME window
+    # (premium previously used Y-2..Y-4, skipping the most recent draft).
+    window = ["Current", "Prev_1Yr", "Prev_2Yr"]
+
+    def picks(rounds):
+        vals = [row.get(f"{w}_Round_{r}_Picks") for w in window for r in rounds]
+        vals = [v for v in vals if v is not None and v == v]
+        return float(sum(vals)) if vals else np.nan
+    f["hire_recent_r1_picks"] = picks((1,))
+    f["hire_premium_draft"] = picks((1, 2))
+    # roster retention entering Y-1 (the Y-2 -> Y-1 transition under the old regime):
+    # overall, offense and defense, from the raw rosters (see roster_retention)
+    team_y2 = prior_season_franchise(standardize_team_abbreviation(abbr, hire_year), py - 1).upper()
+    (f["hire_roster_retention"], f["hire_off_retention"],
+     f["hire_def_retention"]) = roster_retention(team_y2, team, py)
     return f
 
 
@@ -1050,8 +1301,8 @@ def build_modeling_dataset(df, verbose=True):
                 feat.update(tier6_features(hist, hire_year))
                 feat.update(team_quality_features(hist, hire_year))
         raw_hist = load_history(coach, dedupe=False)
-        feat.update(interim_features(raw_hist, hire_year))
-        feat.update(tier2_features(ranks, hire_year, raw_hist))
+        feat.update(interim_features(raw_hist, hire_year, coach, ranks))
+        feat.update(tier2_features(ranks, hire_year, raw_hist, coach))
         rows.append(feat)
 
     new_df = pd.DataFrame(rows, index=df.index)

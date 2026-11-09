@@ -1,7 +1,9 @@
 coach,hire_year,duration,last_year,final_record,final_winpct,age_at_exit,notes,hc_elsewhere_next,hc_elsewhere_after,label_source,resolved_label,event,active,confidence,reason,source
+Don McCafferty,1973,1,1973,6-7-1,0.464,52.0,,0,0,research,censor,0,0,high,"VOLUNTARY (cat C; author-confirmed 2026-10-29): died of a heart attack at home on July 28 1974, before the season, while still head coach; a death in office is a health exit, not a firing, despite the losing final season",Michigan Daily 1974-07-29
 Sid Gillman,1974,1,1974,7-7,0.5,63.0,,0,0,research,censor,0,0,high,"Sid Gillman retired on top after 1974 (7-7, NFL Coach of the Year); hand-picked successor Bum Phillips",Wikipedia
 Jack Pardee,1975,3,1977,9-5,0.643,41.0,,1,1,research,censor,0,0,high,"Jack Pardee voluntarily resigned from Bears after 1977; rejected GM Finks offer to stay, chose Redskins job",Washington Post
 Chuck Fairbanks,1973,6,1978,11-4,0.733,45.0,,0,0,research,censor,0,0,high,Chuck Fairbanks voluntarily left Patriots after 1978 (11-4) for Univ. of Colorado; Patriots sued to block move,Wikipedia/Boston Globe
+John McKay,1976,9,1984,6-10,0.375,61.0,,0,0,research,censor,0,0,high,"VOLUNTARY (cat B; author rule 2026-10-29): announced Nov 5 1984, mid-season, that he would step down as coach at season's end and stay on as team president; also cited health",UPI 1984-11-05
 Bill Walsh,1979,10,1988,10-6,0.625,57.0,Super Bowl Champions,0,0,research,censor,0,0,high,Bill Walsh retired Jan 1989 days after winning Super Bowl XXIII due to burnout while wanted; voluntary on top,UPI/ESPN
 Bill Parcells,1983,8,1990,13-3,0.813,49.0,Super Bowl Champions,0,1,research,censor,0,0,high,"Bill Parcells resigned from Giants May 1991 after Super Bowl XXV citing health; voluntary while wanted, took 2 years off",Washington Post
 Jerry Burns,1986,6,1991,8-8,0.5,64.0,,0,0,research,censor,0,0,medium,"Jerry Burns announced own retirement Dec 1991 at age 64 after 8-8; self-initiated, no pressure, beloved departure",Wikipedia/obits
@@ -20,6 +22,7 @@ Bill Cowher,1992,15,2006,8-8,0.5,49.0,,0,0,research,censor,0,0,high,"Bill Cowher
 Bill Parcells,2003,4,2006,9-7,0.563,65.0,,0,0,research,censor,0,0,high,"Bill Parcells voluntarily retired from coaching Jan 2007 after 4 Dallas seasons; his own choice, Jones wanted him back",ESPN
 Joe Gibbs,2004,4,2007,9-7,0.563,67.0,,0,0,research,censor,0,0,high,Joe Gibbs resigned Jan 2008 for family/non-football reasons (grandson's leukemia); voluntary departure,Washington Post
 Tony Dungy,2002,7,2008,12-4,0.75,53.0,,0,0,research,censor,0,0,high,Tony Dungy retired voluntarily Jan 2009 on top after 12-4 playoff season to be with family; hand-picked successor Caldwell,ESPN
+Mike Holmgren,1999,10,2008,4-12,0.25,60.0,,0,0,research,censor,0,0,high,VOLUNTARY (cat B; author rule 2026-10-29: a retirement announced before or during the final season is retirement on top): announced Jan 22 2008 that 2008 would be his last season; successor Jim Mora named Feb 6 2008,AP 2008-01-22; Seahawks 2008-02-06
 Gary Kubiak,2015,2,2016,9-7,0.563,55.0,,0,0,research,censor,0,0,high,"Gary Kubiak retired Jan 2017 for health reasons (migraine condition/seizures, ambulance during season); non-football",ESPN/NFL.com
 Bruce Arians,2013,5,2017,8-8,0.5,65.0,,0,1,research,censor,0,0,high,Bruce Arians retired Jan 2018 (Cardinals) citing family after 42-yr career; left as franchise winningest coach by choice,CBS/Yahoo
 Bruce Arians,2019,3,2021,13-4,0.765,69.0,,0,0,research,censor,0,0,high,"Bruce Arians voluntarily stepped down March 2022 (Bucs) while successful (SB winner), hand-picked successor Bowles, moved to front office",NFL.com/ESPN
@@ -48,17 +51,17 @@ Shane Steichen,2023,3,2025,,,,,0,0,deterministic,censor,0,1,high,active,record/N
 Todd Bowles,2022,4,2025,,,,,0,0,deterministic,censor,0,1,high,active,record/Notes
 Zac Taylor,2019,7,2025,,,,,0,0,deterministic,censor,0,1,high,active,record/Notes
 Bill Austin,1970,1,1970,6-8,0.429,42.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
+Charlie Waller,1970,1,1970,5-6-3,0.455,49.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
 Ed Hughes,1971,1,1971,4-9-1,0.308,44.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
 Harvey Johnson,1971,1,1971,1-13,0.071,52.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
 Sid Gillman,1971,1,1971,4-6,0.4,60.0,,0,1,deterministic,event,1,0,high,losing_finale,record/Notes
 Bob Hollway,1971,2,1972,4-9-1,0.321,46.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
 Don McCafferty,1970,3,1972,1-4,0.2,51.0,,1,1,deterministic,event,1,0,high,losing_finale,record/Notes
 Ed Khayat,1972,1,1972,2-11-1,0.179,37.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
-J.D. Roberts,1970,3,1972,2-11-1,0.179,40.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
+J.D. Roberts,1971,2,1972,2-11-1,0.179,40.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
 John Mazur,1971,2,1972,2-7,0.222,42.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
 Tommy Prothro,1971,2,1972,6-7-1,0.464,52.0,,0,1,deterministic,event,1,0,high,losing_finale,record/Notes
 Bill Peterson,1972,2,1973,0-5,0.0,50.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
-Don McCafferty,1973,1,1973,6-7-1,0.464,52.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
 Harland Svare,1972,2,1973,1-6-1,0.188,43.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
 Abe Gibron,1972,3,1974,4-10,0.286,49.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
 Dan Devine,1971,4,1974,6-8,0.429,50.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
@@ -110,7 +113,6 @@ Ed Biles,1981,3,1983,0-6,0.0,52.0,,0,0,deterministic,event,1,0,high,losing_final
 Forrest Gregg,1980,4,1983,7-9,0.438,50.0,,1,1,deterministic,event,1,0,high,losing_finale,record/Notes
 Ron Meyer,1982,3,1984,5-3,0.625,43.0,,0,1,research,event,1,0,high,Ron Meyer fired midway through 1984 by Patriots after firing his DC; replaced by Raymond Berry,Wikipedia
 Frank Kush,1982,3,1984,4-11,0.267,55.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
-John McKay,1976,9,1984,6-10,0.375,61.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
 Les Steckel,1984,1,1984,3-13,0.188,38.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
 Monte Clark,1978,7,1984,4-11-1,0.281,47.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
 Sam Rutigliano,1978,7,1984,1-7,0.125,52.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
@@ -243,7 +245,6 @@ Jon Gruden,2002,7,2008,9-7,0.563,45.0,,0,1,research,event,1,0,high,Jon Gruden fi
 Mike Shanahan,1995,14,2008,8-8,0.5,56.0,,0,1,research,event,1,0,high,"Mike Shanahan fired by owner Bowlen Dec 2008 after late collapse (8-8) missed playoffs 3rd straight, ending 14-yr tenure",ESPN/Wikipedia
 Herm Edwards,2006,3,2008,2-14,0.125,54.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
 Lane Kiffin,2007,2,2008,1-3,0.25,33.0,Fired after Week 4,0,0,deterministic,event,1,0,high,fired_notes,record/Notes
-Mike Holmgren,1999,10,2008,4-12,0.25,60.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
 Mike Nolan,2005,4,2008,2-5,0.286,49.0,Fired after Week 7,0,0,deterministic,event,1,0,high,fired_notes,record/Notes
 Rod Marinelli,2006,3,2008,0-16,0.0,59.0,,0,0,deterministic,event,1,0,high,losing_finale,record/Notes
 Romeo Crennel,2005,4,2008,4-12,0.25,61.0,,0,1,deterministic,event,1,0,high,losing_finale,record/Notes

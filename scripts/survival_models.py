@@ -21,9 +21,10 @@ collapses the narrow 3-4 year middle class, hurting Macro F1):
      fit per fold), then locked for the 50-seed evaluation -- the same
      tune-once / resample-evaluate protocol used for the classifier.
 
-We also test the survival-only advantage: re-training with the censored recent
-hires (tenure class -1) appended to the TRAINING set (they carry partial,
-right-censored tenure the classifier must discard).
+The sample is every stint: the coaches still active at the boundary (most of tenure
+class -1) carry partial, right-censored tenure, which the survival models use and
+the classifier must discard. The tenure-class KPIs and the ordinal classifier are
+therefore computed on the stints that have a class (known_class); the C-index on all.
 
 Usage:
     python scripts/survival_models.py
@@ -51,13 +52,12 @@ from model import ordinal_metrics
 from model.config import ORDINAL_CONFIG, MODEL_CONFIG
 from model.cross_validation import CoachLevelStratifiedKFold
 from model.pipeline import (
-    FSTART, FEND, load_modeling_data, load_recent_hires, shap_feature_ranking,
-    best_k, leakage_free_split, fit_model, ordinal_model, transform_select,
+    load_modeling_data, shap_feature_ranking, best_k, leakage_free_split,
+    fit_model, ordinal_model, varying_columns,
 )
 from scripts.survival_analysis import (
     global_max_season, build_survival_targets, surv_to_class_proba, tci, CUTPOINTS,
 )
-from scripts.data.engineer_career_features import reconstruct_tenure
 
 warnings.filterwarnings("ignore")
 
@@ -87,6 +87,10 @@ class _LifelinesSurv:
         self.f = fitter
 
     def fit(self, X, T, E):
+        # columns constant in this training set (e.g. a rare structural flag) have no
+        # estimable coefficient; leave them out of the fit and of prediction
+        self.keep = varying_columns(X)
+        X = np.asarray(X)[:, self.keep]
         self.cols = [f"f{i}" for i in range(X.shape[1])]
         d = pd.DataFrame(X, columns=self.cols)
         d["T"], d["E"] = T, E
@@ -94,7 +98,7 @@ class _LifelinesSurv:
         return self
 
     def _Xdf(self, X):
-        return pd.DataFrame(X, columns=self.cols)
+        return pd.DataFrame(np.asarray(X)[:, self.keep], columns=self.cols)
 
     def proba(self, X):
         return surv_to_class_proba(self.f, self._Xdf(X))
@@ -176,10 +180,10 @@ def precompute_cv_folds(df, X, y, dur, evt, idx, n_splits=5, seed=42):
     groups = df["Coach Name"].values
     Xv, yv = X.values, y.values
     Tv, Ev = dur.values.astype(float), evt.values.astype(int)
-    from scripts.data.matrix_factorization_imputation import SVDImputer
+    from model.pipeline import make_imputer
     folds = []
     for tr, va in cv.split(Xv, yv, groups):
-        imp = SVDImputer().fit(Xv[tr])
+        imp = make_imputer().fit(Xv[tr])
         Xtr = imp.transform(Xv[tr])[:, idx]
         Xva = imp.transform(Xv[va])[:, idx]
         folds.append((Xtr, Tv[tr], Ev[tr], Xva, Tv[va], Ev[va]))
@@ -239,6 +243,9 @@ def xgbaft_builder(p):
         reg_lambda=p["reg_lambda"])
 
 COX_SPACE = {"penalizer": [0.01, 0.05, 0.1, 0.5, 1.0], "l1_ratio": [0.0, 0.5, 1.0]}
+# every COX_SPACE point, lightest penalizer first (exhaustive tuning: tune_cox_penalty)
+COX_GRID = [{"penalizer": p, "l1_ratio": l}
+            for p in COX_SPACE["penalizer"] for l in COX_SPACE["l1_ratio"]]
 AFT_SPACE = {"penalizer": [0.0, 0.001, 0.01, 0.1, 0.5]}
 XGBAFT_SPACE = {
     "num_boost_round": [30, 50, 80, 120], "eta": [0.03, 0.05, 0.1, 0.15],
@@ -254,35 +261,38 @@ XGBAFT_SPACE = {
 METRICS = ["qwk", "mae", "macro_f1", "adjacent_accuracy", "auroc"]
 
 
-def eval_model(builder, params, df, X, y, dur, evt, idx,
-               recent=None, rec_dur=None):
+def known_class(split):
+    """`split` restricted to the stints with a tenure class (y >= 0).
+
+    Survival models train and are scored (C-index) on every stint: a coach still
+    active at the boundary is a right-censored observation. The tenure-class KPIs and
+    the ordinal classifier need a class, which an unfinished tenure (class -1) does
+    not have, so they use these rows only.
+    """
+    tr, te = np.asarray(split.y_train) >= 0, np.asarray(split.y_test) >= 0
+    return split._replace(X_train=split.X_train[tr], y_train=split.y_train[tr],
+                          X_test=split.X_test[te], y_test=split.y_test[te],
+                          train_index=split.train_index[tr],
+                          test_index=split.test_index[te])
+
+
+def eval_model(builder, params, df, X, y, dur, evt, idx):
     """50-seed leakage-free evaluation; returns dict of metric lists (+c_index).
-    If `recent` is given, its censored rows are appended to each split's TRAIN set
-    (coach-leakage-guarded) using that split's fitted imputer."""
+    The survival model is fit on every training stint (active coaches censored); the
+    tenure-class KPIs are scored on the held-out stints that have a class."""
     out = {m: [] for m in METRICS}
     out["c_index"] = []
     for seed in range(N_SEEDS):
         split = leakage_free_split(df, X, y, seed, feature_indices=idx)
-        Xtr, ytr = split.X_train, split.y_train
         Ttr = dur.loc[split.train_index].values.astype(float)
         Etr = evt.loc[split.train_index].values.astype(int)
         Tte = dur.loc[split.test_index].values.astype(float)
         Ete = evt.loc[split.test_index].values.astype(int)
 
-        if recent is not None:
-            test_coaches = set(df.loc[split.test_index, "Coach Name"])
-            keep = ~recent["Coach Name"].isin(test_coaches)
-            r = recent[keep]
-            if len(r):
-                Xr = transform_select(r.iloc[:, FSTART:FEND], split.imputer, idx)
-                Xtr = np.vstack([Xtr, Xr])
-                Ttr = np.concatenate([Ttr, rec_dur.loc[r.index].values.astype(float)])
-                Etr = np.concatenate([Etr, np.zeros(len(r), int)])  # all censored
-
-        m = builder(params).fit(Xtr, Ttr, Etr)
-        proba = m.proba(split.X_test)
-        pred = m.pred_class(split.X_test)
-        r = ordinal_metrics(split.y_test, pred, proba, ORDINAL_CONFIG["class_names"])
+        m = builder(params).fit(split.X_train, Ttr, Etr)
+        ks = known_class(split)
+        r = ordinal_metrics(ks.y_test, m.pred_class(ks.X_test), m.proba(ks.X_test),
+                            ORDINAL_CONFIG["class_names"])
         for k in METRICS:
             out[k].append(r[k])
         out["c_index"].append(concordance_index(Tte, m.surv_score(split.X_test), Ete))
@@ -292,7 +302,7 @@ def eval_model(builder, params, df, X, y, dur, evt, idx,
 def classifier_reference(df, X, y, idx):
     out = {m: [] for m in METRICS}
     for seed in range(N_SEEDS):
-        split = leakage_free_split(df, X, y, seed, feature_indices=idx)
+        split = known_class(leakage_free_split(df, X, y, seed, feature_indices=idx))
         om = fit_model(split, ordinal_model, seed)
         Xte = pd.DataFrame(split.X_test)
         r = ordinal_metrics(split.y_test, om.predict(Xte), om.predict_proba(Xte),
@@ -309,7 +319,10 @@ def main():
     n_iter_xgb = 12 if args.quick else 40
     n_iter_aft = 3 if args.quick else 5
 
-    df, X, y = load_modeling_data()
+    # known_only=False: the survival sample is every stint, active coaches included as
+    # right-censored rows (the survival-only advantage the old "+censored" augmentation
+    # bolted on; it is now the base sample). Class KPIs use the rows with a class.
+    df, X, y = load_modeling_data(known_only=False)
     idx = shap_feature_ranking()[:best_k()]
     bk = len(idx)
     boundary = global_max_season()
@@ -342,21 +355,6 @@ def main():
         results[name] = eval_model(t["builder"], t["params"], df, X, y, dur, evt, idx)
         print(f"  done: {name}")
 
-    # survival-only advantage: XGB-AFT trained WITH censored recent hires
-    recent = load_recent_hires()
-    rec_dur = pd.Series(
-        {i: reconstruct_tenure(c, int(yr))
-         for i, c, yr in zip(recent.index, recent["Coach Name"], recent["Year"])})
-    recent = recent.loc[rec_dur.dropna().index]
-    rec_dur = rec_dur.dropna()
-    print(f"\nCensored recent hires available for augmentation: {len(recent)}")
-    best_surv = max(tuned, key=lambda k: tuned[k]["cv_cindex"])
-    aug_name = f"XGB-AFT +censored"
-    results[aug_name] = eval_model(
-        tuned["XGB-AFT"]["builder"], tuned["XGB-AFT"]["params"],
-        df, X, y, dur, evt, idx, recent=recent, rec_dur=rec_dur)
-    print(f"  done: {aug_name}")
-
     print("\nClassifier reference on identical splits...")
     clf = classifier_reference(df, X, y, idx)
     results["Ordinal classifier"] = {**clf, "c_index": [np.nan]}
@@ -369,7 +367,7 @@ def main():
     print("-" * 100)
     summary = {}
     order = ["Ordinal classifier", "Cox", "Weibull AFT", "LogNormal AFT",
-             "LogLogistic AFT", "XGB-AFT", aug_name]
+             "LogLogistic AFT", "XGB-AFT"]
     for name in order:
         r = results[name]
         qm, ql, qh = tci(r["qwk"])
@@ -388,8 +386,7 @@ def main():
                      "tuned": {k: {"params": v["params"], "cv_cindex": v["cv_cindex"]}
                                for k, v in tuned.items()},
                      "best_k": bk, "n_seeds": N_SEEDS, "boundary": boundary,
-                     "n_censored_train": int((evt == 0).sum()),
-                     "n_recent_aug": int(len(recent))}, f)
+                     "n_censored_train": int((evt == 0).sum())}, f)
     print(f"\nSaved {out}")
 
 

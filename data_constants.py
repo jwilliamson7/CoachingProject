@@ -5,6 +5,7 @@ This module contains all the static dictionaries, lists, and mappings
 used throughout the coaching data analysis pipeline.
 """
 
+import re
 from typing import Dict, List, Union, Optional
 import pandas as pd
 
@@ -197,6 +198,21 @@ EXCLUDED_ROLE_KEYWORDS = [
     "Senior Assistant",
     "Associate Head Coach"
 ]
+
+
+def coaching_title(role) -> str:
+    """A PFR role title with its excluded duties removed.
+
+    Titles list slash-separated duties, and an excluded duty excludes only itself:
+    "Quarterbacks/Passing Game Coordinator" is a quarterbacks-coach season and
+    "Associate Head Coach/Defensive Coordinator" a coordinator season. A title made
+    only of excluded duties ("Quality Control", "Scout") returns ''. Shared by the
+    base builder and the feature engineer so the two role classifiers cannot drift.
+    """
+    keys = [k.strip("/ ") for k in EXCLUDED_ROLE_KEYWORDS]
+    parts = [p.strip() for p in re.split(r"[/\\]", str(role))
+             if p.strip() and not any(k in p for k in keys)]
+    return "/".join(parts)
 
 # Coaching tenure classification thresholds
 TENURE_CLASSIFICATIONS = {

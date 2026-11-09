@@ -11,6 +11,9 @@ analysis/survival_definitive.pkl).
   (b) Unpenalized HR table : refit the cause-specific cluster-robust Cox at
       penalizer=0 and compare to the reported penalizer=0.1 ridge. The reported
       p-values/CIs should be materially unchanged (EPV ~64, ~uncorrelated feats).
+  (c) Collinearity of the model features (correlations, VIF).
+  (d) Labor-market eras : internal-hire HR with era-specific baseline hazards
+      (salary cap 1994, Rooney Rule 2003) and its interaction with each break.
 
 Usage:
     python scripts/survival_robustness_check.py
@@ -28,16 +31,48 @@ import pandas as pd
 
 from model.pipeline import load_modeling_data
 from scripts.survival_analysis import global_max_season, build_survival_targets
-from scripts.data.matrix_factorization_imputation import SVDImputer
-from scripts.survival_methods import build_competing_targets, cox_hazard_ratios, ph_test
+from model.pipeline import make_imputer
+from scripts.survival_methods import (build_competing_targets, cox_hazard_ratios, ph_test,
+                                      ERA_BREAKS)
 from scripts.survival_definitive import nm
 
 PKL = os.path.join(project_root, "analysis", "survival_definitive.pkl")
+from scripts.survival_methods import with_structural_indicators, structural_companions
+
+
+def collinearity_report(Xsel):
+    """Pairwise |correlation| matrix and VIFs of the model features (two or more)."""
+    Z = Xsel.values.astype(float)
+    names = [nm(c) for c in Xsel.columns]
+    corr = np.corrcoef(Z, rowvar=False)
+    off = corr - np.eye(len(names))
+    iu = np.triu_indices(len(names), k=1)
+    amax = np.abs(off[iu]).max()
+    apair = (iu[0][np.abs(off[iu]).argmax()], iu[1][np.abs(off[iu]).argmax()])
+    print("  pairwise |correlation| matrix:")
+    print("      " + "".join(f"{j:>8}" for j in range(len(names))))
+    for i, n in enumerate(names):
+        print(f"  {i} {n[:14]:<14}" + "".join(f"{abs(corr[i,j]):>8.2f}" for j in range(len(names))))
+    print(f"  max |off-diagonal corr| = {amax:.3f}  "
+          f"({names[apair[0]]} vs {names[apair[1]]})")
+    vif = []
+    for j in range(Z.shape[1]):
+        yj = Z[:, j]
+        Xo = np.column_stack([np.ones(len(yj)), np.delete(Z, j, axis=1)])
+        beta, *_ = np.linalg.lstsq(Xo, yj, rcond=None)
+        ss_res = ((yj - Xo @ beta) ** 2).sum()
+        ss_tot = ((yj - yj.mean()) ** 2).sum()
+        r2 = 1 - ss_res / ss_tot if ss_tot > 0 else 0.0
+        vif.append(np.inf if r2 >= 1 else 1.0 / (1.0 - r2))
+    print("  variance inflation factors (VIF; >5 = concerning, >10 = severe):")
+    for n, v in zip(names, vif):
+        print(f"    {n:<22} {v:>6.2f}")
+    print(f"  max VIF = {max(vif):.2f}")
 
 
 def main():
     # ---- reproduce the definitive data prep exactly ----
-    df0, X0, y0 = load_modeling_data()
+    df0, X0, y0 = load_modeling_data(known_only=False)   # same 364 stints as the headline
     boundary = global_max_season()
     dur, cause = build_competing_targets(df0, boundary)
     keep = dur.index
@@ -63,10 +98,11 @@ def main():
                   f"  durb={aligned.loc[i]}  dur={dur.loc[i]}")
 
     # ---- check (b): unpenalized vs ridge HR table ----
-    stable = pickle.load(open(PKL, "rb"))["stable"]
+    _d = pickle.load(open(PKL, "rb"))
+    stable = list(_d.get("model_features") or with_structural_indicators(_d["stable"], X))
     cols = list(X.columns)
     stable_idx = [cols.index(c) for c in stable]
-    Ximp = SVDImputer().fit(X.values).transform(X.values)
+    Ximp = make_imputer().fit(X.values).transform(X.values)
     Xsel = pd.DataFrame(Ximp[:, stable_idx], columns=stable, index=X.index)
     coach = df["Coach Name"].values
 
@@ -107,34 +143,38 @@ def main():
     # If features are ~uncorrelated and VIF is low, the unpenalized MLE is stable
     # and the ridge has no legitimate stabilizing role for the reported inference.
     print("\n" + "=" * 64)
-    print("(c) collinearity of the 5 stable features (unpenalized MLE safe?)")
+    print(f"(c) collinearity of the {Xsel.shape[1]} model features (unpenalized MLE safe?)")
     print("=" * 64)
-    Z = Xsel.values.astype(float)
-    names = [nm(c) for c in Xsel.columns]
-    corr = np.corrcoef(Z, rowvar=False)
-    off = corr - np.eye(len(names))
-    iu = np.triu_indices(len(names), k=1)
-    amax = np.abs(off[iu]).max()
-    apair = (iu[0][np.abs(off[iu]).argmax()], iu[1][np.abs(off[iu]).argmax()])
-    print("  pairwise |correlation| matrix:")
-    print("      " + "".join(f"{j:>8}" for j in range(len(names))))
-    for i, n in enumerate(names):
-        print(f"  {i} {n[:14]:<14}" + "".join(f"{abs(corr[i,j]):>8.2f}" for j in range(len(names))))
-    print(f"  max |off-diagonal corr| = {amax:.3f}  "
-          f"({names[apair[0]]} vs {names[apair[1]]})")
-    vif = []
-    for j in range(Z.shape[1]):
-        yj = Z[:, j]
-        Xo = np.column_stack([np.ones(len(yj)), np.delete(Z, j, axis=1)])
-        beta, *_ = np.linalg.lstsq(Xo, yj, rcond=None)
-        ss_res = ((yj - Xo @ beta) ** 2).sum()
-        ss_tot = ((yj - yj.mean()) ** 2).sum()
-        r2 = 1 - ss_res / ss_tot if ss_tot > 0 else 0.0
-        vif.append(np.inf if r2 >= 1 else 1.0 / (1.0 - r2))
-    print("  variance inflation factors (VIF; >5 = concerning, >10 = severe):")
-    for n, v in zip(names, vif):
-        print(f"    {n:<22} {v:>6.2f}")
-    print(f"  max VIF = {max(vif):.2f}")
+    if Xsel.shape[1] < 2:
+        print("  one feature: no collinearity to check")
+    else:
+        collinearity_report(Xsel)
+
+    # ---- check (d): labor-market eras (salary cap, Rooney Rule) ----
+    # Separate baseline hazards per era, then an internal x post-break interaction
+    # for each break: does the internal-hire premium hold within eras, and differ
+    # across them?
+    print("\n" + "=" * 64)
+    print("(d) internal-hire HR across labor-market eras " + str(ERA_BREAKS))
+    print("=" * 64)
+    yr = df["Year"].values
+    era = np.digitize(yr, sorted(ERA_BREAKS.values()))
+    ih = Xsel["cf_internal_hire"].values
+    for k in range(len(ERA_BREAKS) + 1):
+        print(f"  era {k}: {int((era == k).sum())} hires, "
+              f"{100 * ih[era == k].mean():.0f}% internal")
+    hr_era, _ = cox_hazard_ratios(Xsel, dur, cause, coach, penalizer=0.0, strata=era)
+    u = hr_era.loc["cf_internal_hire"]
+    print(f"  stratified by era: internal HR {u['HR']:.3f} "
+          f"[{u['CI_low']:.3f}, {u['CI_high']:.3f}]  p={u['p']:.3f}")
+    for name, brk in ERA_BREAKS.items():
+        post = (yr >= brk).astype(int)
+        Xi = Xsel.assign(**{name: post, f"internal_x_{name}": ih * post})
+        hr_i, _ = cox_hazard_ratios(Xi, dur, cause, coach, penalizer=0.0)
+        for f in ("cf_internal_hire", name, f"internal_x_{name}"):
+            u = hr_i.loc[f]
+            print(f"    {f:<26} HR {u['HR']:.3f}  [{u['CI_low']:.3f}, {u['CI_high']:.3f}]"
+                  f"  p={u['p']:.3f}")
     print("=" * 64)
 
 

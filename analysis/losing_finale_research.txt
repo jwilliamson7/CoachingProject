@@ -1,0 +1,179 @@
+LOSING-FINALE EXCEPTION REVIEW (research brief, 2026-10-29)
+==========================================================
+
+Scope: all 219 rows of analysis/event_labels_final.csv with reason == "losing_finale"
+(label_source == "deterministic", event = 1). Row-level output:
+analysis/losing_finale_review.csv. Every row was screened against
+Coaches/<name>/all_coaching_history.csv. Web research focused on coaches who never
+coached again or were 60+ at exit, plus every coach whose next-season job was a head
+job elsewhere. No death within about a year of a last season was found other than
+McCafferty.
+
+Screening rule used for the moved_* findings: a row is moved_nfl_hc or
+moved_college_or_other_league only when the coach left in order to take the new job
+(resigned for it, was released from contract for it, or was traded). A coach who was
+fired, bought out or forced out first and was hired elsewhere afterwards is "none";
+those rows are listed separately below so the author can see them.
+
+
+1. COUNTS BY FINDING
+--------------------
+  none                            206
+  moved_college_or_other_league     7
+  moved_nfl_hc                      3
+  pre_announced_retirement          2
+  death                             1
+  health                            0
+  total                           219
+
+Proposed recodes (event 1 -> 0): 3.  needs_review = yes: 10 rows.
+
+
+2. PROPOSED RECODES (event 1 -> 0)
+----------------------------------
+Coach / team / stint        Finding                    Cat  Conf  Key date and evidence
+Don McCafferty, DET 1973    death                      C    high  Died July 28, 1974 (heart attack at home, before
+                                                                  the 1974 season) while Lions head coach.
+    Sources: https://digital.bentley.umich.edu/midaily/mdp.39015071754571/624
+             https://en.wikipedia.org/wiki/Don_McCafferty
+
+Mike Holmgren, SEA 1999-08  pre_announced_retirement   B    high  Jan 22, 2008 (before the 2008 season): "This will be
+                                                                  my last year." Mora named successor Feb 6, 2008.
+    Sources: https://www.spokesman.com/stories/2008/jan/23/one-and-done-for-hawks-holmgren/
+             https://spokesman.com/stories/2008/feb/07/mora-will-replace-holmgren
+
+John McKay, TB 1976-84      pre_announced_retirement   B    high  Nov 5, 1984 (team 3-7, six games left): resigning as
+                                                                  coach effective at season's end, to stay as team
+                                                                  president; last game Dec 16, 1984. He cited health
+                                                                  and the need for a younger coach, so C also fits.
+    Sources: https://www.upi.com/Archives/1984/11/05/Bucs-coach-resigns/3089468478800/
+             https://en.wikipedia.org/wiki/1984_Tampa_Bay_Buccaneers_season
+
+NOT recoded although the author listed it as a known case:
+Bud Grant, MIN 1985. The dates fail the pre-announcement test. Grant said he decided on
+Dec 28, 1985, six days after the Dec 22 finale, and the resignation was announced on
+Jan 6, 1986. He said he had signed a year-to-year contract. No pre-season or in-season
+statement that 1985 would be his last was found. Retrospective sources that say he
+"returned for one more season" are hindsight. Kept as event 1, needs_review = yes.
+    Sources: https://www.upi.com/Archives/1986/01/06/Bud-Grant-resigns-as-Vikings-coach/7225505371600/
+             https://en.wikipedia.org/wiki/1985_Minnesota_Vikings_season
+
+
+3. moved_nfl_hc: FOR THE AUTHOR'S DECISION (no change proposed)
+---------------------------------------------------------------
+Chuck Knox, BUF 1978-82 (4-5). His contract expired after 1982 and talks with Ralph
+  Wilson failed. He left and accepted the Seattle job on Jan 26, 1983.
+  https://en.wikipedia.org/wiki/Chuck_Knox
+Forrest Gregg, CIN 1980-83 (7-9). The Bengals released him from the final year of his
+  contract to replace Bart Starr. Named Packers coach Dec 24, 1983; Wyche hired by CIN
+  Dec 29. https://en.wikipedia.org/wiki/1983_Cincinnati_Bengals_season
+Herm Edwards, NYJ 2001-05 (4-12). He was under contract with two years left. Released
+  to KC for a 4th-round pick: compensation agreed Jan 6, 2006, hired Jan 9, 2006.
+  https://www.patriots.com/news/chiefs-and-jets-agree-on-compensation-93901
+
+Borderline, classified "none" (needs_review = yes):
+  Chuck Knox, SEA 1983-91 (7-9). "Mutually agreed to part ways" on Dec 27, 1991; the
+    club honored his buyout and he had no job in hand. Signed by the Rams Jan 8, 1992.
+    https://www.upi.com/Archives/1991/12/27/Knox-and-Seahawks-go-separate-ways/8172693810000/
+  Sam Wyche, CIN 1984-91 (3-13). After a Dec 24, 1991 meeting with Mike Brown, the club
+    said he resigned and Wyche said he was fired. Hired by Tampa Bay days later.
+    https://www.upi.com/Archives/1991/12/24/Wyche-quits-as-Bengals-coach/1334693550800/
+
+Fired or not retained first, then an NFL head coach the next season (classified "none",
+no review needed): McCafferty BAL 1972 (fired 1-4, DET 1973); McCormack BAL 1981 (fired,
+SEA front office then interim HC 1982); Kotite PHI 1994 (relieved Dec 26, 1994, NYJ
+1995); Reeves NYG 1996 (ATL 1997); Rhodes PHI 1998 (GB 1999); Fox CAR 2010 (contract not
+renewed, DEN Jan 13, 2011); Reid PHI 2012 (KC 2013); Ryan NYJ 2014 (BUF 2015); Gase MIA
+2018 (NYJ 2019).
+
+
+4. moved_college_or_other_league (stays a firing per author; recorded only)
+---------------------------------------------------------------------------
+Devine GB 1974: resigned Dec 16, 1974 for Notre Dame. Holtz NYJ 1976: resigned Dec 9,
+1976 with one game left, hired by Arkansas two days later. Perkins NYG 1982: announced
+Dec 15, 1982, mid-season, that he would leave for Alabama after the season. Kush IND
+1984: quit Dec 13, 1984 with one game left, for the USFL Arizona Outlaws. Gregg GB 1987:
+named SMU coach Jan 1988 (SMU's 1988 season was cancelled, so the history file shows
+no 1988 row). N. Saban MIA 2006: left Jan 3, 2007 for Alabama. Petrino ATL 2007:
+resigned Dec 11, 2007 after 13 games, for Arkansas.
+Not classified as moved because the coach was out before the new job: Gibron CHI 1974
+(fired, then WFL 1975), L. Saban BUF 1976 (quit mid-season, then Miami FL 1977),
+Stallings PHO 1989 (removed Nov 20, 1989, then Alabama), Pardee HOU 1994 (forced out at
+1-9, then CFL 1995), Callahan OAK 2003 (fired, then Nebraska), L. Smith TB 2015 (fired,
+then Illinois).
+
+
+5. VERIFICATION ANSWERS (data fix)
+----------------------------------
+(a) J.D. Roberts, Saints 1970.
+    Fears was fired by owner John Mecom on Nov 3, 1970 (reports dated Nov 4: "Fears
+    fired by Saints"), after a 1-5-1 start (7 games). Roberts' job immediately before
+    was head coach of the Richmond Roadrunners of the Atlantic Coast Football League
+    (1969), renamed the Richmond Saints for 1970. That club was the New Orleans Saints'
+    minor-league affiliate. ProFootballArchives lists him as 1970 Richmond coach (1-7)
+    before he moved up. He had been a Saints scout and linebackers coach in 1967-68.
+    So he was not on the NFL Saints staff when hired (outside the NFL staff), but he
+    came from the club's own farm team and was a former Saints assistant. Whether that
+    counts as "outside" is a definitional call. Note: the repo history file lists
+    Richmond only for 1969.
+    https://en.wikipedia.org/wiki/J._D._Roberts
+    https://en.wikipedia.org/wiki/Richmond_Roadrunners
+    https://profootballarchives.com/coaches/robe04300.html
+    https://en.wikipedia.org/wiki/1970_New_Orleans_Saints_season
+
+(b) Charlie Waller, Chargers.
+    Insider: Chargers offensive backfield coach from 1966 (repo history 1966-68). He
+    took over on Nov 14, 1969 when Gillman stepped down for health reasons, with
+    Gillman staying as GM. Record 4-1 in 1969, 5-6-3 in 1970. His stint ended because
+    Gillman's health recovered and Gillman resumed the head job. Wikipedia, citing the
+    Chargers' history page, says Gillman was named head coach on Dec 30, 1970. The PFRA
+    Hall of Fame bio says he "asked to return to the active coaching job" in 1971.
+    Waller stayed on staff as offensive coordinator in 1971, then went to Washington
+    in 1972. No source calls it a firing. In effect it was a demotion back to
+    assistant, ordered by the boss returning to the job, not a performance dismissal
+    and not a voluntary exit by Waller. How to code it is the author's call.
+    https://en.wikipedia.org/wiki/Charlie_Waller_(American_football)
+    https://www.profootballresearchers.com/archives/Website_Files/Coffin_Corner/27-03-1080.pdf
+
+(c) Sid Gillman, Chargers 1969.
+    Yes, health. Per the PFRA Coffin Corner bio (courtesy of the Pro Football Hall of
+    Fame), a duodenal ulcer and a hiatal hernia forced a premature, temporary
+    retirement in 1969. Wikipedia cites the hiatal hernia. He stepped down
+    after nine games with a 4-5 record and stayed on as general manager. (His 1971
+    exit, 4-6 after 10 games, followed a clash with ownership. The PFRA bio and other
+    sources do not give health as the reason, and he coached for Dallas in 1972.)
+    https://www.profootballresearchers.com/archives/Website_Files/Coffin_Corner/27-03-1080.pdf
+    https://en.wikipedia.org/wiki/1969_San_Diego_Chargers_season
+
+(d) Tom Fears. Confirmed: 1970 was his last season as Saints coach. He was fired
+    seven games in (Nov 3, 1970) and was Eagles offensive coordinator in 1971-72 (repo
+    history). He never coached the Saints again.
+
+
+6. AMBIGUOUS OR WORTH A SECOND LOOK (all kept at event 1 unless listed in section 2)
+------------------------------------------------------------------------------------
+- Bud Grant 1985: see section 2. The author expected a pre-announcement; the dates
+  say otherwise.
+- John McKay 1984: B per the pre-announcement rule. Health was also cited, so C is
+  an alternative. The recode holds either way.
+- Rich Kotite NYJ 1996: announced Fri Dec 20, 1996, two days before the finale, that
+  he was stepping down at 1-14. That meets the letter of "announced before the final
+  game", but it was a record-driven resignation ("Kotite fires himself"), not a
+  retirement. Not proposed.
+- Bum Phillips NO 1985 (age 62): quit Nov 25, 1985 with four games left, effective
+  immediately, under new owner Tom Benson. Never coached again. No advance
+  announcement and no health reason. Not proposed.
+- Marion Campbell ATL 1989 (age 60): out Nov 28, 1989 at 3-9. One source lists him as
+  fired and another as retired. No advance announcement found.
+- Dick Vermeil PHI 1982: resigned Jan 10, 1983, after the season, citing burnout.
+  Post-season, so it stays a firing, unless the author reads burnout as a health
+  exit (category C).
+- Post-season retirements or resignations that stay firings under the protocol: Levy
+  1997 (Dec 31, 1997, age 72), Coughlin 2015, Spurrier 2003, Switzer 1997,
+  Schottenheimer 1998, Flores 1987, Belichick 2023 (mutual parting).
+- Dick MacPherson NE 1992: missed seven games after intestinal surgery, but was fired
+  Jan 8, 1993. A documented firing, not a health exit.
+- Gene Stallings PHO 1989: announced in November 1989 that he would not return (to
+  leave, not to retire) and was removed at once. Kept as a firing.
+- Ray Perkins NYG 1982: a pre-announced departure (Dec 15, 1982), but for a college
+  job, so it falls under the quasi-firing rule.

@@ -2,7 +2,7 @@
 
 Compiled 2026-10-28. Covers every hire in the sample whose stint is anchored at the first
 full season after a mid-season takeover in which Pro-Football-Reference lists the coach
-only as "Head Coach" for the partial season (16 cases). PFR records one role per partial
+only as "Head Coach" for the partial season (18 cases). PFR records one role per partial
 season and drops whatever the coach did earlier that season, so the data alone cannot say
 whether he was an insider. Each case was therefore resolved from contemporaneous sources.
 
@@ -20,6 +20,7 @@ change the internal coding, which depends only on whether the coach was already 
 
 | Coach | Takeover | Anchored | Team | Before taking over | Interim or permanent | Coded | Evidence |
 |---|---|---|---|---|---|---|---|
+| Charlie Waller | 1969 | 1970 | SD | Chargers offensive backfield coach (1968) | not needed | internal | On staff the prior season (PFR); took over from Sid Gillman during the 1969 AFL season; anchored by games coached (added 2026-10-29) |
 | Jim Ringo | 1976 | 1977 | BUF | Bills offensive line coach (1975) | not needed | internal | On staff the prior season (PFR) |
 | Al Saunders | 1986 | 1987 | SD | Chargers receivers coach (1985) | not needed | internal | On staff the prior season (PFR) |
 | Art Shell | 1989 | 1990 | LAR | Raiders offensive line coach (1988) | not needed | internal | On staff the prior season (PFR) |
@@ -36,6 +37,7 @@ change the internal coding, which depends only on whether the coach was already 
 | Raymond Berry | 1984 | 1985 | NE | Out of football 1982-84 | permanent ("multi-year pact") | **external** | UPI 1984-10-26 (full text) |
 | Marv Levy | 1986 | 1987 | BUF | Out of coaching; no Bills coaching role | unresolved, leaning permanent | **external** | UPI 1986-11-09; no period source says interim |
 | Ron Meyer | 1986 | 1987 | IND | Fired by the Patriots (1984); no Colts role | permanent ("long-term commitment") | **external** | UPI 1986-12-02 |
+| J.D. Roberts | 1970 | 1971 | NO | Head coach of the Richmond Roadrunners (ACFL), the Saints' minor-league affiliate; Saints scout and LB coach 1967-68 | took over 1970-11-03 after Fears was fired at 1-5-1 | internal (author decision 2026-10-29: the affiliate is inside the organization) | added 2026-10-29 (bug scan): Coach_WAR's tie-break had wrongly made Roberts the 1970 opener; PRIMARY_COACH_OVERRIDES |
 
 **Why reference works disagree.** Many sources, including the Pro Football Researchers
 Association's 2004 article "Interim Coaches", label any mid-season replacement "interim" by

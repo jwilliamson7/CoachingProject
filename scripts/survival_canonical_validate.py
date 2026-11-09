@@ -32,7 +32,9 @@ warnings.filterwarnings("ignore")
 
 
 def main():
-    df, X, y = load_modeling_data()
+    # known_only=False: tune on the SAME sample the headline uses (every stint, active
+    # coaches as right-censored rows); the default would drop the tenure-class -1 rows
+    df, X, y = load_modeling_data(known_only=False)
     boundary = global_max_season()
     dur, evt = build_survival_targets(df, boundary)
     keep = dur.index

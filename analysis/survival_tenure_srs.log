@@ -1,0 +1,59 @@
+panel: 1526 coach-seasons from 358 stints (254 coaches), seasons 1970-2024; 305 firings; SRS missing in 0 seasons; 6 first seasons with no prior SRS (expansion)
+SRS: mean -0.17, sd 6.07 (points per game)
+  mean SRS: internal -1.11, external +0.03; firing rate per season: internal 0.304, external 0.178
+
+====================================================================================================
+Firing hazard per coach-season (cloglog, tenure-year baselines, clustered on coach)
+====================================================================================================
+  stint-level Cox, same window: internal HR 1.960 [1.469, 2.615]
+  (1)  n=1526  log-likelihood -734.2
+    internal hire                            HR 1.983 [1.489, 2.640]  p=0.000
+  (2)  n=1526  log-likelihood -584.4
+    internal hire                            HR 1.907 [1.406, 2.586]  p=0.000
+    SRS this season (per point)              HR 0.830 [0.811, 0.851]  p=0.000
+  (3)  n=1526  log-likelihood -580.7
+    internal hire                            HR 1.874 [1.385, 2.535]  p=0.000
+    SRS this season (per point)              HR 0.827 [0.807, 0.849]  p=0.000
+    SRS last season (per point)              HR 0.998 [0.974, 1.021]  p=0.846
+  (4)  n=1526  log-likelihood -580.3
+    internal hire                            HR 2.069 [1.449, 2.953]  p=0.000
+    SRS this season (per point)              HR 0.823 [0.800, 0.847]  p=0.000
+    internal x SRS this season               HR 1.022 [0.971, 1.076]  p=0.401
+    SRS last season (per point)              HR 0.998 [0.975, 1.022]  p=0.851
+  (5)  n=1526  log-likelihood -710.2
+    internal hire                            HR 2.053 [1.533, 2.749]  p=0.000
+    SRS last season (per point)              HR 0.929 [0.911, 0.948]  p=0.000
+  (6a)  n=1526  log-likelihood -733.5
+    internal, tenure years 1-2               HR 2.379 [1.591, 3.557]  p=0.000
+    internal, tenure years 3+                HR 1.742 [1.197, 2.537]  p=0.004
+    early vs late (ratio)                    HR 1.365  p=0.268
+  (6b)  n=1526  log-likelihood -579.6
+    internal, tenure years 1-2               HR 2.380 [1.515, 3.738]  p=0.000
+    internal, tenure years 3+                HR 1.571 [1.074, 2.299]  p=0.020
+    SRS this season (per point)              HR 0.828 [0.807, 0.849]  p=0.000
+    SRS last season (per point)              HR 0.996 [0.972, 1.020]  p=0.717
+    early vs late (ratio)                    HR 1.514  p=0.173
+  (7a)  n=1526  log-likelihood -733.8
+    internal, predecessor fired              HR 2.112 [1.503, 2.968]  p=0.000
+    internal, predecessor left voluntarily   HR 1.518 [0.749, 3.077]  p=0.246
+    predecessor fired                        HR 0.887 [0.493, 1.598]  p=0.691
+    after fired vs after departed (ratio)    HR 1.391  p=0.411
+  (7b)  n=1526  log-likelihood -578.2
+    internal, predecessor fired              HR 1.663 [1.189, 2.328]  p=0.003
+    internal, predecessor left voluntarily   HR 2.951 [1.337, 6.514]  p=0.007
+    predecessor fired                        HR 0.917 [0.484, 1.738]  p=0.791
+    SRS this season (per point)              HR 0.825 [0.804, 0.847]  p=0.000
+    SRS last season (per point)              HR 0.994 [0.971, 1.017]  p=0.606
+    after fired vs after departed (ratio)    HR 0.564  p=0.199
+    (4) internal HR at SRS -6: 1.814
+    (4) internal HR at SRS +0: 2.069
+    (4) internal HR at SRS +6: 2.360
+
+====================================================================================================
+OLS: SRS this season on internal hire (tenure-year effects, clustered on coach)
+====================================================================================================
+  all seasons            n= 1526  internal: -0.98 points/game [-1.80, -0.17]  p=0.018  (SRS last season +0.43)
+  first season only      n=  358  internal: -0.43 points/game [-1.67, +0.82]  p=0.503  (SRS last season +0.37)
+  all seasons, no lag    n= 1526  internal: -0.53 points/game [-1.65, +0.60]  p=0.358
+
+Saved C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\survival_tenure_srs.pkl

@@ -35,7 +35,7 @@ import numpy as np
 import pandas as pd
 
 from model.pipeline import load_modeling_data
-from scripts.data.matrix_factorization_imputation import SVDImputer
+from model.pipeline import make_imputer
 from scripts.survival_analysis import global_max_season, build_survival_targets, tci
 from scripts.survival_models import (
     cox_builder, weibull_builder, xgbaft_builder, random_search, precompute_cv_folds,
@@ -53,7 +53,8 @@ def main():
     ap.add_argument("--quick", action="store_true")
     args = ap.parse_args()
 
-    df, X, y = load_modeling_data()
+    # every stint (active coaches right-censored), as in survival_definitive
+    df, X, y = load_modeling_data(known_only=False)
     boundary = global_max_season()
     dur, evt = build_survival_targets(df, boundary)        # FIRING events
     keep = dur.index
@@ -81,7 +82,7 @@ def main():
     print(f"Tuned Cox    (full): CV C-index={cox_cv:.3f} {cox_p}")
 
     # ---- survival-native SHAP ranking over ALL features ----
-    Ximp = SVDImputer().fit(X.values).transform(X.values)
+    Ximp = make_imputer().fit(X.values).transform(X.values)
     rank, src = survival_importance(Ximp, T, E, xgb_p)
     print(f"\nSurvival SHAP ranking ({src}) -- top 25 firing drivers:")
     for r, i in enumerate(rank[:25], 1):

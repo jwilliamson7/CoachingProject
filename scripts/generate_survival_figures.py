@@ -7,8 +7,11 @@ existing survival_km.png convention.
   1. survival_stability.png    Cox stability-selection frequency bar (the steep
                                drop-off that justifies the tight stable core).
   2. survival_forest.png       Cause-specific firing hazard-ratio forest plot
-                               (cluster-robust 95% CI; significant vs not).
-  3. survival_calibration.png  IPCW time-dependent Brier curve + integrated Brier.
+                               (cluster-robust 95% CI; significant vs not). The
+                               structural indicators are nuisance companions and
+                               are not drawn.
+  3. survival_calibration.png  IPCW time-dependent Brier curve + integrated Brier,
+                               against the covariate-free Kaplan-Meier null.
   4. survival_cif.png          Competing-risks cumulative incidence: firing vs
                                voluntary exit (Aalen-Johansen, 95% CI bands).
 
@@ -29,7 +32,7 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.ticker import ScalarFormatter
+from matplotlib.ticker import ScalarFormatter, NullFormatter
 
 # Times New Roman to match the LaTeX manuscript body (papers/jse)
 plt.rcParams.update({
@@ -41,7 +44,8 @@ plt.rcParams.update({
 from model.pipeline import load_modeling_data
 from scripts.survival_analysis import global_max_season
 from scripts.survival_methods import (
-    build_competing_targets, aalen_johansen_cif, FIRED, VOLUNTARY,
+    build_competing_targets, aalen_johansen_cif, cif_at, friendly_name,
+    STRUCTURAL_INDICATORS, FIRED, VOLUNTARY,
 )
 
 FIGDIR = os.path.join(project_root, "papers", "jse", "figures")
@@ -49,32 +53,9 @@ PKL = os.path.join(project_root, "analysis", "survival_definitive.pkl")
 SIG, NS = "#1f77b4", "#9aa0a6"     # significant / not-significant colors
 REF = "#d62728"                    # reference-line red
 
-# Internal feature keys -> manuscript display labels (Tables 4 & 6 for the core
-# five; Appendix A/B wording for the remaining stability bars).
-LABELS = {
-    "cf_internal_hire": "Internal hire",
-    "age": "Age at hire",
-    "Y/P__unit": "Prior-unit yards-per-play efficiency",
-    "num_yr_nfl_pos": "Years as NFL position coach",
-    "tq_dsrs": "Inherited defensive SRS",
-    "cf_nfl_share": "NFL career share",
-    "cf_age_first_job": "Age at first job",
-    "Pen__unit": "Prior-unit penalties",
-    "hire_starter_av": "Inherited starter value",
-    "rf_unit_traj": "Unit trajectory",
-    "num_yr_nfl_hc": "NFL head-coach years",
-    "rf_final_unit_pctl": "Final unit percentile",
-    "Time Average Drive__unit": "Prior-unit time per drive",
-    "hiring_team_num_playoff_appearances": "Playoff appearances (prior 2 seasons)",
-    "cf_pre_level_nfl": "Prior NFL experience",
-    "hire_starter_exp": "Inherited starter experience",
-    "cf_num_nfl_employers": "NFL employers",
-    "Att Passing__unit": "Prior-unit pass attempts",
-}
-
-
-def _lab(k):
-    return LABELS.get(k, k)
+# Internal feature keys -> manuscript display labels: survival_methods.FEATURE_LABELS
+# covers every column of the modeling data (supplement Tables S1/S2 wording).
+_lab = friendly_name
 
 
 def _save(fig, name):
@@ -85,7 +66,9 @@ def _save(fig, name):
 
 
 def fig_stability(d, top=18):
-    freq = d["stab_freq_named"].head(top)[::-1]   # largest on top in barh
+    freq = d["stab_freq_named"]
+    freq = freq[~freq.index.isin(STRUCTURAL_INDICATORS)]   # never candidates
+    freq = freq.head(top)[::-1]                    # largest on top in barh
     thr = d["stab_thr"]
     colors = [SIG if v >= thr else NS for v in freq.values]
     fig, ax = plt.subplots(figsize=(7, 6.2))
@@ -95,14 +78,15 @@ def fig_stability(d, top=18):
     ax.axvline(thr, ls="--", color=REF, alpha=0.8,
                label=f"stable threshold = {thr:g}")
     ax.set_xlim(0, 1)
-    ax.set_xlabel("Selection frequency (2000 coach-level subsamples)")
+    ax.set_xlabel(f"Selection frequency ({d.get('stab_boots', 2000)} coach-level subsamples)")
     ax.set_title("Cox-native stability selection")
     ax.legend(loc="lower right", frameon=False)
     _save(fig, "survival_stability.png")
 
 
 def fig_forest(d):
-    hr = d["hazard_ratios"].sort_values("HR")
+    hr = d["hazard_ratios"]
+    hr = hr[~hr.index.isin(STRUCTURAL_INDICATORS)].sort_values("HR")  # nuisance companions
     n = len(hr)
     fig, ax = plt.subplots(figsize=(7, 0.62 * n + 1.6))
     for i, (name, r) in enumerate(hr.iterrows()):
@@ -116,6 +100,7 @@ def fig_forest(d):
     ax.set_xscale("log")
     ax.set_xticks([0.5, 0.7, 1.0, 1.5, 2.0])
     ax.get_xaxis().set_major_formatter(ScalarFormatter())
+    ax.get_xaxis().set_minor_formatter(NullFormatter())   # no "3x10^0" minor labels
     lo = min(hr["CI_low"].min() * 0.9, 0.5)
     hi = max(hr["CI_high"].max() * 1.1, 2.0)
     ax.set_xlim(lo, hi)
@@ -128,40 +113,32 @@ def fig_forest(d):
 
 
 def fig_calibration(d):
+    # The reference is the covariate-free Kaplan-Meier curve scored on the same
+    # held-out stints (survival_methods.km_null_brier), not a 0.25 coin flip.
     g = np.asarray(d["brier_grid"], float)
     bs = np.asarray(d["brier_curve"], float)
-    ibs = d["ibs_ci"]
+    bs_km = np.asarray(d["brier_curve_km"], float)
+    ibs, ibs_km = d["ibs_ci"], d["ibs_km_ci"]
     fig, ax = plt.subplots(figsize=(6.5, 4.2))
-    ax.plot(g, bs, "o-", color=SIG, lw=2, label="IPCW Brier(t)")
-    ax.axhline(0.25, ls="--", color=REF, alpha=0.8, label="uninformative (0.25)")
+    ax.plot(g, bs, "o-", color=SIG, lw=2, label="Cox model")
+    ax.plot(g, bs_km, "s--", color=REF, lw=1.6, alpha=0.85,
+            label="Kaplan-Meier null (no covariates)")
     ax.set_xlabel("Horizon (seasons since hire)")
     ax.set_ylabel("IPCW Brier score (lower = better)")
-    ax.set_ylim(0, 0.30)
+    ax.set_ylim(0, max(0.30, 1.1 * float(max(bs.max(), bs_km.max()))))
     ax.set_xlim(g.min(), g.max())
     ax.set_title(f"Time-dependent prediction error\n"
-                 f"integrated Brier = {ibs[0]:.3f} [{ibs[1]:.3f}, {ibs[2]:.3f}]")
+                 f"integrated Brier: Cox {ibs[0]:.3f} [{ibs[1]:.3f}, {ibs[2]:.3f}], "
+                 f"KM null {ibs_km[0]:.3f} [{ibs_km[1]:.3f}, {ibs_km[2]:.3f}]",
+                 fontsize=10)
     ax.legend(loc="upper right", frameon=False)
     _save(fig, "survival_calibration.png")
 
 
-def _step_at_seasons(index, vals, seasons):
-    """Cumulative-incidence value through the END of each integer season.
-
-    lifelines' AalenJohansenFitter jitters tied integer event times by a small
-    random offset to break ties, so a season-s firing lands at s +/- epsilon.
-    Reading the step at exactly x = s therefore captures only the season-s
-    events that happened to jitter below s, UNDER-counting that season by ~half.
-    We instead read at s + 0.5: since the jitter is well under half a season,
-    this captures every event with integer time <= s and excludes season s+1,
-    giving the true incidence by the end of season s (e.g. firing incidence
-    ~0.29 by the end of season 2, matching the raw empirical fraction)."""
-    index = np.asarray(index, float)
-    vals = np.asarray(vals, float)
-    out = np.empty(len(seasons))
-    for j, s in enumerate(seasons):
-        mask = index <= s + 0.5
-        out[j] = vals[mask][-1] if mask.any() else 0.0
-    return out
+def _step_at_seasons(frame, col, seasons):
+    """Cumulative incidence through the END of each integer season (read at s + 0.5;
+    see survival_methods.cif_at for why)."""
+    return np.array([cif_at(frame, s, col) for s in seasons])
 
 
 def fig_cif():
@@ -177,9 +154,9 @@ def fig_cif():
         aj = aalen_johansen_cif(dur, cause, ev)
         cdf = aj.cumulative_density_
         ci = aj.confidence_interval_
-        y_int = _step_at_seasons(cdf.index.values, cdf.iloc[:, 0].values, seasons)
-        lo_int = _step_at_seasons(ci.index.values, ci.iloc[:, 0].values, seasons)
-        hi_int = _step_at_seasons(ci.index.values, ci.iloc[:, 1].values, seasons)
+        y_int = _step_at_seasons(cdf, 0, seasons)
+        lo_int = _step_at_seasons(ci, 0, seasons)
+        hi_int = _step_at_seasons(ci, 1, seasons)
         ax.step(seasons, y_int, where="post", color=color, lw=2, label=lab)
         ax.fill_between(seasons, lo_int, hi_int, step="post", color=color, alpha=0.15)
     ax.set_xlim(0, 15)

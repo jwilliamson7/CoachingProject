@@ -94,17 +94,42 @@ def top_k_indices(k=None):
 # --------------------------------------------------------------------------- #
 # Core leakage-free routine
 # --------------------------------------------------------------------------- #
-def _svd_imputer():
-    # Lazy import keeps the model package importable without the scripts package.
-    from scripts.data.matrix_factorization_imputation import SVDImputer
-    return SVDImputer()
+IMPUTER = "structural"   # "structural" (default) or "svd" (robustness comparison only)
+
+
+def make_imputer(kind=None):
+    """The single imputer factory for every split and full-sample fit.
+
+    "structural" (default): constant fill of structurally missing values with
+    training-partition medians; the structural indicator columns in the data carry
+    the information (scripts/data/structural_imputer.py). "svd": the earlier matrix
+    completion, kept only as a robustness comparison.
+    """
+    # Lazy imports keep the model package importable without the scripts package.
+    if (kind or IMPUTER) == "svd":
+        from scripts.data.matrix_factorization_imputation import SVDImputer
+        return SVDImputer()
+    from scripts.data.structural_imputer import StructuralImputer
+    return StructuralImputer()
+
+
+def varying_columns(X):
+    """Boolean mask of the columns that vary in X.
+
+    A structural indicator (or a constant-filled feature) can be constant within a
+    subsample or training split, e.g. when all six expansion hires fall in the test
+    partition. Its coefficient is then undefined, so survival fits leave such a column
+    out of that fit and of its predictions, instead of failing in the fitter's
+    standardization.
+    """
+    return np.asarray(X, dtype=float).std(axis=0) > 0
 
 
 def leakage_free_split(df, X, y, seed, feature_indices=None, test_size=None):
     """One coach-level split with leakage-free imputation and feature selection.
 
-    The SVD imputer is fit on the training partition only (feature columns,
-    never the target), applied to both partitions, then ``feature_indices`` (if
+    The imputer (make_imputer) is fit on the training partition only (feature
+    columns, never the target), applied to both partitions, then ``feature_indices`` (if
     given) selects the modeled columns. Returns a :class:`SplitData`.
     """
     if test_size is None:
@@ -113,7 +138,7 @@ def leakage_free_split(df, X, y, seed, feature_indices=None, test_size=None):
     Xtr_df, Xte_df, ytr, yte, _ = stratified_coach_level_split(
         df, X, y, test_size=test_size, random_state=seed)
 
-    imp = _svd_imputer().fit(np.asarray(Xtr_df))
+    imp = make_imputer().fit(np.asarray(Xtr_df))
     Xtr = imp.transform(np.asarray(Xtr_df))
     Xte = imp.transform(np.asarray(Xte_df))
     if feature_indices is not None:
@@ -131,7 +156,7 @@ def fit_on_full(X_df, y, feature_indices=None, model_factory=None):
     trained on the selected columns. Returns (model, imputer).
     """
     Xa = np.asarray(X_df)
-    imp = _svd_imputer().fit(Xa)
+    imp = make_imputer().fit(Xa)
     Xt = imp.transform(Xa)
     if feature_indices is not None:
         Xt = Xt[:, np.asarray(feature_indices)]

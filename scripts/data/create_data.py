@@ -15,7 +15,7 @@ from data_constants import (
     standardize_team_abbreviation,
     prior_season_franchise,
     CURRENT_TEAM_ABBREVIATIONS,
-    EXCLUDED_ROLE_KEYWORDS,
+    coaching_title,
     TENURE_CLASSIFICATIONS,
     DATA_FILES,
     ANALYSIS_CONFIG,
@@ -55,12 +55,12 @@ class CoachingDataProcessor:
         """Classify coaching role, excluding interim and non-coaching positions"""
         if not role or not isinstance(role, str):
             return "None"
-        
-        # Check for excluded keywords
-        for keyword in EXCLUDED_ROLE_KEYWORDS:
-            if keyword in role:
-                return "None"
-        
+
+        # Drop excluded duties (an excluded duty in a compound title excludes only itself)
+        role = coaching_title(role)
+        if not role:
+            return "None"
+
         # Exclude generic assistant roles
         if ("Assistant" in role or "Asst" in role) and "/" not in role and "\\" not in role:
             return "None"
@@ -318,19 +318,27 @@ class CoachingDataProcessor:
         from that table comes back 'clean' (kept as detected).
         """
         from scripts.data.engineer_career_features import (
-            classify_hire_instance, _primary_coach_index, PRIMARY_COACH_START)
-        # Pre-1970 hires are removed by the downstream era filter and are NOT covered
-        # by the Coach_WAR Primary_Coach table. Classifying them treats the
-        # pre-coverage season as "not primary" and would spuriously re-anchor a clean
-        # pre-1970 hire forward INTO the modeled window (e.g. Chuck Noll 1969 -> 1970).
-        # Mirror engineer's filter-then-classify order by keeping them as detected.
-        if hire_year < PRIMARY_COACH_START:
-            return "clean", hire_year
+            classify_hire_instance, _primary_coach_index, PRIMARY_COACH_START,
+            _took_over_pre_table, _is_primary)
         if self._primary_idx is None:
             try:
                 self._primary_idx = _primary_coach_index()
             except Exception:
                 self._primary_idx = {}
+        # Pre-1970 hires are removed by the downstream era filter and are NOT covered
+        # by the Coach_WAR Primary_Coach table. Classifying them treats the
+        # pre-coverage season as "not primary" and would spuriously re-anchor a clean
+        # pre-1970 hire forward INTO the modeled window (e.g. Chuck Noll 1969 -> 1970).
+        # Mirror engineer's filter-then-classify order by keeping them as detected. The
+        # exception is a takeover in the last uncovered season that the coach kept
+        # (Waller took over the 1969 AFL Chargers after nine games and opened 1970): it
+        # is re-anchored into the window like any other interim->permanent promotion.
+        if hire_year < PRIMARY_COACH_START:
+            if (hire_year == PRIMARY_COACH_START - 1 and
+                    _took_over_pre_table(coach_name, hire_year) and
+                    _is_primary(self._primary_idx, coach_name, hire_year + 1) is True):
+                return "reanchor", hire_year + 1
+            return "clean", hire_year
         return classify_hire_instance(self._primary_idx, coach_name, hire_year)
 
     def _finalize_prev_tenure(self, career_instances, year, last_hc_year):
@@ -423,6 +431,13 @@ class CoachingDataProcessor:
             return []
 
         results_df, ranks_df, history_df = dfs
+        # Interim years (interim titles, mid-season takeover seasons): their head-coaching
+        # side never counts toward the unit block, while a coordinator title held outright
+        # that season still loads on its own side. Shared with the recent-form features,
+        # and read from the raw history, whose split rows can carry the interim title.
+        from scripts.data.engineer_career_features import interim_seasons
+        interim = interim_seasons(coach_name, history_df,
+                                  None if ranks_df.empty else ranks_df)
         # Collapse PFR sub-role duplicate rows so each season is counted once.
         history_df = self._dedupe_career_rows(history_df)
 
@@ -486,6 +501,16 @@ class CoachingDataProcessor:
                             franchise = team_rows.iloc[0]['Tm'].lower()
                             franchise_list = self._franchise_file_candidates(franchise, year)
 
+                    # A coordinator season missing from PFR's coach ranks table (e.g.
+                    # Tobin's 1994-95 Colts defenses) is located from the history
+                    # employer instead, so its unit statistics are not silently skipped.
+                    if franchise is None and role in ["Offensive Coordinator", "Defensive Coordinator"]:
+                        from scripts.data.engineer_career_features import name2abbr
+                        abbr = name2abbr().get(str(row.get('Employer', '')).strip().lower())
+                        if abbr:
+                            franchise = abbr.lower()
+                            franchise_list = self._franchise_file_candidates(franchise, year)
+
                     # For current year head coach hires without ranking data, derive team from role
                     # This applies to NEW hires and team changes in current year
                     if (franchise is None and role == "Head Coach" and
@@ -506,6 +531,7 @@ class CoachingDataProcessor:
                                 franchise_list = self._franchise_file_candidates(current_franchise, year)
                     
                     if franchise_list:
+                        hc_unit_season = year not in interim
 
                         # Load performance data for ranked roles (the coordinator
                         # counter was already incremented above, independent of ranks).
@@ -554,10 +580,12 @@ class CoachingDataProcessor:
                                 elif kind == "reanchor" and anchor == year + 1:
                                     # Interim takeover kept on as the permanent coach the next
                                     # season. Fold THIS partial HC season into prior experience
-                                    # (its unit performance + the HC-year count) and anchor the
-                                    # modeled hire to the season-opening year, with age and
-                                    # hiring-team context taken as-of that anchored year.
-                                    self._load_league_data(year, franchise_list, "HC", feature_dict)
+                                    # (the HC-year count; as an interim year its unit statistics
+                                    # are excluded) and anchor the modeled hire to the
+                                    # season-opening year, with age and hiring-team context
+                                    # taken as-of that anchored year.
+                                    if hc_unit_season:
+                                        self._load_league_data(year, franchise_list, "HC", feature_dict)
                                     feature_dict["num_yr_nfl_hc"] += 1
                                     folded_interim = True
                                     is_head_coach = True
@@ -578,7 +606,8 @@ class CoachingDataProcessor:
                             # unless it was already folded into a re-anchored hire above
                             # (avoid double-counting the interim audition season).
                             if not folded_interim:
-                                self._load_league_data(year, franchise_list, "HC", feature_dict)
+                                if hc_unit_season:
+                                    self._load_league_data(year, franchise_list, "HC", feature_dict)
                                 feature_dict["num_yr_nfl_hc"] += 1
 
                             # Update continuity trackers (all HC seasons, not just new hires).
