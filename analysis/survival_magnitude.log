@@ -1,0 +1,22 @@
+standardized firing-free survival S(t)=P(no firing by t) and firing CIF:
+  season:              1      2      3      4      5      6      7      8
+  S(t) ext:       0.903  0.749  0.587  0.429  0.332  0.266  0.219  0.189
+  per-season ext: 0.903  0.830  0.783  0.731  0.775  0.802  0.822  0.861
+  CIF_f(t) ext:   0.097  0.249  0.410  0.562  0.652  0.710  0.751  0.776
+  S(t) int:       0.815  0.550  0.321  0.156  0.089  0.055  0.036  0.027
+  per-season int: 0.815  0.675  0.584  0.485  0.569  0.622  0.659  0.735
+  CIF_f(t) int:   0.185  0.448  0.673  0.831  0.891  0.919  0.935  0.942
+
+internal-hire HR        : 1.912 [1.439, 2.541]  p=0.000
+internal-hire share     : 23.6% of stints
+
+marginal standardization over all 365 stints (each evaluated as an external and as an internal hire, other covariates as observed):
+  P(fired within 4 seasons), competing risks     external= 56.2%  internal= 83.1%
+  1 - S(4) (firing only, for reference)          external= 57.1%  internal= 84.4%
+  median firing-free tenure (seasons)            external=     4  internal=     3
+
+self-check at the observed covariates, season 4:
+  sample-mean S(4) product-limit 0.364 vs Kaplan-Meier 0.368   (exp(-H) form: 0.416)
+  sample-mean CIF_f(4) 0.626 vs Aalen-Johansen 0.623
+
+Saved C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\survival_magnitude.pkl

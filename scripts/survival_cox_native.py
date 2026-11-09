@@ -32,11 +32,11 @@ from model.pipeline import load_modeling_data
 from model.config import MODEL_CONFIG
 from scripts.survival_analysis import global_max_season, build_survival_targets, tci
 from scripts.survival_models import cox_builder, N_SEEDS
-from scripts.data.matrix_factorization_imputation import SVDImputer
+from model.pipeline import make_imputer
 from data_constants import get_all_feature_names, HIRING_TEAM_FEATURES
 from scripts.survival_methods import (
     build_competing_targets, firing_event, cox_hazard_ratios, ph_test,
-    survival_eval, stability_selection, cox_importance, FIRED, VOLUNTARY,
+    survival_eval, stability_selection, cox_importance, choose_stable, FIRED, VOLUNTARY,
 )
 
 warnings.filterwarnings("ignore")
@@ -60,7 +60,8 @@ def nm(c):
 
 
 def main():
-    df, X, y = load_modeling_data()
+    # every stint (active coaches right-censored), as in survival_definitive
+    df, X, y = load_modeling_data(known_only=False)
     boundary = global_max_season()
     dur, cause = build_competing_targets(df, boundary)
     keep = dur.index
@@ -83,7 +84,7 @@ def main():
     print(f"Cox-native stability selection: {STAB_BOOTS} subsamples, top-{STAB_K}...")
     freq = stability_selection(df, X, dur, evt, K=STAB_K, n_boot=STAB_BOOTS,
                                subsample=0.5, seed=0, importance_fn=cox_importance)
-    stable = list(freq[freq >= STAB_THR].index)
+    stable = choose_stable(freq, STAB_THR)   # the shared rule, at this variant's threshold
     stable_idx = [cols.index(c) for c in stable]
     print(f"stable set ({len(stable)} feats, freq>= {STAB_THR}):")
     for c in stable:
@@ -101,7 +102,7 @@ def main():
           f"  Uno C {u[0]:.3f} [{u[1]:.3f},{u[2]:.3f}]")
 
     # ---- named hazard ratios (cluster-robust) + PH test ----
-    Ximp_full = SVDImputer().fit(X.values).transform(X.values)
+    Ximp_full = make_imputer().fit(X.values).transform(X.values)
     Xsel = pd.DataFrame(Ximp_full[:, stable_idx], columns=stable, index=X.index)
     hr, _ = cox_hazard_ratios(Xsel, dur, cause, df["Coach Name"].values)
     pht = ph_test(Xsel, dur, cause)

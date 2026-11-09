@@ -3,7 +3,7 @@
 Selection probe for the internal-hire firing premium (JSE reframe).
 
 The headline cause-specific Cox model (survival_definitive.py) reports an
-internal-hire hazard ratio of 1.52. An economic reviewer will ask whether that
+internal-hire hazard ratio. An economic reviewer will ask whether that
 premium reflects the internal channel itself or the distressed franchises that
 tend to promote from within (selection on the hiring situation). This script
 gives the identification posture its observable-component test: refit the
@@ -16,14 +16,11 @@ it absorbs the OBSERVABLE part of the "which teams promote internally" story so
 the residual premium can be read as conditional on it, leaving only selection on
 unobservables to concede in prose.
 
-Everything reuses the frozen pipeline: same data prep, same SVD imputation, same
-cluster-robust `cox_hazard_ratios` as the headline. Model 1 reproduces the
-published table exactly; Model 2 is Model 1 + the five distress proxies. No
-re-selection, no new split/impute machinery.
-
-    Model 1 (frozen headline): cf_internal_hire, age, num_yr_nfl_pos, tq_dsrs, Y/P__unit
-    Model 2 (+ distress proxies): + org_unique_hc_10yr, org_prev_coach_tenure,
-                                    tq_osrs, hire_roster_av, tq_srs_traj
+Everything reuses the frozen pipeline: same data prep, same structural fill
+(make_imputer), same cluster-robust `cox_hazard_ratios` as the headline. Model 1
+reproduces the headline model (its features from survival_definitive.pkl, with their
+structural indicators); Model 2 is Model 1 + the six distress proxies in PROXIES and
+their indicators. No re-selection, no new split/impute machinery.
 
 Usage:
     python scripts/survival_selection_probe.py
@@ -46,21 +43,23 @@ from scripts.survival_methods import (
     build_competing_targets, drop_redundant_features, cox_hazard_ratios, ph_test,
     FIRED, VOLUNTARY,
 )
-from scripts.data.matrix_factorization_imputation import SVDImputer
+from model.pipeline import make_imputer
 from data_constants import get_all_feature_names, HIRING_TEAM_FEATURES
 
+from scripts.survival_methods import with_structural_indicators, structural_companions
 warnings.filterwarnings("ignore")
 
 _PLACEHOLDER_NAMES = get_all_feature_names() + HIRING_TEAM_FEATURES
 
 # Observable franchise-distress / inherited-quality proxies for the
 # "which teams promote internally" selection story. All measured strictly
-# pre-hire; all survive drop_redundant_features; tq_dsrs is already in the
-# headline model (defensive side), so we add the offensive side (tq_osrs) and
+# pre-hire; all survive drop_redundant_features. Inherited quality enters as its
+# offensive and defensive SRS (the non-redundant basis; tq_srs is their sum) plus
 # the fitted 3-season SRS slope (tq_srs_traj, least-squares annual rate).
 PROXIES = ["org_unique_hc_10yr",   # HC churn over the prior decade (instability)
-           "org_prev_coach_tenure",  # previous coach's tenure (near-orthogonal to internal: r=0.10)
-           "tq_osrs",               # inherited offensive quality (def already in model)
+           "org_prev_coach_tenure",  # previous coach's tenure
+           "tq_osrs",               # inherited offensive quality
+           "tq_dsrs",               # inherited defensive quality
            "hire_roster_av",        # inherited roster talent
            "tq_srs_traj"]           # fitted 3-season SRS slope (franchise trending down)
 
@@ -100,8 +99,8 @@ def main():
     X = drop_redundant_features(X)
     cols = list(X.columns)
 
-    # SVD imputation on the full sample, exactly as the headline HR path does.
-    Ximp = SVDImputer().fit(X.values).transform(X.values)
+    # Full-sample imputation (make_imputer), exactly as the headline HR path does.
+    Ximp = make_imputer().fit(X.values).transform(X.values)
     Xf = pd.DataFrame(Ximp, columns=cols, index=X.index)
     coach_ids = df["Coach Name"].values
 
@@ -113,14 +112,17 @@ def main():
     # frozen headline stable set (from the camera-ready definitive run)
     defn = pickle.load(open(os.path.join(project_root, "analysis",
                                           "survival_definitive.pkl"), "rb"))
-    stable = list(defn["stable"])
+    # the headline MODEL set: the stable features plus their structural indicators
+    stable = list(defn.get("model_features") or with_structural_indicators(defn["stable"], X))
     missing = [c for c in stable + PROXIES if c not in Xf.columns]
     if missing:
         raise SystemExit(f"columns absent after prune/impute: {missing}")
+    aug = with_structural_indicators(stable + PROXIES, X)   # proxies bring their flags too
     print("Model 1 (headline):", [nm(c) for c in stable])
-    print("Model 2 adds      :", [nm(c) for c in PROXIES])
-    print(f"Model 2: {len(stable) + len(PROXIES)} covariates, {n_fire} events "
-          f"(EPV ~ {n_fire / (len(stable) + len(PROXIES)):.0f})\n")
+    print("Model 2 adds      :", [nm(c) for c in PROXIES],
+          "+ indicators", [nm(c) for c in aug if c not in stable + PROXIES])
+    print(f"Model 2: {len(aug)} covariates, {n_fire} events "
+          f"(EPV ~ {n_fire / len(aug):.0f})\n")
 
     # ---- Model 1: reproduce the frozen headline ----
     hr1, _ = cox_hazard_ratios(Xf[stable], dur, cause, coach_ids, penalizer=0.0)
@@ -129,7 +131,6 @@ def main():
     print(hr1.round(3).to_string(), "\n")
 
     # ---- Model 2: headline + distress proxies ----
-    aug = stable + PROXIES
     hr2, _ = cox_hazard_ratios(Xf[aug], dur, cause, coach_ids, penalizer=0.0)
     pht2 = ph_test(Xf[aug], dur, cause, penalizer=0.0)
     hr2.index = [nm(c) for c in hr2.index]

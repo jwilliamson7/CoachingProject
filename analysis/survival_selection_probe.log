@@ -1,0 +1,40 @@
+365 stints | fired=314 voluntary=29 active-censored=22
+Model 1 (headline): ['cf_internal_hire']
+Model 2 adds      : ['org_unique_hc_10yr', 'org_prev_coach_tenure', 'tq_osrs', 'tq_dsrs', 'hire_roster_av', 'tq_srs_traj'] + indicators ['org_expansion', 'hire_no_roster_data']
+Model 2: 9 covariates, 314 events (EPV ~ 35)
+
+=== Model 1: frozen headline (reproduction check) ===
+                     HR  CI_low  CI_high    p
+cf_internal_hire  1.912   1.439    2.541  0.0 
+
+=== Model 2: + observable distress proxies (cluster-robust) ===
+                          HR  CI_low  CI_high      p
+cf_internal_hire       1.993   1.439    2.761  0.000
+hire_roster_av         0.713   0.547    0.930  0.012
+tq_dsrs                1.053   1.009    1.100  0.018
+org_prev_coach_tenure  0.982   0.942    1.025  0.406
+org_unique_hc_10yr     1.042   0.915    1.188  0.533
+tq_osrs                1.013   0.969    1.059  0.567
+hire_no_roster_data    0.587   0.091    3.768  0.574
+org_expansion          0.788   0.331    1.877  0.591
+tq_srs_traj            1.008   0.967    1.052  0.697
+
+PH test (Grambsch-Therneau) min p = 0.001 (all > 0.05? False)
+
+VIF (augmented design):
+cf_internal_hire         1.11
+org_unique_hc_10yr       1.67
+org_prev_coach_tenure    1.53
+tq_osrs                  2.05
+tq_dsrs                  1.68
+hire_roster_av           2.60
+tq_srs_traj              1.46
+org_expansion            1.18
+hire_no_roster_data      1.03
+
+=== internal-hire HR: headline vs selection-adjusted ===
+  Model 1 (headline)        : HR 1.912 [1.439, 2.541]  p=0.000
+  Model 2 (+distress proxies): HR 1.993 [1.439, 2.761]  p=0.000
+  change in HR: +4.2%   (persists)
+
+Saved C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\survival_selection_probe.pkl

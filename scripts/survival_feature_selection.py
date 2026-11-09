@@ -74,17 +74,28 @@ def survival_importance(Ximp, T, E, params):
 
 def full_cv_folds(df, X, y, dur, evt, n_splits=5, seed=42):
     """Leakage-free CV folds with FULL imputed feature matrices (no selection)."""
-    from scripts.data.matrix_factorization_imputation import SVDImputer
+    from model.pipeline import make_imputer
     cv = CoachLevelStratifiedKFold(n_splits=n_splits, random_state=seed)
     groups = df["Coach Name"].values
     Xv, yv = X.values, y.values
     Tv, Ev = dur.values.astype(float), evt.values.astype(int)
     folds = []
     for tr, va in cv.split(Xv, yv, groups):
-        imp = SVDImputer().fit(Xv[tr])
+        imp = make_imputer().fit(Xv[tr])
         folds.append((imp.transform(Xv[tr]), Tv[tr], Ev[tr],
                       imp.transform(Xv[va]), Tv[va], Ev[va]))
     return folds
+
+
+def tune_cox_penalty(folds, idx, grid):
+    """Elastic-net penalty for a Cox model on columns `idx`: the grid point with the
+    highest coach-level CV concordance over `folds`. Ties (to six decimals) go to the
+    lightest penalty, smallest penalizer then smallest l1_ratio. A single binary
+    covariate ranks the stints identically at every penalty, and taking the last tied
+    point would shrink its coefficient to zero."""
+    scored = [(round(cv_cindex_at_k(cox_builder, p, folds, idx), 6),
+               -p["penalizer"], -p["l1_ratio"], i) for i, p in enumerate(grid)]
+    return grid[max(scored)[3]]
 
 
 def cv_cindex_at_k(builder, params, folds, idx):
@@ -99,7 +110,8 @@ def cv_cindex_at_k(builder, params, folds, idx):
 
 
 def main():
-    df, X, y = load_modeling_data()
+    # every stint (active coaches right-censored), as in survival_definitive
+    df, X, y = load_modeling_data(known_only=False)
     boundary = global_max_season()
     dur, evt = build_survival_targets(df, boundary)
     keep = dur.index
@@ -114,8 +126,8 @@ def main():
     wb_params = bake["tuned"]["Weibull AFT"]["params"]
 
     # ---- rank features for survival, on full imputed known population ----
-    from scripts.data.matrix_factorization_imputation import SVDImputer
-    Ximp = SVDImputer().fit(X.values).transform(X.values)
+    from model.pipeline import make_imputer
+    Ximp = make_imputer().fit(X.values).transform(X.values)
     rank, src = survival_importance(Ximp, dur.values.astype(float),
                                     evt.values.astype(int), xgb_params)
     print(f"Survival feature ranking via XGB-AFT {src}: top-10 indices = "

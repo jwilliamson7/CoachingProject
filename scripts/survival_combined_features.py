@@ -39,7 +39,7 @@ import pandas as pd
 import data_constants as dc
 from model.pipeline import load_modeling_data
 from scripts.data.engineer_career_features import load_history, classify_role, is_nfl
-from scripts.data.matrix_factorization_imputation import SVDImputer
+from model.pipeline import make_imputer
 from scripts.survival_analysis import global_max_season, build_survival_targets, tci
 from scripts.survival_models import (
     cox_builder, xgbaft_builder, random_search, precompute_cv_folds, eval_model,
@@ -137,7 +137,7 @@ def best_cindex(df, Xmat, y, dur, evt):
     rng = np.random.default_rng(0)
     xgb_p, _ = random_search(xgbaft_builder, XGBAFT_SPACE_WIDE, folds_sel, N_XGB_DRAWS, rng)
     cox_p, _ = random_search(cox_builder, COX_SPACE_WIDE, folds_sel, N_COX_DRAWS, rng)
-    Ximp = SVDImputer().fit(Xmat.values).transform(Xmat.values)
+    Ximp = make_imputer().fit(Xmat.values).transform(Xmat.values)
     rank, _ = survival_importance(Ximp, dur.values.astype(float),
                                   evt.values.astype(int), xgb_p)
     folds_full = full_cv_folds(df, Xmat, y, dur, evt)
@@ -159,7 +159,8 @@ def best_cindex(df, Xmat, y, dur, evt):
 
 
 def main():
-    df, X, y = load_modeling_data()
+    # every stint (active coaches right-censored), as in survival_definitive
+    df, X, y = load_modeling_data(known_only=False)
     boundary = global_max_season()
     dur, evt = build_survival_targets(df, boundary)
     keep = dur.index

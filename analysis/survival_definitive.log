@@ -1,77 +1,155 @@
-redundancy prune: 94 -> 74 feats (20 dropped)
+redundancy prune: 102 -> 81 feats (21 dropped)
 
-371 stints | 74 feats | fired=312 voluntary=27 active-censored=32 | seeds=50
+365 stints | 81 feats | fired=314 voluntary=29 active-censored=22 | seeds=50
 
-Cox params {'penalizer': 0.5, 'l1_ratio': 0.25}
-XGB params {'num_boost_round': 50, 'eta': 0.03, 'max_depth': 4, 'subsample': 0.6, 'colsample_bytree': 0.6, 'min_child_weight': 5, 'reg_lambda': 1.0, 'scale': 0.8}
+Cox params {'penalizer': 0.1, 'l1_ratio': 1.0}
+XGB params {'num_boost_round': 30, 'eta': 0.03, 'max_depth': 4, 'subsample': 0.6, 'colsample_bytree': 0.85, 'min_child_weight': 5, 'reg_lambda': 2.0, 'scale': 1.5}
 
-CV-argmax K=10 (CV C-index 0.611); K-curve {5:0.610, 8:0.610, 10:0.611, 11:0.611, 12:0.611, 13:0.611, 14:0.611, 15:0.611, 16:0.611, 17:0.611, 18:0.611, 19:0.611, 20:0.611, 25:0.611, 30:0.604, 40:0.597}
+CV-argmax K=12 (CV C-index 0.616); K-curve {5:0.613, 8:0.613, 10:0.613, 11:0.613, 12:0.616, 13:0.616, 14:0.616, 15:0.616, 16:0.613, 17:0.613, 18:0.613, 19:0.613, 20:0.613, 25:0.613, 30:0.614, 40:0.613}
 
 Stability selection: 2000 coach-level subsamples, top-K K in (10, 15, 20) (primary K=10, threshold 0.6)...
-stable set (5 feats, freq>= 0.6, K=10, FLOORED to top-5):
-  cf_internal_hire             cf_internal_hire 0.82
-  age                          Feature 1      0.53
-  num_yr_nfl_pos               Feature 6      0.48
-  tq_dsrs                      tq_dsrs        0.44
-  Y/P__unit                    Feature 11     0.44
+
+Selection-frequency distribution: 75 candidates (structural indicators excluded), B=2000; Monte-Carlo SE = sqrt(p(1-p)/B)
+    #  feature                               variable                          q=10  (SE)      q=15  (SE)      q=20  (SE)  companions
+    1  Internal hire                         cf_internal_hire                0.987 (0.003)    0.997 (0.001)    0.999 (0.001)  -
+    2  Unit trajectory                       rf_unit_traj                    0.493 (0.011)    0.614 (0.011)    0.705 (0.010)  rf_no_trend, cf_no_unit_record
+    3  Age at hire                           age                             0.450 (0.011)    0.591 (0.011)    0.680 (0.010)  -
+    4  Final unit percentile                 rf_final_unit_pctl              0.421 (0.011)    0.546 (0.011)    0.641 (0.011)  cf_no_unit_record
+    5  NFL career share                      cf_nfl_share                    0.392 (0.011)    0.508 (0.011)    0.602 (0.011)  -
+    6  Inherited defensive SRS               tq_dsrs                         0.384 (0.011)    0.505 (0.011)    0.597 (0.011)  org_expansion
+    7  Prior-unit fourth-down attempts       4DAtt__unit                     0.377 (0.011)    0.497 (0.011)    0.600 (0.011)  cf_no_unit_record, cf_no_drive_record
+    8  Prior-unit time per drive             Time Average Drive__unit        0.341 (0.011)    0.443 (0.011)    0.525 (0.011)  cf_no_unit_record, cf_no_drive_record
+    9  Inherited starter value               hire_starter_av                 0.338 (0.011)    0.469 (0.011)    0.586 (0.011)  org_expansion, hire_no_roster_data
+   10  Prior-unit penalties                  Pen__unit                       0.336 (0.011)    0.450 (0.011)    0.551 (0.011)  cf_no_unit_record
+   11  Prior-unit completions                Cmp Passing__unit               0.308 (0.010)    0.407 (0.011)    0.491 (0.011)  cf_no_unit_record
+   12  Playoff appearances (prior 2 seasons) hiring_team_num_playoff_app     0.233 (0.009)    0.340 (0.011)    0.419 (0.011)  -
+   13  Prior-unit yards-per-play efficiency  Y/P__unit                       0.225 (0.009)    0.348 (0.011)    0.446 (0.011)  cf_no_unit_record
+   14  Prior-unit first downs by penalty     1stPy__unit                     0.186 (0.009)    0.270 (0.010)    0.364 (0.011)  cf_no_unit_record
+   15  Inherited roster value                hire_roster_av                  0.180 (0.009)    0.270 (0.010)    0.342 (0.011)  org_expansion, hire_no_roster_data
+   16  Average team-success percentile       rf_avg_winpct_pctl              0.174 (0.008)    0.278 (0.010)    0.355 (0.011)  cf_no_unit_record
+   17  Defensive retention                   hire_def_retention              0.166 (0.008)    0.253 (0.010)    0.351 (0.011)  org_expansion, hire_no_retention_data
+   18  Premium draft capital                 hire_premium_draft              0.158 (0.008)    0.252 (0.010)    0.332 (0.011)  org_expansion, hire_no_roster_data
+   19  Years as NFL position coach           num_yr_nfl_pos                  0.152 (0.008)    0.244 (0.010)    0.312 (0.010)  -
+   20  Age at first NFL job                  cf_age_first_nfl                0.132 (0.008)    0.210 (0.009)    0.276 (0.010)  -
+   21  Years at hiring org                   cf_years_at_hiring_org          0.130 (0.008)    0.221 (0.009)    0.291 (0.010)  -
+   22  Prior-unit rushing touchdowns         TD Rushing__unit                0.122 (0.007)    0.191 (0.009)    0.271 (0.010)  cf_no_unit_record
+   23  Prior-unit passing first downs        1stD Passing__unit              0.121 (0.007)    0.195 (0.009)    0.267 (0.010)  cf_no_unit_record
+   24  Hired from offensive role             cf_pre_side_off                 0.112 (0.007)    0.181 (0.009)    0.252 (0.010)  -
+   25  Inherited starting-QB value           hire_qb_av                      0.112 (0.007)    0.178 (0.009)    0.251 (0.010)  org_expansion, hire_no_roster_data
+   26  Inherited roster experience           hire_roster_exp                 0.111 (0.007)    0.182 (0.009)    0.256 (0.010)  org_expansion, hire_no_roster_data
+   27  NFL employers                         cf_num_nfl_employers            0.108 (0.007)    0.175 (0.008)    0.248 (0.010)  -
+   28  Inherited starter experience          hire_starter_exp                0.095 (0.007)    0.160 (0.008)    0.240 (0.010)  org_expansion, hire_no_roster_data
+   29  Hiring-team turnovers committed       hiring_team_turnovers_commi     0.095 (0.007)    0.162 (0.008)    0.236 (0.010)  org_expansion
+   30  College head-coach years              num_yr_col_hc                   0.093 (0.007)    0.159 (0.008)    0.229 (0.009)  -
+   31  Hired from OC role                    cf_pre_OC                       0.092 (0.006)    0.169 (0.008)    0.245 (0.010)  -
+   32  Ever NFL DC                           cf_ever_nfl_dc                  0.092 (0.006)    0.161 (0.008)    0.235 (0.009)  -
+   33  Predecessor fired                     org_prev_fired                  0.091 (0.006)    0.150 (0.008)    0.217 (0.009)  org_expansion
+   34  Ever NFL OC                           cf_ever_nfl_oc                  0.089 (0.006)    0.149 (0.008)    0.210 (0.009)  -
+   35  Prior-unit passing touchdowns         TD Passing__unit                0.086 (0.006)    0.135 (0.008)    0.191 (0.009)  cf_no_unit_record
+   36  College employers                     cf_num_college_employers        0.084 (0.006)    0.147 (0.008)    0.208 (0.009)  -
+   37  Ever interim HC                       cf_ever_interim_hc              0.081 (0.006)    0.140 (0.008)    0.199 (0.009)  -
+   38  Inherited SRS trajectory              tq_srs_traj                     0.081 (0.006)    0.143 (0.008)    0.211 (0.009)  org_expansion
+   39  Prior HC stints                       num_times_hc                    0.080 (0.006)    0.137 (0.008)    0.194 (0.009)  -
+   40  Prior-unit red-zone rate              RZPct__unit                     0.079 (0.006)    0.142 (0.008)    0.198 (0.009)  cf_no_unit_record, cf_no_drive_record
+   41  NFL coordinator years                 num_yr_nfl_coor                 0.077 (0.006)    0.142 (0.008)    0.218 (0.009)  -
+   42  Prior-unit turnovers                  TO__unit                        0.074 (0.006)    0.129 (0.007)    0.190 (0.009)  cf_no_unit_record
+   43  Prior-unit yards per drive            Yds Average Drive__unit         0.073 (0.006)    0.135 (0.008)    0.198 (0.009)  cf_no_unit_record, cf_no_drive_record
+   44  Prior-unit first downs                1stD__unit                      0.072 (0.006)    0.129 (0.007)    0.203 (0.009)  cf_no_unit_record
+   45  Prior-unit red-zone attempts          RZAtt__unit                     0.071 (0.006)    0.126 (0.007)    0.192 (0.009)  cf_no_unit_record, cf_no_drive_record
+   46  Predecessor tenure                    org_prev_coach_tenure           0.067 (0.006)    0.105 (0.007)    0.156 (0.008)  org_expansion
+   47  Average unit percentile               rf_avg_unit_pctl                0.067 (0.006)    0.118 (0.007)    0.174 (0.008)  cf_no_unit_record
+   48  Inherited offensive SRS               tq_osrs                         0.066 (0.006)    0.113 (0.007)    0.164 (0.008)  org_expansion
+   49  Prior-unit turnover percentage        TO%__unit                       0.063 (0.005)    0.127 (0.007)    0.196 (0.009)  cf_no_unit_record, cf_no_drive_record
+   50  Hired from position-coach role        cf_pre_POS                      0.061 (0.005)    0.117 (0.007)    0.172 (0.008)  -
+   51  Head coaches in prior decade          org_unique_hc_10yr              0.061 (0.005)    0.113 (0.007)    0.169 (0.008)  -
+   52  Prior-unit third-down rate            3D%__unit                       0.058 (0.005)    0.115 (0.007)    0.174 (0.008)  cf_no_unit_record, cf_no_drive_record
+   53  Hired from NFL-level role             cf_pre_level_nfl                0.051 (0.005)    0.112 (0.007)    0.168 (0.008)  -
+   54  Prior-unit pass attempts              Att Passing__unit               0.051 (0.005)    0.102 (0.007)    0.159 (0.008)  cf_no_unit_record
+   55  College position-coach years          num_yr_col_pos                  0.050 (0.005)    0.102 (0.007)    0.163 (0.008)  -
+   56  Recent first-round picks              hire_recent_r1_picks            0.050 (0.005)    0.092 (0.006)    0.154 (0.008)  org_expansion, hire_no_roster_data
+   57  Prior-unit rush attempts              Att Rushing__unit               0.049 (0.005)    0.105 (0.007)    0.167 (0.008)  cf_no_unit_record
+   58  College coordinator years             num_yr_col_coor                 0.049 (0.005)    0.103 (0.007)    0.163 (0.008)  -
+   59  Prior-unit scoring percentage         Sc%__unit                       0.046 (0.005)    0.095 (0.007)    0.151 (0.008)  cf_no_unit_record, cf_no_drive_record
+   60  NFL head-coach years                  num_yr_nfl_hc                   0.045 (0.005)    0.099 (0.007)    0.160 (0.008)  -
+   61  Prior-unit third-down attempts        3DAtt__unit                     0.038 (0.004)    0.097 (0.007)    0.158 (0.008)  cf_no_unit_record, cf_no_drive_record
+   62  Prior-unit yards per carry            Y/A Rushing__unit               0.037 (0.004)    0.075 (0.006)    0.122 (0.007)  cf_no_unit_record
+   63  Age at first job                      cf_age_first_job                0.037 (0.004)    0.082 (0.006)    0.141 (0.008)  -
+   64  Offensive retention                   hire_off_retention              0.035 (0.004)    0.077 (0.006)    0.130 (0.008)  org_expansion, hire_no_retention_data
+   65  Inherited strength of schedule        tq_sos                          0.034 (0.004)    0.067 (0.006)    0.113 (0.007)  org_expansion
+   66  Hired from head-coach role            cf_pre_HC                       0.032 (0.004)    0.073 (0.006)    0.127 (0.007)  -
+   67  Prior-unit rushing yards              Yds Rushing__unit               0.031 (0.004)    0.074 (0.006)    0.141 (0.008)  cf_no_unit_record
+   68  Gap before hire                       cf_gap_before_hire              0.029 (0.004)    0.052 (0.005)    0.101 (0.007)  -
+   69  Ranked seasons                        rf_n_seasons_rank               0.025 (0.004)    0.059 (0.005)    0.104 (0.007)  -
+   70  Hiring-team turnovers forced          hiring_team_turnovers_force     0.024 (0.003)    0.061 (0.005)    0.103 (0.007)  org_expansion
+   71  Prior-unit fourth-down rate           4D%__unit                       0.022 (0.003)    0.056 (0.005)    0.096 (0.007)  cf_no_unit_record, cf_no_drive_record
+   72  Hired from DC role                    cf_pre_DC                       0.022 (0.003)    0.052 (0.005)    0.102 (0.007)  -
+   73  Prior-unit drives                     #Dr__unit                       0.021 (0.003)    0.045 (0.005)    0.091 (0.006)  cf_no_unit_record, cf_no_drive_record
+   74  Prior-unit passing yards              Yds Passing__unit               0.014 (0.003)    0.042 (0.004)    0.076 (0.006)  cf_no_unit_record
+   75  Prior-unit plays per drive            Plays Average Drive__unit       0.014 (0.003)    0.044 (0.005)    0.082 (0.006)  cf_no_unit_record, cf_no_drive_record
+
+  candidates at or above each frequency, by q:
+    freq >= 0.5: q=10:  1  q=15:  6  q=20: 10
+    freq >= 0.6: q=10:  1  q=15:  2  q=20:  6
+    freq >= 0.7: q=10:  1  q=15:  1  q=20:  2
+    freq >= 0.8: q=10:  1  q=15:  1  q=20:  1
+    freq >= 0.9: q=10:  1  q=15:  1  q=20:  1
+
+Saved C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\survival_selection_distribution.pkl
+stable set (1 feats, freq>= 0.6, K=10):
+  cf_internal_hire             cf_internal_hire 0.99
   freq>=0.6: 1 | >=0.7: 1
-  collinearity guard: no stable-set pair |r|>0.7 (clean)
+  structural indicators added to the model: none
   K-sensitivity (freq at K in (10, 15, 20), threshold 0.6):
-    * cf_internal_hire           K10=0.82  K15=0.89  K20=0.92
-      age                        K10=0.53  K15=0.64  K20=0.74
-      num_yr_nfl_pos             K10=0.48  K15=0.60  K20=0.68
-      tq_dsrs                    K10=0.44  K15=0.57  K20=0.67
-      Y/P__unit                  K10=0.44  K15=0.59  K20=0.71
+    * cf_internal_hire           K10=0.99  K15=1.00  K20=1.00
+      rf_unit_traj               K10=0.49  K15=0.61  K20=0.70
+      age                        K10=0.45  K15=0.59  K20=0.68
+      rf_final_unit_pctl         K10=0.42  K15=0.55  K20=0.64
+      cf_nfl_share               K10=0.39  K15=0.51  K20=0.60
+      4DAtt__unit                K10=0.38  K15=0.50  K20=0.60
   selection frequencies (top 20, primary K):
-    cf_internal_hire             0.82
-    age                          0.53
-    num_yr_nfl_pos               0.48
-    tq_dsrs                      0.44
-    Y/P__unit                    0.44
-    cf_nfl_share                 0.33
-    cf_age_first_job             0.29
-    Pen__unit                    0.26
-    hire_starter_av              0.25
-    rf_unit_traj                 0.24
-    num_yr_nfl_hc                0.23
-    rf_final_unit_pctl           0.22
-    Time Average Drive__unit     0.22
-    hiring_team_num_playoff_appearances 0.22
-    cf_pre_level_nfl             0.22
-    hire_starter_exp             0.20
-    cf_num_nfl_employers         0.19
-    Att Passing__unit            0.19
+    cf_internal_hire             0.99
+    rf_unit_traj                 0.49
+    age                          0.45
+    rf_final_unit_pctl           0.42
+    cf_nfl_share                 0.39
+    tq_dsrs                      0.38
+    4DAtt__unit                  0.38
+    Time Average Drive__unit     0.34
+    hire_starter_av              0.34
+    Pen__unit                    0.34
+    Cmp Passing__unit            0.31
+    hiring_team_num_playoff_appearances 0.23
+    Y/P__unit                    0.23
+    1stPy__unit                  0.19
+    hire_roster_av               0.18
     rf_avg_winpct_pctl           0.17
-    1stPy__unit                  0.17
+    hire_def_retention           0.17
+    hire_premium_draft           0.16
+    num_yr_nfl_pos               0.15
+    cf_age_first_nfl             0.13
 
-NB stable(K=5) - CV-argmax(K=10) Cox Harrell: delta=+0.0021 t=+0.634 p=0.529  (stable 0.602 vs topk 0.600)
+stable-set Cox penalty (coach-level CV, ties to the lightest): {'penalizer': 0.01, 'l1_ratio': 0.0}
 
-Model bake-off on the stable set (Nadeau-Bengio 95% CI):
-  model                        Harrell C               Uno C
-  Cox                   0.602 [0.560,0.645]    0.631 [0.511,0.751]
-  Weibull AFT           0.615 [0.573,0.657]    0.643 [0.526,0.760]
-  LogNormal AFT         0.615 [0.576,0.654]    0.641 [0.525,0.758]
-  LogLogistic AFT       0.615 [0.575,0.654]    0.640 [0.524,0.757]
-  XGB-AFT               0.621 [0.585,0.657]    0.649 [0.535,0.764]
+NB stable(K=1) - CV-argmax(K=12) Cox Harrell: delta=-0.0284 t=-2.220 p=0.0311  (stable 0.574 vs topk 0.602)
 
-Calibration (Cox, Nadeau-Bengio 95% CI): integrated Brier 0.1758 [0.1602,0.1914]  (0.25 = uninformative)
-  Brier by horizon: {np.int64(1): np.float64(0.092), np.int64(2): np.float64(0.189), np.int64(3): np.float64(0.247), np.int64(4): np.float64(0.252), np.int64(5): np.float64(0.219), np.int64(6): np.float64(0.188), np.int64(7): np.float64(0.157), np.int64(8): np.float64(0.134), np.int64(10): np.float64(0.083)}
+Stable-set Cox (Nadeau-Bengio 95% CI): Harrell 0.574 [0.540,0.607]  Uno 0.571 [0.539,0.603]
+
+Calibration (Nadeau-Bengio 95% CI): integrated Brier Cox 0.1726 [0.1580,0.1872]   KM null 0.1785 [0.1635,0.1934]
+  paired skill KM - Cox = +0.0059 [+0.0005,+0.0113]  t=2.19 p=0.0337; relative skill vs KM 0.033
+  Cox Brier by horizon: {1: 0.083, 2: 0.181, 3: 0.235, 4: 0.249, 5: 0.22, 6: 0.182, 7: 0.154, 8: 0.134, 10: 0.089}
+  KM  Brier by horizon: {1: 0.085, 2: 0.189, 3: 0.251, 4: 0.257, 5: 0.224, 6: 0.188, 7: 0.157, 8: 0.138, 10: 0.091}
 
 Hazard ratios (cause-specific firing, cluster-robust SE on coach):
-                     HR  CI_low  CI_high      p
-Y/P__unit         0.739   0.614    0.891  0.001
-cf_internal_hire  1.524   1.150    2.021  0.003
-age               1.021   1.003    1.039  0.021
-tq_dsrs           1.024   0.992    1.057  0.147
-num_yr_nfl_pos    1.021   0.989    1.054  0.198
-PH test: all p>0.05? True (min p=0.201)
+                     HR  CI_low  CI_high    p
+cf_internal_hire  1.912   1.439    2.541  0.0
+PH test: all p>0.05? False (min p=0.043)
 
 Cumulative incidence (competing risks):
-  by season 2: fired=0.295  voluntary=0.008
-  by season 4: fired=0.619  voluntary=0.037
-  by season 6: fired=0.759  voluntary=0.055
-  by season 8: fired=0.819  voluntary=0.064
+  by season 2: fired=0.294  voluntary=0.011
+  by season 4: fired=0.623  voluntary=0.040
+  by season 6: fired=0.762  voluntary=0.055
+  by season 8: fired=0.820  voluntary=0.064
 
-KM median firing-free tenure = 4 seasons; era log-rank p = 0.564
+KM median firing-free tenure = 4 seasons; era log-rank p: salary_cap 0.874, rooney_rule 0.508, three_era 0.585
 
 Saved C:\Users\jonwi\Documents\Projects\CoachingProject\analysis\survival_definitive.pkl
