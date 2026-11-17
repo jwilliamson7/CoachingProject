@@ -103,7 +103,7 @@ def classify_coach_background(coach_histories):
         # Coach", "Defensive Tackles"). Matching offense independently double
         # counted those defensive roles on both sides; excluding defensive
         # matches from the offensive set keeps every role on one side of the ball
-        # (same fix as Coach_WAR commit 1433770).
+        # (same fix as Coach_WAR commit 3beb19e).
         is_defensive = non_hc_roles['Role'].str.contains(
             defensive_pattern, case=False, na=False)
         is_offensive = non_hc_roles['Role'].str.contains(
