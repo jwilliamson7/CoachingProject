@@ -172,7 +172,7 @@ def compute_coach_backgrounds_from_history() -> pd.DataFrame:
             # Count offensive and defensive experience
             # Defensive first: bare offensive tokens ('Line Coach', 'Backs Coach',
             # 'Ends Coach', 'Tackles') also match defensive role names, which were
-            # double counted on both sides (Coach_WAR commit 1433770).
+            # double counted on both sides (Coach_WAR commit 3beb19e).
             is_def = non_hc_roles['Role'].str.contains(defensive_pattern, case=False, na=False)
             is_off = non_hc_roles['Role'].str.contains(offensive_pattern, case=False, na=False) & ~is_def
             offensive_exp = non_hc_roles[is_off]
