@@ -35,5 +35,17 @@ analysis/survival_magnitude.pkl
 analysis/internal_hire_audit_summary.csv
 analysis/internal_hire_history_detail.csv
 
-# Downloaded third-party papers for the JSE revision (copyrighted; keep local)
-literature/jse_round1/*.pdf
+# Literature library: publisher, working-paper and web copies are copyrighted and this repo is
+# public, so only the index and our own reading notes are tracked. The files themselves are
+# backed up privately (Egnyte: Private/jonwilliamson/Personal/Research/CoachingProject).
+literature/**
+!literature/
+!literature/INDEX.md
+!literature/notes/
+!literature/notes/*.md
+
+# Personal Claude Code settings (machine-local permissions)
+.claude/settings.local.json
+
+# Responses to reviewers quote the confidential reports (see papers/*/feedback/ above)
+papers/**/*[Rr]esponse*.docx

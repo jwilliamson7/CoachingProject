@@ -33,6 +33,10 @@ CoachingProject/
 │   ├── jse/                 # Journal of Sports Economics (CURRENT: R&R on JSE-26-0210)
 │   │   └── figures/         # Survival figures written by generate_survival_figures.py
 │   └── */feedback/          # Decision letters + reviewer reports (gitignored)
+├── literature/              # Reference library: <bibkey>.pdf = version cited, <bibkey>_OLD_* = other
+│                            #   versions; INDEX.md lists every file. Only INDEX.md + notes/ (reading
+│                            #   notes) are tracked; the PDFs/HTML are copyrighted (public repo) and
+│                            #   backed up on Egnyte. Check here before asking for a paper.
 ├── figures/                 # All exploratory/supplementary figures
 │   ├── tenure/              # Tenure model figures (SHAP, feature importance)
 │   ├── war/                 # WAR model figures
